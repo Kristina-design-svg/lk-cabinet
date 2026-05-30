@@ -362,4 +362,29 @@
     document.querySelectorAll(".requestBtn").forEach(b=>b.onclick=()=>{state.requests.push({name:"Вы",service:"Новая заявка",date:new Date().toLocaleDateString("ru-RU"),status:"active"});alert("Заявка отправлена");render()});
     if($("publishReview"))$("publishReview").onclick=()=>{state.clientReviews.push({stars:+$("reviewStars").value,text:$("reviewText").value});render()};
     document.querySelectorAll(".faq-q").forEach(b=>b.onclick=()=>document.getElementById("faq"+b.dataset.i).classList.toggle("show"));
-    if($("sendSupport"))$("sendSupport
+    if($("sendSupport"))$("sendSupport").onclick=()=>{state.supportMessages.push($("supportText").value);alert("Сообщение отправлено");render()};
+    if($("twoFA"))$("twoFA").onchange=e=>{state.twoFA=e.target.checked;alert("Код отправлен");render()};
+    if($("privacy"))$("privacy").onclick=()=>openModal("<h2>Политика конфиденциальности</h2><p>Мы храним данные локально в браузере в демонстрационных целях. В реальном сервисе данные защищаются и обрабатываются по закону.</p><br><button onclick='closeModal()'>Закрыть</button>");
+    if($("downloadData"))$("downloadData").onclick=()=>alert(JSON.stringify(state,null,2));
+    sendHeight();
+  }
+
+  function sendMessage(){const input=document.getElementById("msgInput");if(!input.value.trim())return;const d=state.dialogs[state.activeDialog];d.messages.push({from:"out",text:input.value.trim()});d.last=input.value.trim();d.time="сейчас";render()}
+  function openTariffs(){openModal(`<h2>Тарифы</h2><div class="grid">${[["Базовый","500₽/мес"],["Продвинутый","1000₽/мес"],["Премиум","2000₽/мес"]].map(t=>`<div class="card"><h3>${t[0]}</h3><p>${t[1]}</p><button onclick="payStub()">Перейти к оплате</button></div>`).join("")}<button class="secondary" onclick="closeModal()">Закрыть</button></div>`)}
+  window.payStub=function(){state.paid=true;save();alert("Оплата: заглушка");closeModal();render()};
+  function openLogout(){openModal(`<h2>Выйти из аккаунта?</h2><p class="muted">Сессия будет завершена. Данные пользователя сохранятся.</p><br><div class="row"><button class="danger" onclick="confirmLogout()">Выйти</button><button class="secondary" onclick="closeModal()">Отмена</button></div>`)}
+  window.confirmLogout=function(){localStorage.setItem(LOGIN_KEY,"false");closeModal();render()};
+  window.closeModal=closeModal;
+  function openModal(html){document.getElementById("modal").innerHTML=html;document.getElementById("modalBackdrop").classList.add("show");document.getElementById("modal").classList.add("show");sendHeight()}
+  function closeModal(){document.getElementById("modalBackdrop").classList.remove("show");document.getElementById("modal").classList.remove("show");sendHeight()}
+  function openDrawer(){document.getElementById("sidebar").classList.add("open");document.getElementById("drawerOverlay").classList.add("show")}
+  function closeDrawer(){const s=document.getElementById("sidebar"),o=document.getElementById("drawerOverlay");if(s)s.classList.remove("open");if(o)o.classList.remove("show")}
+  document.getElementById("modalBackdrop").onclick=closeModal;
+
+  function sendHeight(){setTimeout(()=>parent.postMessage({type:"resize",height:document.documentElement.scrollHeight},"*"),50)}
+  window.addEventListener("resize",sendHeight);
+  render();
+})();
+</script>
+</body>
+</html>
