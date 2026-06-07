@@ -1,0 +1,1217 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Каталог специалистов</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #F5F5F5;
+      --card: #FFFFFF;
+      --accent: #4A76A8;
+      --accent-dark: #3F6795;
+      --accent-soft: #E8F0FA;
+      --text: #000000;
+      --muted: #818C99;
+      --line: #DCE1E6;
+      --danger: #E64646;
+      --success: #2EA44F;
+      --warning: #F5A623;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 12px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      background: #EEF2F6;
+      color: #2C4058;
+    }
+
+    button.secondary:hover {
+      background: #E3EAF2;
+    }
+
+    button.icon {
+      min-width: 44px;
+      padding: 0 12px;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: clamp(24px, 3vw, 34px);
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin-bottom: 14px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 18px;
+      line-height: 1.25;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    input,
+    select {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #FFFFFF;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(74,118,168,0.12);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #2C4058;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      margin-right: auto;
+      color: #2C4058;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .container {
+      width: min(100%, 1480px);
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .search-card,
+    .filters-card,
+    .card {
+      border-radius: var(--radius);
+      background: var(--card);
+      box-shadow: var(--shadow);
+    }
+
+    .search-card {
+      padding: 18px;
+    }
+
+    .search-input {
+      height: 52px;
+      padding: 0 16px;
+      font-size: 16px;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 240px;
+      gap: 14px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .filters-card {
+      padding: 16px;
+    }
+
+    .filters-head {
+      display: none;
+      margin-bottom: 12px;
+    }
+
+    .filters-grid {
+      display: grid;
+      grid-template-columns: minmax(170px, 1fr) minmax(150px, 1fr) 120px 120px minmax(250px, 1.2fr) minmax(250px, 1.2fr) auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .filter-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .segmented {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .segmented button {
+      min-height: 38px;
+      padding: 0 10px;
+      background: #EEF2F6;
+      color: #2C4058;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    .segmented button.active {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .sort-card {
+      padding: 16px;
+    }
+
+    .mobile-filter-btn {
+      display: none;
+    }
+
+    .results-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 18px 0 14px;
+    }
+
+    .results-count {
+      color: #2C4058;
+      font-weight: 800;
+      font-size: 18px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .specialist-card {
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+    }
+
+    .photo {
+      width: 160px;
+      height: 160px;
+      display: grid;
+      place-items: center;
+      justify-self: center;
+      overflow: hidden;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 42px;
+      font-weight: 800;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card-main {
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 14px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+
+    .rating {
+      color: var(--warning);
+      font-weight: 800;
+    }
+
+    .price {
+      color: #2C4058;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .description {
+      color: #2C4058;
+    }
+
+    .card-actions {
+      display: grid;
+      grid-template-columns: 1fr 52px;
+      gap: 8px;
+    }
+
+    .write-btn {
+      grid-column: span 2;
+    }
+
+    .empty-state {
+      display: grid;
+      justify-items: center;
+      gap: 10px;
+      padding: 54px 20px;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .empty-icon {
+      font-size: 46px;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      min-width: 44px;
+      background: #EEF2F6;
+      color: #2C4058;
+    }
+
+    .page-btn.active {
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 100;
+      display: none;
+      transform: translateX(-50%);
+      max-width: calc(100vw - 32px);
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #2C4058;
+      color: #FFFFFF;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+      font-weight: 700;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .filters-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      background: rgba(0,0,0,0.38);
+    }
+
+    .filters-overlay.show {
+      display: block;
+    }
+
+    @media (max-width: 1199px) {
+      .container {
+        padding: 18px;
+      }
+
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        font-size: 16px;
+      }
+
+      .topbar {
+        height: auto;
+        min-height: 64px;
+        align-items: stretch;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+      }
+
+      .logo {
+        width: 100%;
+        margin: 0;
+        font-size: 18px;
+      }
+
+      .top-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .top-actions button {
+        width: 100%;
+      }
+
+      .container {
+        padding: 16px;
+      }
+
+      .search-card {
+        padding: 14px;
+      }
+
+      .search-input {
+        height: 48px;
+        font-size: 16px;
+      }
+
+      .toolbar {
+        display: block;
+      }
+
+      .mobile-filter-btn {
+        display: block;
+        width: 100%;
+        margin: 12px 0;
+      }
+
+      .filters-card {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 90;
+        max-height: 88vh;
+        overflow: auto;
+        padding: 16px;
+        border-radius: 16px 16px 0 0;
+        transform: translateY(105%);
+        transition: transform 0.2s ease;
+      }
+
+      .filters-card.open {
+        transform: translateY(0);
+      }
+
+      .filters-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .filters-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .sort-card {
+        margin-bottom: 14px;
+      }
+
+      .results-head {
+        display: grid;
+        gap: 8px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card-actions {
+        grid-template-columns: 1fr 52px;
+      }
+
+      button,
+      input,
+      select {
+        min-height: 44px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="logo" id="logo">Каталог специалистов</div>
+      <div class="top-actions">
+        <button class="secondary" id="loginBtn" type="button">Войти</button>
+        <button id="registerBtn" type="button">Регистрация</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <div>
+          <h1>Найдите репетитора или няню</h1>
+          <p class="muted">Выбирайте специалистов по городу, цене, рейтингу и опыту.</p>
+        </div>
+
+        <div class="search-card">
+          <input class="search-input" id="queryInput" placeholder="Поиск по имени, предмету или городу...">
+        </div>
+      </section>
+
+      <button class="mobile-filter-btn" id="openFiltersBtn" type="button">⚙️ Фильтры</button>
+
+      <div class="toolbar">
+        <section class="filters-card" id="filtersCard">
+          <div class="filters-head">
+            <h2>Фильтры</h2>
+            <button class="secondary" id="closeFiltersBtn" type="button">Закрыть</button>
+          </div>
+
+          <div class="filters-grid">
+            <label>Специализация
+              <select id="specializationSelect"></select>
+            </label>
+
+            <label>Город
+              <select id="citySelect"></select>
+            </label>
+
+            <label>Цена от
+              <input id="priceFrom" type="number" min="0" placeholder="0">
+            </label>
+
+            <label>Цена до
+              <input id="priceTo" type="number" min="0" placeholder="3000">
+            </label>
+
+            <div class="filter-group">
+              <label>Рейтинг</label>
+              <div class="segmented" id="ratingButtons">
+                <button type="button" data-rating="">Любой</button>
+                <button type="button" data-rating="4">★ 4.0+</button>
+                <button type="button" data-rating="4.5">★ 4.5+</button>
+                <button type="button" data-rating="4.8">★ 4.8+</button>
+              </div>
+            </div>
+
+            <div class="filter-group">
+              <label>Опыт</label>
+              <div class="segmented" id="experienceButtons">
+                <button type="button" data-exp="">Любой</button>
+                <button type="button" data-exp="1">От 1 года</button>
+                <button type="button" data-exp="3">От 3 лет</button>
+                <button type="button" data-exp="5">От 5 лет</button>
+              </div>
+            </div>
+
+            <button class="secondary" id="resetBtn" type="button">Сбросить фильтры</button>
+          </div>
+        </section>
+
+        <section class="sort-card card">
+          <label>Сортировка
+            <select id="sortSelect">
+              <option value="rating">По рейтингу</option>
+              <option value="priceAsc">По цене: дешёвые сначала</option>
+              <option value="priceDesc">По цене: дорогие сначала</option>
+              <option value="reviews">По отзывам</option>
+            </select>
+          </label>
+        </section>
+      </div>
+
+      <div class="results-head">
+        <div class="results-count" id="resultsCount">Найдено 0 специалистов</div>
+      </div>
+
+      <section class="grid" id="resultsGrid"></section>
+      <div class="pagination" id="pagination"></div>
+    </main>
+
+    <div class="filters-overlay" id="filtersOverlay"></div>
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    function sendToTilda(action, data) {
+      window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
+    }
+
+    const USERS_KEY = 'users';
+    const CURRENT_USER_KEY = 'currentUser';
+    const LOGIN_KEY = 'isLoggedIn';
+    const PAGE_SIZE = 12;
+
+    let allSpecialists = [];
+    let filteredSpecialists = [];
+    let currentPage = 1;
+
+    const filters = {
+      query: '',
+      specialization: '',
+      city: '',
+      priceFrom: '',
+      priceTo: '',
+      rating: '',
+      experience: '',
+      sort: 'rating'
+    };
+
+    const sampleSpecialists = [
+      {
+        id: 101,
+        firstName: 'Ирина',
+        lastName: 'Иванова',
+        role: 'specialist',
+        isActive: true,
+        specialization: 'Репетитор по математике',
+        city: 'Москва',
+        rating: 4.8,
+        reviewsCount: 36,
+        hourlyPrice: 1200,
+        experience: 8,
+        about: 'Готовлю к ОГЭ и помогаю закрывать пробелы в школьной программе. Работаю спокойно и системно.',
+        photo: ''
+      },
+      {
+        id: 102,
+        firstName: 'Ольга',
+        lastName: 'Смирнова',
+        role: 'specialist',
+        isActive: true,
+        specialization: 'Репетитор по английскому',
+        city: 'Санкт-Петербург',
+        rating: 4.9,
+        reviewsCount: 42,
+        hourlyPrice: 1500,
+        experience: 6,
+        about: 'Английский для школьников и дошкольников. Помогаю говорить увереннее и не бояться ошибок.',
+        photo: ''
+      },
+      {
+        id: 103,
+        firstName: 'Наталья',
+        lastName: 'Орлова',
+        role: 'specialist',
+        isActive: true,
+        specialization: 'Няня',
+        city: 'Москва',
+        rating: 4.7,
+        reviewsCount: 21,
+        hourlyPrice: 1000,
+        experience: 10,
+        about: 'Няня с педагогическим опытом. Прогулки, режим дня, развивающие занятия, спокойное сопровождение.',
+        photo: ''
+      }
+    ];
+
+    function safeParse(value, fallback) {
+      try {
+        return JSON.parse(value) || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, function(match) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[match];
+      });
+    }
+
+    function getUsers() {
+      return safeParse(localStorage.getItem(USERS_KEY), []);
+    }
+
+    function setUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function isLoggedIn() {
+      return localStorage.getItem(LOGIN_KEY) === 'true';
+    }
+
+    function getCurrentUser() {
+      return safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
+    }
+
+    function setCurrentUser(user) {
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+
+    function seedIfEmpty() {
+      const users = getUsers();
+      const hasActiveSpecialists = users.some(function(user) {
+        return user.role === 'specialist' && user.isActive === true;
+      });
+
+      if (!hasActiveSpecialists) {
+        setUsers(users.concat(sampleSpecialists));
+      }
+    }
+
+    function loadSpecialists() {
+      allSpecialists = getUsers().filter(function(user) {
+        return user.role === 'specialist' && user.isActive === true;
+      });
+    }
+
+    function readUrlParams() {
+      const params = new URLSearchParams(window.location.search);
+      filters.query = params.get('query') || '';
+      filters.specialization = params.get('specialization') || '';
+      filters.city = params.get('city') || '';
+      filters.priceFrom = params.get('priceFrom') || '';
+      filters.priceTo = params.get('priceTo') || '';
+      filters.rating = params.get('rating') || '';
+      filters.experience = params.get('experience') || '';
+      filters.sort = params.get('sort') || 'rating';
+      currentPage = Number(params.get('page') || 1);
+    }
+
+    function updateUrl() {
+      const params = new URLSearchParams();
+
+      Object.keys(filters).forEach(function(key) {
+        if (filters[key]) {
+          params.set(key, filters[key]);
+        }
+      });
+
+      if (currentPage > 1) {
+        params.set('page', currentPage);
+      }
+
+      const query = params.toString();
+      const url = query ? window.location.pathname + '?' + query : window.location.pathname;
+      history.pushState(null, '', url);
+    }
+
+    function uniqueValues(field) {
+      const values = allSpecialists.map(function(item) {
+        return item[field] || '';
+      }).filter(Boolean);
+
+      return Array.from(new Set(values)).sort();
+    }
+
+    function fillSelects() {
+      const specializationSelect = document.getElementById('specializationSelect');
+      const citySelect = document.getElementById('citySelect');
+
+      specializationSelect.innerHTML = '<option value="">Любая</option>' + uniqueValues('specialization').map(function(value) {
+        return `<option value="${esc(value)}" ${filters.specialization === value ? 'selected' : ''}>${esc(value)}</option>`;
+      }).join('');
+
+      citySelect.innerHTML = '<option value="">Любой</option>' + uniqueValues('city').map(function(value) {
+        return `<option value="${esc(value)}" ${filters.city === value ? 'selected' : ''}>${esc(value)}</option>`;
+      }).join('');
+    }
+
+    function applyInputs() {
+      document.getElementById('queryInput').value = filters.query;
+      document.getElementById('priceFrom').value = filters.priceFrom;
+      document.getElementById('priceTo').value = filters.priceTo;
+      document.getElementById('sortSelect').value = filters.sort;
+
+      document.querySelectorAll('[data-rating]').forEach(function(button) {
+        button.classList.toggle('active', button.dataset.rating === filters.rating);
+      });
+
+      document.querySelectorAll('[data-exp]').forEach(function(button) {
+        button.classList.toggle('active', button.dataset.exp === filters.experience);
+      });
+    }
+
+    function applyFilters() {
+      const q = filters.query.trim().toLowerCase();
+      const priceFrom = Number(filters.priceFrom || 0);
+      const priceTo = Number(filters.priceTo || 0);
+      const rating = Number(filters.rating || 0);
+      const experience = Number(filters.experience || 0);
+
+      filteredSpecialists = allSpecialists.filter(function(item) {
+        const name = `${item.firstName || ''} ${item.lastName || ''}`.toLowerCase();
+        const specialization = String(item.specialization || '').toLowerCase();
+        const city = String(item.city || '').toLowerCase();
+        const price = Number(item.hourlyPrice || item.price || 0);
+        const itemRating = Number(item.rating || 0);
+        const itemExperience = Number(item.experience || 0);
+
+        if (q && !(name.includes(q) || specialization.includes(q) || city.includes(q))) return false;
+        if (filters.specialization && item.specialization !== filters.specialization) return false;
+        if (filters.city && item.city !== filters.city) return false;
+        if (priceFrom && price < priceFrom) return false;
+        if (priceTo && price > priceTo) return false;
+        if (rating && itemRating < rating) return false;
+        if (experience && itemExperience < experience) return false;
+
+        return true;
+      });
+
+      filteredSpecialists.sort(function(a, b) {
+        if (filters.sort === 'priceAsc') {
+          return Number(a.hourlyPrice || a.price || 0) - Number(b.hourlyPrice || b.price || 0);
+        }
+        if (filters.sort === 'priceDesc') {
+          return Number(b.hourlyPrice || b.price || 0) - Number(a.hourlyPrice || a.price || 0);
+        }
+        if (filters.sort === 'reviews') {
+          return Number(b.reviewsCount || 0) - Number(a.reviewsCount || 0);
+        }
+        return Number(b.rating || 0) - Number(a.rating || 0);
+      });
+
+      const pages = Math.max(1, Math.ceil(filteredSpecialists.length / PAGE_SIZE));
+      if (currentPage > pages) {
+        currentPage = pages;
+      }
+    }
+
+    function renderResults() {
+      const grid = document.getElementById('resultsGrid');
+      const count = document.getElementById('resultsCount');
+
+      count.textContent = 'Найдено ' + filteredSpecialists.length + ' специалистов';
+
+      if (!allSpecialists.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">🧑‍🏫</div>
+            <h2>Пока нет специалистов</h2>
+            <p class="muted">Станьте первым специалистом на площадке.</p>
+            <button type="button" id="beFirstBtn">Стать первым</button>
+          </div>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+        document.getElementById('beFirstBtn').addEventListener('click', function() {
+          sendToTilda('goToRegister');
+        });
+        sendResize();
+        return;
+      }
+
+      if (!filteredSpecialists.length) {
+        grid.innerHTML = `
+          <div class="empty-state" style="grid-column: 1 / -1;">
+            <div class="empty-icon">🔎</div>
+            <h2>Специалисты не найдены</h2>
+            <p class="muted">Попробуйте изменить фильтры.</p>
+            <button type="button" id="emptyResetBtn">Сбросить</button>
+          </div>
+        `;
+        document.getElementById('pagination').innerHTML = '';
+        document.getElementById('emptyResetBtn').addEventListener('click', resetFilters);
+        sendResize();
+        return;
+      }
+
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageItems = filteredSpecialists.slice(start, start + PAGE_SIZE);
+
+      grid.innerHTML = pageItems.map(cardHTML).join('');
+      renderPagination();
+      bindCardEvents();
+      sendResize();
+    }
+
+    function cardHTML(item) {
+      const name = `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Специалист';
+      const initials = ((item.firstName || 'С')[0] || 'С') + ((item.lastName || 'П')[0] || 'П');
+      const price = item.hourlyPrice || item.price || 0;
+      const about = String(item.about || 'Описание пока не заполнено.');
+      const shortAbout = about.length > 100 ? about.slice(0, 100) + '...' : about;
+
+      return `
+        <article class="specialist-card">
+          <div class="photo">
+            ${item.photo ? `<img src="${item.photo}" alt="${esc(name)}">` : esc(initials)}
+          </div>
+
+          <div class="card-main">
+            <h3>${esc(name)}</h3>
+            <div class="badge">${esc(item.specialization || 'Специалист')}</div>
+          </div>
+
+          <div class="meta">
+            <span>📍 ${esc(item.city || 'Город не указан')}</span>
+          </div>
+
+          <div class="meta">
+            <span class="rating">★ ${esc(item.rating || '4.8')}</span>
+            <span>${esc(item.reviewsCount || 0)} отзывов</span>
+          </div>
+
+          <div class="price">${esc(price)}₽/час</div>
+          <p class="description">${esc(shortAbout)}</p>
+
+          <div class="card-actions">
+            <button type="button" class="details-btn" data-id="${esc(item.id)}">Подробнее</button>
+            <button type="button" class="favorite-btn icon" data-id="${esc(item.id)}">❤️</button>
+            <button type="button" class="write-btn" data-id="${esc(item.id)}">✉️ Написать</button>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderPagination() {
+      const pagination = document.getElementById('pagination');
+      const pages = Math.ceil(filteredSpecialists.length / PAGE_SIZE);
+
+      if (pages <= 1) {
+        pagination.innerHTML = '';
+        return;
+      }
+
+      let html = '';
+
+      for (let i = 1; i <= pages; i++) {
+        html += `<button type="button" class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+      }
+
+      pagination.innerHTML = html;
+
+      pagination.querySelectorAll('.page-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          currentPage = Number(button.dataset.page);
+          updateAndRender();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+    }
+
+    function bindCardEvents() {
+      document.querySelectorAll('.details-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          sendToTilda('viewSpecialist', { id: button.dataset.id });
+        });
+      });
+
+      document.querySelectorAll('.favorite-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          if (!isLoggedIn()) {
+            showToast('Войдите, чтобы добавить в избранное');
+            return;
+          }
+
+          const user = getCurrentUser();
+
+          if (!user) {
+            showToast('Войдите, чтобы добавить в избранное');
+            return;
+          }
+
+          user.favorites = user.favorites || [];
+
+          if (!user.favorites.map(String).includes(String(button.dataset.id))) {
+            user.favorites.push(button.dataset.id);
+          }
+
+          setCurrentUser(user);
+          updateUserInUsers(user);
+          showToast('Добавлено в избранное');
+        });
+      });
+
+      document.querySelectorAll('.write-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          if (!isLoggedIn()) {
+            sendToTilda('goToLogin');
+            return;
+          }
+
+          sendToTilda('openChat', { specialistId: button.dataset.id });
+        });
+      });
+    }
+
+    function updateUserInUsers(user) {
+      const users = getUsers();
+      const index = users.findIndex(function(item) {
+        return String(item.id) === String(user.id) || item.email === user.email;
+      });
+
+      if (index >= 0) {
+        users[index] = Object.assign({}, users[index], user);
+        setUsers(users);
+      }
+    }
+
+    function resetFilters() {
+      filters.query = '';
+      filters.specialization = '';
+      filters.city = '';
+      filters.priceFrom = '';
+      filters.priceTo = '';
+      filters.rating = '';
+      filters.experience = '';
+      filters.sort = 'rating';
+      currentPage = 1;
+      fillSelects();
+      applyInputs();
+      updateAndRender();
+      closeFilters();
+    }
+
+    function updateAndRender() {
+      applyFilters();
+      updateUrl();
+      renderResults();
+      applyInputs();
+    }
+
+    function bindControls() {
+      document.getElementById('logo').addEventListener('click', function() {
+        sendToTilda('goHome');
+      });
+
+      document.getElementById('loginBtn').addEventListener('click', function() {
+        sendToTilda('goToLogin');
+      });
+
+      document.getElementById('registerBtn').addEventListener('click', function() {
+        sendToTilda('goToRegister');
+      });
+
+      document.getElementById('queryInput').addEventListener('input', function(e) {
+        filters.query = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.getElementById('specializationSelect').addEventListener('change', function(e) {
+        filters.specialization = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.getElementById('citySelect').addEventListener('change', function(e) {
+        filters.city = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.getElementById('priceFrom').addEventListener('input', function(e) {
+        filters.priceFrom = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.getElementById('priceTo').addEventListener('input', function(e) {
+        filters.priceTo = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.getElementById('sortSelect').addEventListener('change', function(e) {
+        filters.sort = e.target.value;
+        currentPage = 1;
+        updateAndRender();
+      });
+
+      document.querySelectorAll('[data-rating]').forEach(function(button) {
+        button.addEventListener('click', function() {
+          filters.rating = button.dataset.rating;
+          currentPage = 1;
+          updateAndRender();
+        });
+      });
+
+      document.querySelectorAll('[data-exp]').forEach(function(button) {
+        button.addEventListener('click', function() {
+          filters.experience = button.dataset.exp;
+          currentPage = 1;
+          updateAndRender();
+        });
+      });
+
+      document.getElementById('resetBtn').addEventListener('click', resetFilters);
+
+      document.getElementById('openFiltersBtn').addEventListener('click', openFilters);
+      document.getElementById('closeFiltersBtn').addEventListener('click', closeFilters);
+      document.getElementById('filtersOverlay').addEventListener('click', closeFilters);
+    }
+
+    function openFilters() {
+      document.getElementById('filtersCard').classList.add('open');
+      document.getElementById('filtersOverlay').classList.add('show');
+      document.body.classList.add('locked');
+    }
+
+    function closeFilters() {
+      document.getElementById('filtersCard').classList.remove('open');
+      document.getElementById('filtersOverlay').classList.remove('show');
+      document.body.classList.remove('locked');
+    }
+
+    function showToast(text) {
+      const toast = document.getElementById('toast');
+      toast.textContent = text;
+      toast.classList.add('show');
+
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2200);
+    }
+
+    function sendResize() {
+      setTimeout(function() {
+        window.parent.postMessage({
+          action: 'resize',
+          height: document.body.scrollHeight
+        }, '*');
+      }, 50);
+    }
+
+    function init() {
+      seedIfEmpty();
+      readUrlParams();
+      loadSpecialists();
+      fillSelects();
+      bindControls();
+      applyInputs();
+      updateAndRender();
+    }
+
+    window.addEventListener('load', function() {
+      window.parent.postMessage({
+        action: 'resize',
+        height: document.body.scrollHeight
+      }, '*');
+    });
+
+    const observer = new ResizeObserver(function() {
+      sendResize();
+    });
+
+    observer.observe(document.body);
+
+    init();
+  </script>
+</body>
+</html>
