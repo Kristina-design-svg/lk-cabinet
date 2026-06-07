@@ -1,0 +1,2028 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Личный кабинет специалиста</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #F5F5F5;
+      --card: #FFFFFF;
+      --accent: #4A76A8;
+      --accent-dark: #3F6795;
+      --accent-soft: #E8F0FA;
+      --text: #000000;
+      --muted: #818C99;
+      --line: #DCE1E6;
+      --danger: #E64646;
+      --success: #2EA44F;
+      --warning: #F5A623;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 12px;
+      --sidebar: 240px;
+      --header: 64px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+    }
+
+    button {
+      min-height: 44px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      background: #EEF2F6;
+      color: #2C4058;
+    }
+
+    button.secondary:hover {
+      background: #E3EAF2;
+    }
+
+    button.ghost {
+      background: transparent;
+      color: var(--accent);
+      padding: 0;
+      min-height: auto;
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    button.success {
+      background: var(--success);
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+      font-size: 28px;
+      line-height: 1.15;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin-bottom: 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
+    img {
+      max-width: 100%;
+      display: block;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #FFFFFF;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(74,118,168,0.12);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #2C4058;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .app {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      height: var(--header);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 0 20px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .burger {
+      display: none;
+      width: 44px;
+      padding: 0;
+      background: #EEF2F6;
+      color: #2C4058;
+      font-size: 20px;
+    }
+
+    .logo {
+      margin-right: auto;
+      color: #2C4058;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .notification {
+      position: relative;
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: #EEF2F6;
+      font-size: 18px;
+    }
+
+    .notification-badge {
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      border-radius: 10px;
+      background: var(--danger);
+      color: #FFFFFF;
+      font-size: 11px;
+      line-height: 18px;
+      text-align: center;
+      font-weight: 700;
+    }
+
+    .top-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+    }
+
+    .layout {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 18px;
+      display: grid;
+      grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      gap: 18px;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 82px;
+      height: calc(100vh - 100px);
+      overflow: auto;
+      padding: 8px;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+    }
+
+    .nav-item {
+      width: 100%;
+      min-height: 46px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 2px 0;
+      padding: 0 12px;
+      border-radius: 8px;
+      background: transparent;
+      color: #2C4058;
+      text-align: left;
+      font-weight: 600;
+    }
+
+    .nav-item:hover {
+      background: #F2F5F8;
+    }
+
+    .nav-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+    }
+
+    .nav-item .count {
+      margin-left: auto;
+      min-width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      padding: 0 6px;
+      border-radius: 10px;
+      background: var(--danger);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .content {
+      min-width: 0;
+    }
+
+    .page-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      min-width: 0;
+      padding: 18px;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grid.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .between {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .form {
+      display: grid;
+      gap: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .profile-card {
+      display: grid;
+      grid-template-columns: 120px minmax(0, 1fr);
+      gap: 20px;
+      align-items: center;
+    }
+
+    .big-avatar {
+      width: 120px;
+      height: 120px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 36px;
+      font-weight: 800;
+    }
+
+    .rating {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--warning);
+      font-weight: 800;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 10px;
+      border-radius: 15px;
+      font-weight: 800;
+      font-size: 13px;
+    }
+
+    .status.good {
+      background: #EAF7EE;
+      color: var(--success);
+    }
+
+    .status.bad {
+      background: #FFECEC;
+      color: var(--danger);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 18px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      overflow-x: auto;
+    }
+
+    .tab {
+      min-height: 44px;
+      padding: 0 2px;
+      border-radius: 0;
+      border-bottom: 3px solid transparent;
+      background: transparent;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      font-weight: 800;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .list-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #FFFFFF;
+    }
+
+    .editable-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .editable-item {
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #FFFFFF;
+    }
+
+    .checkbox {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #2C4058;
+    }
+
+    .checkbox input {
+      width: 20px;
+      height: 20px;
+      min-height: 20px;
+      padding: 0;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: #2C4058;
+    }
+
+    .toggle-row input {
+      width: 20px;
+      height: 20px;
+      min-height: 20px;
+      padding: 0;
+    }
+
+    .service-card {
+      display: grid;
+      gap: 12px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #FFFFFF;
+    }
+
+    .service-price {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--accent);
+    }
+
+    .review-summary {
+      display: grid;
+      grid-template-columns: 150px minmax(0,1fr);
+      gap: 20px;
+      align-items: center;
+    }
+
+    .big-rating {
+      color: var(--accent);
+      font-size: 48px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .stars {
+      color: var(--warning);
+      letter-spacing: 1px;
+      font-size: 18px;
+    }
+
+    .messages-layout {
+      display: grid;
+      grid-template-columns: 320px minmax(0, 1fr);
+      gap: 16px;
+      min-height: 600px;
+    }
+
+    .dialogs,
+    .chat {
+      min-width: 0;
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+    }
+
+    .dialog {
+      display: grid;
+      grid-template-columns: 44px minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 12px;
+      border-bottom: 1px solid var(--line);
+      cursor: pointer;
+    }
+
+    .dialog.active {
+      background: var(--accent-soft);
+    }
+
+    .dialog-avatar,
+    .small-avatar {
+      width: 44px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 800;
+    }
+
+    .dialog-unread {
+      min-width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      margin-top: 4px;
+      border-radius: 10px;
+      background: var(--danger);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .chat-header {
+      height: 60px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 14px;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .back-chat {
+      display: none;
+      background: #EEF2F6;
+      color: #2C4058;
+    }
+
+    .chat-body {
+      height: 460px;
+      overflow: auto;
+      padding: 16px;
+      display: grid;
+      align-content: start;
+      gap: 10px;
+      background: #FAFBFC;
+    }
+
+    .message {
+      max-width: 78%;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #FFFFFF;
+    }
+
+    .message.out {
+      justify-self: end;
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #FFFFFF;
+    }
+
+    .chat-form {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .drawer-overlay,
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      display: none;
+      background: rgba(0,0,0,0.38);
+      z-index: 80;
+    }
+
+    .drawer-overlay.show,
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .modal {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 90;
+      display: none;
+      width: min(560px, calc(100vw - 32px));
+      max-height: calc(100vh - 32px);
+      overflow: auto;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.25);
+    }
+
+    .modal.show {
+      display: block;
+    }
+
+    .cert-grid {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .cert {
+      width: 112px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .cert-preview {
+      width: 112px;
+      height: 90px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #F2F5F8;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .cert-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .faq-button {
+      width: 100%;
+      margin-top: 8px;
+      background: #EEF2F6;
+      color: #2C4058;
+      text-align: left;
+    }
+
+    .faq-answer {
+      display: none;
+      padding: 10px 4px 4px;
+      color: var(--muted);
+    }
+
+    .faq-answer.show {
+      display: block;
+    }
+
+    .empty {
+      padding: 18px;
+      border-radius: 12px;
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+      color: var(--muted);
+    }
+
+    @media (max-width: 1199px) {
+      :root {
+        --sidebar: 200px;
+      }
+
+      .layout {
+        grid-template-columns: var(--sidebar) minmax(0, 1fr);
+      }
+
+      .grid.three {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .messages-layout {
+        grid-template-columns: 240px minmax(0, 1fr);
+      }
+    }
+
+    @media (max-width: 767px) {
+      body {
+        font-size: 15px;
+      }
+
+      .topbar {
+        height: 58px;
+        padding: 0 12px;
+      }
+
+      .burger {
+        display: grid;
+        place-items: center;
+      }
+
+      .logo {
+        font-size: 17px;
+      }
+
+      .layout {
+        display: block;
+        padding: 12px;
+      }
+
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        z-index: 100;
+        width: 280px;
+        max-width: 86vw;
+        height: 100vh;
+        border-radius: 0;
+        transform: translateX(-100%);
+        transition: transform 0.2s ease;
+      }
+
+      .sidebar.open {
+        transform: translateX(0);
+      }
+
+      .grid.two,
+      .grid.three,
+      .form-row,
+      .profile-card,
+      .review-summary {
+        grid-template-columns: 1fr;
+      }
+
+      .profile-card {
+        justify-items: center;
+        text-align: center;
+      }
+
+      .page-title {
+        display: grid;
+      }
+
+      .between {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .row {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .row button,
+      .between button,
+      .card button {
+        width: 100%;
+      }
+
+      .messages-layout {
+        display: block;
+        min-height: auto;
+      }
+
+      .messages-layout.chat-open .dialogs {
+        display: none;
+      }
+
+      .messages-layout:not(.chat-open) .chat {
+        display: none;
+      }
+
+      .dialogs,
+      .chat {
+        min-height: 560px;
+      }
+
+      .back-chat {
+        display: inline-flex;
+        width: auto !important;
+      }
+
+      .chat-form {
+        grid-template-columns: 1fr;
+      }
+
+      .modal {
+        width: calc(100vw - 20px);
+        max-height: calc(100vh - 20px);
+        padding: 16px;
+      }
+
+      input,
+      select,
+      textarea,
+      button {
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app" id="app"></div>
+
+  <script>
+    function sendToTilda(action, data) {
+      window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
+    }
+
+    const USERS_KEY = 'users';
+    const CURRENT_USER_KEY = 'currentUser';
+    const LOGIN_KEY = 'isLoggedIn';
+    const SPECIALIST_DATA_KEY = 'specialistCabinetData';
+
+    const defaultData = {
+      section: 'profile',
+      requestTab: 'active',
+      activeDialog: 0,
+      mobileChatOpen: false,
+      profile: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        city: 'Москва',
+        specialization: 'Репетитор по математике',
+        about: 'Помогаю школьникам понять предмет, подготовиться к экзаменам и заниматься без стресса.',
+        hourlyPrice: 1200
+      },
+      notifications: {
+        requestsEmail: true,
+        messagesEmail: true,
+        sms: false,
+        smsPhone: ''
+      },
+      paid: false,
+      discount: 10,
+      education: [
+        { place: 'МПГУ', specialty: 'Педагогическое образование', year: '2018' },
+        { place: 'Фоксфорд', specialty: 'Методика онлайн-обучения', year: '2022' }
+      ],
+      certificates: [],
+      experience: [
+        { position: 'Репетитор', org: 'Частная практика', from: '2018', to: '2026', desc: 'Подготовка к ОГЭ и ЕГЭ, помощь с текущей школьной программой.' },
+        { position: 'Педагог', org: 'Образовательный центр', from: '2019', to: '2021', desc: 'Групповые и индивидуальные занятия.' }
+      ],
+      recommendations: [
+        { from: 'Анна Петрова', text: 'Ребёнок стал увереннее решать задачи и перестал бояться контрольных.', date: '12.04.2026' }
+      ],
+      services: [
+        { title: 'Математика 5–9 класс', duration: '60 минут', price: 1200, active: true },
+        { title: 'Подготовка к ОГЭ', duration: '90 минут', price: 1800, active: true },
+        { title: 'Няня на вечер', duration: '3 часа', price: 3000, active: false }
+      ],
+      reviews: [
+        { name: 'Марина', date: '14.05.2026', text: 'Очень внимательный специалист. Дочь стала увереннее решать задачи.', rating: 5, answer: '' },
+        { name: 'Олег', date: '08.05.2026', text: 'Понятные объяснения и дисциплина без давления.', rating: 5, answer: '' },
+        { name: 'Екатерина', date: '29.04.2026', text: 'Хороший контакт с ребёнком, будем продолжать.', rating: 4, answer: '' }
+      ],
+      dialogs: [
+        {
+          name: 'Марина',
+          last: 'Спасибо, всё подходит',
+          time: '14:20',
+          unread: 2,
+          messages: [
+            { type: 'in', text: 'Здравствуйте! Можно уточнить расписание?' },
+            { type: 'out', text: 'Да, свободны вторник и четверг после 17:00.' },
+            { type: 'in', text: 'Спасибо, всё подходит' }
+          ]
+        },
+        {
+          name: 'Алексей',
+          last: 'Нужна подготовка к ОГЭ',
+          time: 'Вчера',
+          unread: 1,
+          messages: [
+            { type: 'in', text: 'Добрый день. Нужна подготовка к ОГЭ.' },
+            { type: 'out', text: 'Здравствуйте! Могу предложить пробное занятие.' }
+          ]
+        }
+      ],
+      requests: [
+        { client: 'Марина', date: '02.06.2026', subject: 'Математика 7 класс', comment: 'Нужны занятия два раза в неделю.', status: 'active' },
+        { client: 'Алексей', date: '05.06.2026', subject: 'ОГЭ по математике', comment: 'Подготовка с нуля.', status: 'active' },
+        { client: 'Светлана', date: '20.05.2026', subject: 'Няня на вечер', comment: 'Помощь на выходных.', status: 'done' },
+        { client: 'Ирина', date: '11.05.2026', subject: 'Физика', comment: 'Не подошло расписание.', status: 'rejected' }
+      ],
+      supportMessages: [],
+      twoFA: false
+    };
+
+    let currentUser = null;
+    let data = null;
+
+    const app = document.getElementById('app');
+
+    function safeParse(value, fallback) {
+      try {
+        return JSON.parse(value) || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function clone(obj) {
+      return JSON.parse(JSON.stringify(obj));
+    }
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, function(match) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[match];
+      });
+    }
+
+    function getInitials() {
+      return ((data.profile.firstName || 'С')[0] || 'С') + ((data.profile.lastName || 'П')[0] || 'П');
+    }
+
+    function getUsers() {
+      return safeParse(localStorage.getItem(USERS_KEY), []);
+    }
+
+    function setUsers(users) {
+      localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function saveCurrentUser() {
+      if (!currentUser) return;
+
+      currentUser.firstName = data.profile.firstName;
+      currentUser.lastName = data.profile.lastName;
+      currentUser.email = data.profile.email;
+      currentUser.phone = data.profile.phone;
+      currentUser.specialization = data.profile.specialization;
+      currentUser.city = data.profile.city;
+      currentUser.about = data.profile.about;
+      currentUser.hourlyPrice = data.profile.hourlyPrice;
+      currentUser.role = 'specialist';
+
+      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+
+      const users = getUsers();
+      const index = users.findIndex(function(user) {
+        return String(user.id) === String(currentUser.id) || user.email === currentUser.email;
+      });
+
+      if (index >= 0) {
+        users[index] = Object.assign({}, users[index], currentUser);
+      } else {
+        users.push(currentUser);
+      }
+
+      setUsers(users);
+    }
+
+    function saveData() {
+      localStorage.setItem(SPECIALIST_DATA_KEY, JSON.stringify(data));
+      saveCurrentUser();
+      sendResize();
+    }
+
+    function loadData() {
+      const saved = safeParse(localStorage.getItem(SPECIALIST_DATA_KEY), null);
+      data = Object.assign(clone(defaultData), saved || {});
+
+      data.profile = Object.assign(clone(defaultData.profile), data.profile || {});
+      data.notifications = Object.assign(clone(defaultData.notifications), data.notifications || {});
+
+      data.profile.firstName = currentUser.firstName || data.profile.firstName || 'Ирина';
+      data.profile.lastName = currentUser.lastName || data.profile.lastName || 'Иванова';
+      data.profile.email = currentUser.email || data.profile.email || 'irina@example.ru';
+      data.profile.phone = currentUser.phone || data.profile.phone || '+7 900 123-45-67';
+      data.profile.specialization = currentUser.specialization || data.profile.specialization || 'Репетитор по математике';
+      data.profile.city = currentUser.city || data.profile.city || 'Москва';
+      data.profile.about = currentUser.about || data.profile.about;
+      data.profile.hourlyPrice = currentUser.hourlyPrice || data.profile.hourlyPrice || 1200;
+    }
+
+    function checkAccess() {
+      if (localStorage.getItem(LOGIN_KEY) !== 'true') {
+        sendToTilda('goToLogin');
+        app.innerHTML = '<div class="empty">Необходимо войти в аккаунт.</div>';
+        return false;
+      }
+
+      currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
+
+      if (!currentUser) {
+        localStorage.setItem(LOGIN_KEY, 'false');
+        sendToTilda('goToLogin');
+        app.innerHTML = '<div class="empty">Сессия не найдена.</div>';
+        return false;
+      }
+
+      if (currentUser.role !== 'specialist') {
+        sendToTilda('goToCabinet');
+        app.innerHTML = '<div class="empty">Этот кабинет доступен только специалистам.</div>';
+        return false;
+      }
+
+      return true;
+    }
+
+    function unreadCount() {
+      return data.dialogs.reduce(function(sum, dialog) {
+        return sum + Number(dialog.unread || 0);
+      }, 0);
+    }
+
+    function activeRequestsCount() {
+      return data.requests.filter(function(request) {
+        return request.status === 'active';
+      }).length;
+    }
+
+    function averageRating() {
+      if (!data.reviews.length) return '0.0';
+      const total = data.reviews.reduce(function(sum, review) {
+        return sum + Number(review.rating || 0);
+      }, 0);
+      return (total / data.reviews.length).toFixed(1);
+    }
+
+    function render() {
+      app.innerHTML = `
+        <header class="topbar">
+          <button class="burger" id="burgerBtn" type="button">☰</button>
+          <div class="logo" id="logoBtn">Кабинет специалиста</div>
+          <div class="notification">🔔<span class="notification-badge">${unreadCount() + activeRequestsCount()}</span></div>
+          <div class="top-avatar">${esc(getInitials())}</div>
+        </header>
+
+        <div class="drawer-overlay" id="drawerOverlay"></div>
+
+        <div class="layout">
+          <aside class="sidebar" id="sidebar">
+            ${sidebarHTML()}
+          </aside>
+          <main class="content">
+            ${contentHTML()}
+          </main>
+        </div>
+
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal" id="modal"></div>
+      `;
+
+      bindBaseEvents();
+      bindSectionEvents();
+      sendResize();
+    }
+
+    function sidebarHTML() {
+      const items = [
+        ['profile', '👤', 'Профиль', 0],
+        ['settings', '⚙️', 'Настройки', 0],
+        ['education', '🎓', 'Образование и квалификации', 0],
+        ['experience', '💼', 'Опыт работы', 0],
+        ['services', '💰', 'Услуги и расценки', 0],
+        ['reviews', '⭐', 'Отзывы и рейтинг', 0],
+        ['messages', '✉️', 'Сообщения', unreadCount()],
+        ['requests', '📋', 'Заявки от клиентов', activeRequestsCount()],
+        ['support', '🆘', 'Поддержка', 0],
+        ['security', '🔒', 'Безопасность', 0],
+        ['logout', '🚪', 'Выход', 0]
+      ];
+
+      return items.map(function(item) {
+        return `
+          <button class="nav-item ${data.section === item[0] ? 'active' : ''}" type="button" data-section="${item[0]}">
+            <span>${item[1]}</span>
+            <span>${item[2]}</span>
+            ${item[3] ? `<span class="count">${item[3]}</span>` : ''}
+          </button>
+        `;
+      }).join('');
+    }
+
+    function contentHTML() {
+      if (data.section === 'profile') return profileSection();
+      if (data.section === 'settings') return settingsSection();
+      if (data.section === 'education') return educationSection();
+      if (data.section === 'experience') return experienceSection();
+      if (data.section === 'services') return servicesSection();
+      if (data.section === 'reviews') return reviewsSection();
+      if (data.section === 'messages') return messagesSection();
+      if (data.section === 'requests') return requestsSection();
+      if (data.section === 'support') return supportSection();
+      if (data.section === 'security') return securitySection();
+      return profileSection();
+    }
+
+    function titleHTML(title, subtitle) {
+      return `
+        <div class="page-title">
+          <div>
+            <h1>${esc(title)}</h1>
+            <p class="muted">${esc(subtitle || '')}</p>
+          </div>
+        </div>
+      `;
+    }
+
+    function profileSection() {
+      return titleHTML('Профиль', 'Публичная карточка специалиста') + `
+        <div class="card profile-card">
+          <div class="big-avatar">${esc(getInitials())}</div>
+          <div class="grid">
+            <div>
+              <h2>${esc(data.profile.firstName)} ${esc(data.profile.lastName)}</h2>
+              <p class="muted">${esc(data.profile.specialization)} · ${esc(data.profile.city)}</p>
+            </div>
+            <div class="row">
+              <span class="rating">★ ${averageRating()}</span>
+              <span class="muted">${data.reviews.length} отзывов</span>
+            </div>
+            <p>${esc(data.profile.about)}</p>
+            <div class="row">
+              <button type="button" id="editProfileBtn">Редактировать</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function settingsSection() {
+      return titleHTML('Настройки', 'Редактирование профиля, пароля и уведомлений') + `
+        <div class="grid two">
+          <div class="card">
+            <h2>Основные данные</h2>
+            <div class="form">
+              <div class="form-row">
+                <label>Имя<input id="firstName" value="${esc(data.profile.firstName)}"></label>
+                <label>Фамилия<input id="lastName" value="${esc(data.profile.lastName)}"></label>
+              </div>
+              <div class="form-row">
+                <label>Телефон<input id="phone" type="tel" value="${esc(data.profile.phone)}"></label>
+                <label>Email<input id="email" type="email" value="${esc(data.profile.email)}"></label>
+              </div>
+              <div class="form-row">
+                <label>Город<input id="city" value="${esc(data.profile.city)}"></label>
+                <label>Специализация
+                  <select id="specialization">
+                    ${specializationOptions(data.profile.specialization)}
+                  </select>
+                </label>
+              </div>
+              <label>О себе<textarea id="about">${esc(data.profile.about)}</textarea></label>
+              <button type="button" id="saveSettingsBtn">Сохранить</button>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="card">
+              <h2>Смена пароля</h2>
+              <div class="form">
+                <label>Текущий пароль<input id="oldPassword" type="password"></label>
+                <label>Новый пароль<input id="newPassword" type="password"></label>
+                <label>Повторить<input id="repeatPassword" type="password"></label>
+              </div>
+            </div>
+            <div class="card">
+              <h2>Уведомления</h2>
+              <div class="form">
+                <label class="checkbox"><input id="requestsEmail" type="checkbox" ${data.notifications.requestsEmail ? 'checked' : ''}> Email о новых заявках</label>
+                <label class="checkbox"><input id="messagesEmail" type="checkbox" ${data.notifications.messagesEmail ? 'checked' : ''}> Email о новых сообщениях</label>
+                <label class="checkbox"><input id="sms" type="checkbox" ${data.notifications.sms ? 'checked' : ''}> СМС-уведомления</label>
+                <label>Номер для СМС<input id="smsPhone" type="tel" value="${esc(data.notifications.smsPhone || data.profile.phone)}"></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function specializationOptions(selected) {
+      const options = [
+        'Репетитор по английскому',
+        'Репетитор по математике',
+        'Репетитор по русскому',
+        'Репетитор по физике',
+        'Репетитор по информатике',
+        'Няня',
+        'Няня-воспитатель',
+        'Другое'
+      ];
+      return options.map(function(option) {
+        return `<option value="${esc(option)}" ${option === selected ? 'selected' : ''}>${esc(option)}</option>`;
+      }).join('');
+    }
+
+    function educationSection() {
+      return titleHTML('Образование и квалификации', 'Учёба, курсы, сертификаты') + `
+        <div class="grid two">
+          <div class="card">
+            <div class="between">
+              <h2>Образование</h2>
+              <button type="button" id="addEducationBtn">+ Добавить</button>
+            </div>
+            <div class="editable-list">
+              ${data.education.map(function(item, index) {
+                return `
+                  <div class="editable-item">
+                    <label>Учебное заведение<input data-edu="${index}" data-field="place" value="${esc(item.place)}"></label>
+                    <label>Специальность<input data-edu="${index}" data-field="specialty" value="${esc(item.specialty)}"></label>
+                    <label>Год окончания<input data-edu="${index}" data-field="year" value="${esc(item.year)}"></label>
+                    <button type="button" class="secondary remove-education" data-index="${index}">Удалить</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Сертификаты</h2>
+            <div class="form">
+              <input id="certificateInput" type="file" accept=".jpg,.jpeg,.png,.pdf,image/jpeg,image/png,application/pdf" multiple>
+              <div class="cert-grid">
+                ${data.certificates.map(function(file, index) {
+                  const isImage = String(file.type || '').indexOf('image/') === 0;
+                  return `
+                    <div class="cert">
+                      <div class="cert-preview">
+                        ${isImage ? `<img src="${file.data}" alt="${esc(file.name)}">` : `<span>PDF<br>${esc(file.name)}</span>`}
+                      </div>
+                      <button type="button" class="secondary remove-cert" data-index="${index}">Удалить</button>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function experienceSection() {
+      return titleHTML('Опыт работы', 'Практика и рекомендации') + `
+        <div class="grid two">
+          <div class="card">
+            <div class="between">
+              <h2>Опыт</h2>
+              <button type="button" id="addExperienceBtn">+ Добавить</button>
+            </div>
+            <div class="editable-list">
+              ${data.experience.map(function(item, index) {
+                return `
+                  <div class="editable-item">
+                    <label>Должность<input data-exp="${index}" data-field="position" value="${esc(item.position)}"></label>
+                    <label>Организация<input data-exp="${index}" data-field="org" value="${esc(item.org)}"></label>
+                    <div class="form-row">
+                      <label>С<input data-exp="${index}" data-field="from" value="${esc(item.from)}"></label>
+                      <label>По<input data-exp="${index}" data-field="to" value="${esc(item.to)}"></label>
+                    </div>
+                    <label>Описание<textarea data-exp="${index}" data-field="desc">${esc(item.desc)}</textarea></label>
+                    <button type="button" class="secondary remove-experience" data-index="${index}">Удалить</button>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="between">
+              <h2>Рекомендации</h2>
+              <button type="button" id="requestRecommendationBtn">Запросить</button>
+            </div>
+            <div class="list">
+              ${data.recommendations.map(function(item) {
+                return `
+                  <div class="list-item">
+                    <b>${esc(item.from)}</b>
+                    <p>${esc(item.text)}</p>
+                    <p class="muted">${esc(item.date)}</p>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function servicesSection() {
+      const discount = Number(data.discount || 0);
+      return titleHTML('Услуги и расценки', 'Стоимость, скидки и статус анкеты') + `
+        <div class="grid">
+          <div class="card between">
+            <div>
+              <h2>Статус анкеты</h2>
+              <span class="status ${data.paid ? 'good' : 'bad'}">${data.paid ? 'Анкета активна' : 'Не оплачена'}</span>
+            </div>
+            <button type="button" id="payAccessBtn">Оплатить доступ</button>
+          </div>
+
+          <div class="card row">
+            <label>Скидка %
+              <input id="discountInput" type="number" min="0" max="90" value="${discount}">
+            </label>
+            <button type="button" id="saveDiscountBtn">Сохранить скидку</button>
+            <button type="button" id="addServiceBtn">+ Добавить услугу</button>
+          </div>
+
+          <div class="grid three">
+            ${data.services.map(function(service, index) {
+              const finalPrice = Math.round(Number(service.price || 0) * (1 - discount / 100));
+              return `
+                <div class="service-card">
+                  <label>Название<input data-service="${index}" data-field="title" value="${esc(service.title)}"></label>
+                  <label>Длительность<input data-service="${index}" data-field="duration" value="${esc(service.duration)}"></label>
+                  <label>Цена<input data-service="${index}" data-field="price" type="number" value="${esc(service.price)}"></label>
+                  <div>
+                    <div class="service-price">${finalPrice}₽</div>
+                    <p class="muted">Цена с учётом скидки</p>
+                  </div>
+                  <label class="toggle-row"><input data-service-toggle="${index}" type="checkbox" ${service.active ? 'checked' : ''}> ${service.active ? 'Активна' : 'Неактивна'}</label>
+                  <button type="button" class="secondary remove-service" data-index="${index}">Удалить</button>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function reviewsSection() {
+      return titleHTML('Отзывы и рейтинг', 'Ответы на отзывы клиентов') + `
+        <div class="grid">
+          <div class="card review-summary">
+            <div>
+              <div class="big-rating">${averageRating()}</div>
+              <div class="stars">★★★★★</div>
+            </div>
+            <div>
+              <h2>${data.reviews.length} отзывов</h2>
+              <p class="muted">Средняя оценка по всем опубликованным отзывам.</p>
+            </div>
+          </div>
+
+          <div class="list">
+            ${data.reviews.map(function(review, index) {
+              return `
+                <div class="card">
+                  <div class="between">
+                    <div>
+                      <h3>${esc(review.name)}</h3>
+                      <p class="muted">${esc(review.date)}</p>
+                    </div>
+                    <div class="stars">${'★'.repeat(Number(review.rating || 0))}</div>
+                  </div>
+                  <p>${esc(review.text)}</p>
+                  ${review.answer ? `
+                    <div class="list-item">
+                      <b>Ваш ответ</b>
+                      <p>${esc(review.answer)}</p>
+                    </div>
+                  ` : `
+                    <div class="form">
+                      <textarea class="review-answer" data-index="${index}" placeholder="Напишите ответ"></textarea>
+                      <button type="button" class="save-review-answer" data-index="${index}">Ответить</button>
+                    </div>
+                  `}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function messagesSection() {
+      const dialog = data.dialogs[data.activeDialog] || data.dialogs[0];
+
+      return titleHTML('Сообщения', 'Общение с клиентами') + `
+        <div class="messages-layout ${data.mobileChatOpen ? 'chat-open' : ''}">
+          <div class="dialogs">
+            ${data.dialogs.map(function(item, index) {
+              return `
+                <div class="dialog ${index === data.activeDialog ? 'active' : ''}" data-index="${index}">
+                  <div class="dialog-avatar">${esc(item.name[0])}</div>
+                  <div>
+                    <b>${esc(item.name)}</b>
+                    <p class="muted">${esc(item.last)}</p>
+                  </div>
+                  <div>
+                    <span class="muted">${esc(item.time)}</span>
+                    ${item.unread ? `<span class="dialog-unread">${item.unread}</span>` : ''}
+                  </div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+
+          <div class="chat">
+            <div class="chat-header">
+              <button type="button" class="back-chat" id="backChatBtn">← Назад</button>
+              <div class="small-avatar">${esc(dialog.name[0])}</div>
+              <span>${esc(dialog.name)}</span>
+            </div>
+            <div class="chat-body" id="chatBody">
+              ${dialog.messages.map(function(message) {
+                return `<div class="message ${message.type === 'out' ? 'out' : ''}">${esc(message.text)}</div>`;
+              }).join('')}
+            </div>
+            <div class="chat-form">
+              <input id="chatInput" placeholder="Напишите сообщение">
+              <button type="button" id="sendMessageBtn">Отправить</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function requestsSection() {
+      const tabs = [
+        ['active', 'Активные'],
+        ['done', 'Завершённые'],
+        ['rejected', 'Отклонённые']
+      ];
+
+      const requests = data.requests.filter(function(request) {
+        return request.status === data.requestTab;
+      });
+
+      return titleHTML('Заявки от клиентов', 'Новые обращения и история') + `
+        <div class="tabs">
+          ${tabs.map(function(tab) {
+            return `<button type="button" class="tab ${data.requestTab === tab[0] ? 'active' : ''}" data-request-tab="${tab[0]}">${tab[1]}</button>`;
+          }).join('')}
+        </div>
+        <div class="grid two">
+          ${requests.length ? requests.map(function(request, index) {
+            const globalIndex = data.requests.indexOf(request);
+            return `
+              <div class="card">
+                <div class="between">
+                  <div>
+                    <h3>${esc(request.client)}</h3>
+                    <p class="muted">${esc(request.date)}</p>
+                  </div>
+                  <span class="status ${request.status === 'active' ? 'bad' : 'good'}">${statusText(request.status)}</span>
+                </div>
+                <p><b>Предмет:</b> ${esc(request.subject)}</p>
+                <p>${esc(request.comment)}</p>
+                ${request.status === 'active' ? `
+                  <div class="row">
+                    <button type="button" class="success accept-request" data-index="${globalIndex}">✅ Принять</button>
+                    <button type="button" class="danger reject-request" data-index="${globalIndex}">❌ Отклонить</button>
+                  </div>
+                ` : ''}
+              </div>
+            `;
+          }).join('') : '<div class="empty">Заявок в этой вкладке нет.</div>'}
+        </div>
+      `;
+    }
+
+    function statusText(status) {
+      if (status === 'active') return 'Активная';
+      if (status === 'done') return 'Завершена';
+      if (status === 'rejected') return 'Отклонена';
+      return status;
+    }
+
+    function supportSection() {
+      const faq = [
+        ['Как оплатить доступ?', 'Откройте раздел «Услуги и расценки» и нажмите «Оплатить доступ».'],
+        ['Как изменить цену?', 'Измените цену в карточке услуги и сохраните изменения.'],
+        ['Как отвечать на отзывы?', 'В разделе «Отзывы» под каждым отзывом есть поле ответа.'],
+        ['Как работает рейтинг?', 'Рейтинг считается на основе оценок клиентов.'],
+        ['Как связаться с поддержкой?', 'Используйте форму обратной связи или ссылки Telegram/WhatsApp.']
+      ];
+
+      return titleHTML('Поддержка', 'FAQ и обратная связь') + `
+        <div class="grid two">
+          <div class="card">
+            <h2>FAQ</h2>
+            ${faq.map(function(item, index) {
+              return `
+                <button type="button" class="faq-button" data-index="${index}">${esc(item[0])}</button>
+                <div class="faq-answer" id="faq-${index}">${esc(item[1])}</div>
+              `;
+            }).join('')}
+          </div>
+          <div class="card">
+            <h2>Контакты</h2>
+            <p><a href="https://t.me/example" target="_blank">Telegram</a> · <a href="https://wa.me/79000000000" target="_blank">WhatsApp</a></p>
+            <br>
+            <div class="form">
+              <label>Сообщение<textarea id="supportMessage" placeholder="Опишите вопрос"></textarea></label>
+              <button type="button" id="sendSupportBtn">Отправить</button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function securitySection() {
+      return titleHTML('Безопасность', 'Защита аккаунта') + `
+        <div class="card form">
+          <label class="toggle-row"><input id="twoFAToggle" type="checkbox" ${data.twoFA ? 'checked' : ''}> Включить 2FA</label>
+          <button type="button" id="privacyBtn">Политика конфиденциальности</button>
+        </div>
+      `;
+    }
+
+    function bindBaseEvents() {
+      document.getElementById('logoBtn').addEventListener('click', function() {
+        sendToTilda('goHome');
+      });
+
+      document.getElementById('burgerBtn').addEventListener('click', function() {
+        document.getElementById('sidebar').classList.add('open');
+        document.getElementById('drawerOverlay').classList.add('show');
+        document.body.classList.add('locked');
+      });
+
+      document.getElementById('drawerOverlay').addEventListener('click', closeDrawer);
+
+      document.querySelectorAll('.nav-item').forEach(function(button) {
+        button.addEventListener('click', function() {
+          const section = button.dataset.section;
+
+          if (section === 'logout') {
+            openLogoutModal();
+            return;
+          }
+
+          data.section = section;
+          data.mobileChatOpen = false;
+          closeDrawer();
+          saveData();
+          render();
+        });
+      });
+    }
+
+    function bindSectionEvents() {
+      if (data.section === 'profile') bindProfileEvents();
+      if (data.section === 'settings') bindSettingsEvents();
+      if (data.section === 'education') bindEducationEvents();
+      if (data.section === 'experience') bindExperienceEvents();
+      if (data.section === 'services') bindServicesEvents();
+      if (data.section === 'reviews') bindReviewsEvents();
+      if (data.section === 'messages') bindMessagesEvents();
+      if (data.section === 'requests') bindRequestsEvents();
+      if (data.section === 'support') bindSupportEvents();
+      if (data.section === 'security') bindSecurityEvents();
+      sendResize();
+    }
+
+    function bindProfileEvents() {
+      document.getElementById('editProfileBtn').addEventListener('click', function() {
+        data.section = 'settings';
+        saveData();
+        render();
+      });
+    }
+
+    function bindSettingsEvents() {
+      document.getElementById('saveSettingsBtn').addEventListener('click', function() {
+        data.profile.firstName = document.getElementById('firstName').value.trim();
+        data.profile.lastName = document.getElementById('lastName').value.trim();
+        data.profile.phone = document.getElementById('phone').value.trim();
+        data.profile.email = document.getElementById('email').value.trim();
+        data.profile.city = document.getElementById('city').value.trim();
+        data.profile.specialization = document.getElementById('specialization').value;
+        data.profile.about = document.getElementById('about').value.trim();
+
+        data.notifications.requestsEmail = document.getElementById('requestsEmail').checked;
+        data.notifications.messagesEmail = document.getElementById('messagesEmail').checked;
+        data.notifications.sms = document.getElementById('sms').checked;
+        data.notifications.smsPhone = document.getElementById('smsPhone').value.trim();
+
+        const newPassword = document.getElementById('newPassword').value;
+        const repeatPassword = document.getElementById('repeatPassword').value;
+
+        if (newPassword || repeatPassword) {
+          if (newPassword.length < 6) {
+            alert('Новый пароль должен быть не короче 6 символов');
+            return;
+          }
+          if (newPassword !== repeatPassword) {
+            alert('Новый пароль и повтор не совпадают');
+            return;
+          }
+          currentUser.password = newPassword;
+        }
+
+        saveData();
+        alert('Настройки сохранены');
+        render();
+      });
+    }
+
+    function bindEducationEvents() {
+      document.getElementById('addEducationBtn').addEventListener('click', function() {
+        data.education.push({ place: '', specialty: '', year: '' });
+        saveData();
+        render();
+      });
+
+      document.querySelectorAll('[data-edu]').forEach(function(input) {
+        input.addEventListener('input', function() {
+          const index = Number(input.dataset.edu);
+          const field = input.dataset.field;
+          data.education[index][field] = input.value;
+          saveData();
+        });
+      });
+
+      document.querySelectorAll('.remove-education').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.education.splice(Number(button.dataset.index), 1);
+          saveData();
+          render();
+        });
+      });
+
+      document.getElementById('certificateInput').addEventListener('change', function(event) {
+        Array.from(event.target.files).forEach(function(file) {
+          const reader = new FileReader();
+          reader.onload = function() {
+            data.certificates.push({
+              name: file.name,
+              type: file.type,
+              data: reader.result
+            });
+            saveData();
+            render();
+          };
+          reader.readAsDataURL(file);
+        });
+      });
+
+      document.querySelectorAll('.remove-cert').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.certificates.splice(Number(button.dataset.index), 1);
+          saveData();
+          render();
+        });
+      });
+    }
+
+    function bindExperienceEvents() {
+      document.getElementById('addExperienceBtn').addEventListener('click', function() {
+        data.experience.push({ position: '', org: '', from: '', to: '', desc: '' });
+        saveData();
+        render();
+      });
+
+      document.querySelectorAll('[data-exp]').forEach(function(input) {
+        input.addEventListener('input', function() {
+          const index = Number(input.dataset.exp);
+          const field = input.dataset.field;
+          data.experience[index][field] = input.value;
+          saveData();
+        });
+      });
+
+      document.querySelectorAll('.remove-experience').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.experience.splice(Number(button.dataset.index), 1);
+          saveData();
+          render();
+        });
+      });
+
+      document.getElementById('requestRecommendationBtn').addEventListener('click', function() {
+        data.recommendations.push({
+          from: 'Новый клиент',
+          text: 'Запрос рекомендации отправлен. Это пример записи.',
+          date: new Date().toLocaleDateString('ru-RU')
+        });
+        saveData();
+        render();
+      });
+    }
+
+    function bindServicesEvents() {
+      document.getElementById('saveDiscountBtn').addEventListener('click', function() {
+        data.discount = Number(document.getElementById('discountInput').value || 0);
+        saveData();
+        render();
+      });
+
+      document.getElementById('addServiceBtn').addEventListener('click', function() {
+        data.services.push({ title: 'Новая услуга', duration: '60 минут', price: 1000, active: true });
+        saveData();
+        render();
+      });
+
+      document.querySelectorAll('[data-service]').forEach(function(input) {
+        input.addEventListener('input', function() {
+          const index = Number(input.dataset.service);
+          const field = input.dataset.field;
+          data.services[index][field] = field === 'price' ? Number(input.value || 0) : input.value;
+          saveData();
+        });
+      });
+
+      document.querySelectorAll('[data-service-toggle]').forEach(function(input) {
+        input.addEventListener('change', function() {
+          data.services[Number(input.dataset.serviceToggle)].active = input.checked;
+          saveData();
+          render();
+        });
+      });
+
+      document.querySelectorAll('.remove-service').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.services.splice(Number(button.dataset.index), 1);
+          saveData();
+          render();
+        });
+      });
+
+      document.getElementById('payAccessBtn').addEventListener('click', openPaymentModal);
+    }
+
+    function bindReviewsEvents() {
+      document.querySelectorAll('.save-review-answer').forEach(function(button) {
+        button.addEventListener('click', function() {
+          const index = Number(button.dataset.index);
+          const textarea = document.querySelector('.review-answer[data-index="' + index + '"]');
+          data.reviews[index].answer = textarea.value.trim();
+          saveData();
+          render();
+        });
+      });
+    }
+
+    function bindMessagesEvents() {
+      document.querySelectorAll('.dialog').forEach(function(dialog) {
+        dialog.addEventListener('click', function() {
+          data.activeDialog = Number(dialog.dataset.index);
+          data.dialogs[data.activeDialog].unread = 0;
+          data.mobileChatOpen = true;
+          saveData();
+          render();
+        });
+      });
+
+      const back = document.getElementById('backChatBtn');
+      if (back) {
+        back.addEventListener('click', function() {
+          data.mobileChatOpen = false;
+          saveData();
+          render();
+        });
+      }
+
+      const input = document.getElementById('chatInput');
+      const send = document.getElementById('sendMessageBtn');
+
+      function sendMessage() {
+        const text = input.value.trim();
+        if (!text) return;
+
+        const dialog = data.dialogs[data.activeDialog];
+        dialog.messages.push({ type: 'out', text: text });
+        dialog.last = text;
+        dialog.time = 'сейчас';
+        input.value = '';
+        saveData();
+        render();
+      }
+
+      send.addEventListener('click', sendMessage);
+      input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          sendMessage();
+        }
+      });
+
+      const chatBody = document.getElementById('chatBody');
+      if (chatBody) chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    function bindRequestsEvents() {
+      document.querySelectorAll('[data-request-tab]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          data.requestTab = tab.dataset.requestTab;
+          saveData();
+          render();
+        });
+      });
+
+      document.querySelectorAll('.accept-request').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.requests[Number(button.dataset.index)].status = 'done';
+          saveData();
+          render();
+        });
+      });
+
+      document.querySelectorAll('.reject-request').forEach(function(button) {
+        button.addEventListener('click', function() {
+          data.requests[Number(button.dataset.index)].status = 'rejected';
+          saveData();
+          render();
+        });
+      });
+    }
+
+    function bindSupportEvents() {
+      document.querySelectorAll('.faq-button').forEach(function(button) {
+        button.addEventListener('click', function() {
+          document.getElementById('faq-' + button.dataset.index).classList.toggle('show');
+          sendResize();
+        });
+      });
+
+      document.getElementById('sendSupportBtn').addEventListener('click', function() {
+        const text = document.getElementById('supportMessage').value.trim();
+        if (!text) {
+          alert('Введите сообщение');
+          return;
+        }
+        data.supportMessages.push({
+          text: text,
+          date: new Date().toLocaleString('ru-RU')
+        });
+        saveData();
+        alert('Сообщение отправлено');
+        render();
+      });
+    }
+
+    function bindSecurityEvents() {
+      document.getElementById('twoFAToggle').addEventListener('change', function(event) {
+        data.twoFA = event.target.checked;
+        saveData();
+        alert('Код отправлен на email');
+        render();
+      });
+
+      document.getElementById('privacyBtn').addEventListener('click', function() {
+        openModal(`
+          <h2>Политика конфиденциальности</h2>
+          <p>Это текст-заглушка политики конфиденциальности. В реальном сервисе здесь размещаются условия обработки персональных данных, правила хранения информации и контакты оператора.</p>
+          <br>
+          <button type="button" id="closeModalBtn">Закрыть</button>
+        `);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+      });
+    }
+
+    function openPaymentModal() {
+      openModal(`
+        <h2>Оплатить доступ</h2>
+        <div class="grid">
+          <div class="card">
+            <h3>Базовый</h3>
+            <p>500₽/мес</p>
+            <button type="button" class="payment-btn">Перейти к оплате</button>
+          </div>
+          <div class="card">
+            <h3>Продвинутый</h3>
+            <p>1000₽/мес</p>
+            <button type="button" class="payment-btn">Перейти к оплате</button>
+          </div>
+          <div class="card">
+            <h3>Премиум</h3>
+            <p>2000₽/мес</p>
+            <button type="button" class="payment-btn">Перейти к оплате</button>
+          </div>
+          <button type="button" class="secondary" id="closeModalBtn">Закрыть</button>
+        </div>
+      `);
+
+      document.querySelectorAll('.payment-btn').forEach(function(button) {
+        button.addEventListener('click', function() {
+          alert('Платёжная система');
+          data.paid = true;
+          saveData();
+          closeModal();
+          render();
+        });
+      });
+
+      document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+    }
+
+    function openLogoutModal() {
+      openModal(`
+        <h2>Вы уверены?</h2>
+        <p class="muted">После выхода потребуется снова войти в аккаунт.</p>
+        <br>
+        <div class="row">
+          <button type="button" class="danger" id="confirmLogoutBtn">Выйти</button>
+          <button type="button" class="secondary" id="cancelLogoutBtn">Отмена</button>
+        </div>
+      `);
+
+      document.getElementById('confirmLogoutBtn').addEventListener('click', function() {
+        localStorage.setItem(LOGIN_KEY, 'false');
+        localStorage.removeItem(CURRENT_USER_KEY);
+        sendToTilda('goToLogin');
+      });
+
+      document.getElementById('cancelLogoutBtn').addEventListener('click', closeModal);
+    }
+
+    function openModal(html) {
+      document.getElementById('modal').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('show');
+      document.getElementById('modal').classList.add('show');
+      document.body.classList.add('locked');
+      document.getElementById('modalOverlay').addEventListener('click', closeModal);
+      sendResize();
+    }
+
+    function closeModal() {
+      const overlay = document.getElementById('modalOverlay');
+      const modal = document.getElementById('modal');
+      if (overlay) overlay.classList.remove('show');
+      if (modal) modal.classList.remove('show');
+      document.body.classList.remove('locked');
+      sendResize();
+    }
+
+    function closeDrawer() {
+      const sidebar = document.getElementById('sidebar');
+      const overlay = document.getElementById('drawerOverlay');
+      if (sidebar) sidebar.classList.remove('open');
+      if (overlay) overlay.classList.remove('show');
+      document.body.classList.remove('locked');
+    }
+
+    function sendResize() {
+      setTimeout(function() {
+        window.parent.postMessage({
+          action: 'resize',
+          height: document.body.scrollHeight
+        }, '*');
+      }, 50);
+    }
+
+    function init() {
+      if (!checkAccess()) {
+        sendResize();
+        return;
+      }
+
+      loadData();
+      saveData();
+      render();
+    }
+
+    window.addEventListener('load', function() {
+      window.parent.postMessage({
+        action: 'resize',
+        height: document.body.scrollHeight
+      }, '*');
+    });
+
+    const observer = new ResizeObserver(function() {
+      sendResize();
+    });
+
+    observer.observe(document.body);
+
+    init();
+  </script>
+</body>
+</html>
