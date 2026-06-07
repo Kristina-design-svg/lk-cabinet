@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Публичная карточка специалиста</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #F5F5F5;
+      --card: #FFFFFF;
+      --accent: #4A76A8;
+      --accent-dark: #3F6795;
+      --accent-soft: #E8F0FA;
+      --text: #000000;
+      --muted: #818C99;
+      --line: #DCE1E6;
+      --danger: #E64646;
+      --success: #2EA44F;
+      --warning: #F5A623;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 16px;
+    }
+
+    html,
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100%;
+      overflow-x: hidden;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    body.locked {
+      overflow: hidden;
+    }
+
+    button,
+    input,
+    textarea {
+      font-family: 'Manrope', Arial, sans-serif;
+      font-size: 15px;
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 8px;
+      padding: 0 16px;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-weight: 700;
+      cursor: pointer;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button:active {
+      transform: translateY(1px);
+    }
+
+    button.secondary {
+      border: 1px solid var(--accent);
+      background: #FFFFFF;
+      color: var(--accent);
+    }
+
+    button.secondary:hover {
+      background: var(--accent-soft);
+    }
+
+    button.light {
+      background: #EEF2F6;
+      color: #2C4058;
+    }
+
+    button.light:hover {
+      background: #E3EAF2;
+    }
+
+    a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+      font-size: clamp(26px, 4vw, 36px);
+      line-height: 1.15;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 14px;
+      font-size: 21px;
+      line-height: 1.2;
+    }
+
+    h3 {
+      margin-bottom: 6px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    p {
+      margin-bottom: 0;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      min-height: 46px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #FFFFFF;
+      color: var(--text);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 110px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(74,118,168,0.12);
+    }
+
+    label {
+      display: grid;
+      gap: 6px;
+      color: #2C4058;
+      font-weight: 700;
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    .page {
+      min-height: 100vh;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 24px;
+      background: #FFFFFF;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .logo {
+      margin-right: auto;
+      color: #2C4058;
+      font-size: 20px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .container {
+      width: min(700px, 100%);
+      margin: 0 auto;
+      padding: 24px 0 40px;
+    }
+
+    .profile-card,
+    .section-card,
+    .not-found {
+      width: 100%;
+      border-radius: var(--radius);
+      background: #FFFFFF;
+      box-shadow: var(--shadow);
+    }
+
+    .profile-card {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 28px;
+      text-align: center;
+    }
+
+    .photo {
+      width: 200px;
+      height: 200px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #FFFFFF;
+      font-size: 58px;
+      font-weight: 800;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 15px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .meta {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+
+    .rating {
+      color: var(--warning);
+      font-weight: 800;
+    }
+
+    .price {
+      color: #2C4058;
+      font-size: 24px;
+      font-weight: 800;
+    }
+
+    .actions {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .section-card {
+      margin-top: 16px;
+      padding: 22px;
+    }
+
+    .list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .list-item {
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #FFFFFF;
+    }
+
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+    }
+
+    .cert {
+      height: 130px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #F2F5F8;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .cert img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .review {
+      display: grid;
+      gap: 8px;
+    }
+
+    .answer {
+      padding: 12px;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: #2C4058;
+    }
+
+    .request-form {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #FAFBFC;
+    }
+
+    .request-form.show {
+      display: grid;
+      gap: 12px;
+    }
+
+    .notice {
+      display: none;
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 10px;
+      background: #EAF7EE;
+      color: var(--success);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .notice.show {
+      display: block;
+    }
+
+    .not-found {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      padding: 48px 20px;
+      text-align: center;
+    }
+
+    .not-found-icon {
+      font-size: 48px;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: none;
+      background: rgba(0,0,0,0.42);
+    }
+
+    .modal-overlay.show {
+      display: block;
+    }
+
+    .image-modal {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      z-index: 90;
+      display: none;
+      width: min(920px, calc(100vw - 28px));
+      max-height: calc(100vh - 28px);
+      overflow: auto;
+      transform: translate(-50%, -50%);
+      padding: 14px;
+      border-radius: 16px;
+      background: #FFFFFF;
+      box-shadow: 0 20px 70px rgba(0,0,0,0.28);
+    }
+
+    .image-modal.show {
+      display: block;
+    }
+
+    .image-modal img {
+      width: 100%;
+      height: auto;
+      border-radius: 10px;
+    }
+
+    .image-modal .pdf-box {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--muted);
+    }
+
+    @media (max-width: 1199px) {
+      .container {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 767px) {
+      html,
+      body {
+        font-size: 16px;
+      }
+
+      .topbar {
+        height: auto;
+        min-height: 60px;
+        flex-wrap: wrap;
+        padding: 12px 16px;
+      }
+
+      .logo {
+        width: 100%;
+        margin-right: 0;
+        font-size: 18px;
+      }
+
+      .topbar button {
+        width: 100%;
+      }
+
+      .container {
+        width: 100%;
+        padding: 16px;
+      }
+
+      .profile-card {
+        padding: 22px 16px;
+      }
+
+      .photo {
+        width: 150px;
+        height: 150px;
+        font-size: 44px;
+      }
+
+      .actions {
+        grid-template-columns: 1fr;
+      }
+
+      .section-card {
+        padding: 18px;
+      }
+
+      .cert-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      button,
+      input,
+      textarea {
+        min-height: 44px;
+        font-size: 16px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <div class="logo" id="logo">Публичная карточка специалиста</div>
+      <button class="light" id="backCatalogBtn" type="button">← В каталог</button>
+    </header>
+
+    <main class="container" id="app"></main>
+
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="image-modal" id="imageModal"></div>
+  </div>
+
+  <script>
+    function sendToTilda(action, data) {
+      window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
+    }
+
+    const USERS_KEY = 'users';
+    const REQUESTS_KEY = 'requests';
+    const CURRENT_USER_KEY = 'currentUser';
+    const LOGIN_KEY = 'isLoggedIn';
+
+    const app = document.getElementById('app');
+    const modalOverlay = document.getElementById('modalOverlay');
+    const imageModal = document.getElementById('imageModal');
+
+    let specialist = null;
+
+    function safeParse(value, fallback) {
+      try {
+        return JSON.parse(value) || fallback;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    function esc(value) {
+      return String(value ?? '').replace(/[&<>"']/g, function(match) {
+        return {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        }[match];
+      });
+    }
+
+    function getUsers() {
+      return safeParse(localStorage.getItem(USERS_KEY), []);
+    }
+
+    function getCurrentUser() {
+      return safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
+    }
+
+    function isLoggedIn() {
+      return localStorage.getItem(LOGIN_KEY) === 'true';
+    }
+
+    function getIdFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('id');
+    }
+
+    function initials(user) {
+      return ((user.firstName || 'С')[0] || 'С') + ((user.lastName || 'П')[0] || 'П');
+    }
+
+    function fullName(user) {
+      return `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'Специалист';
+    }
+
+    function findSpecialist() {
+      const id = getIdFromUrl();
+
+      if (!id) return null;
+
+      return getUsers().find(function(user) {
+        return String(user.id) === String(id) && user.role === 'specialist';
+      });
+    }
+
+    function getEducation() {
+      return specialist.education || specialist.educations || [
+        { place: 'МПГУ', specialty: 'Педагогическое образование', year: '2018' },
+        { place: 'Фоксфорд', specialty: 'Методика онлайн-обучения', year: '2022' }
+      ];
+    }
+
+    function getExperience() {
+      return specialist.experienceList || specialist.experienceItems || specialist.workExperience || [
+        { position: 'Репетитор', org: 'Частная практика', period: '2018 — сейчас', desc: 'Индивидуальные занятия, подготовка к экзаменам, сопровождение школьной программы.' },
+        { position: 'Педагог', org: 'Образовательный центр', period: '2019 — 2021', desc: 'Групповые занятия и методическая работа.' }
+      ];
+    }
+
+    function getCertificates() {
+      return specialist.certificates || [];
+    }
+
+    function getReviews() {
+      return specialist.reviews || [
+        { name: 'Марина', date: '14.05.2026', rating: 5, text: 'Очень внимательный специалист. Дочь стала увереннее решать задачи.', answer: 'Спасибо за доверие!' },
+        { name: 'Олег', date: '08.05.2026', rating: 5, text: 'Понятные объяснения и дисциплина без давления.', answer: '' },
+        { name: 'Екатерина', date: '29.04.2026', rating: 4, text: 'Хороший контакт с ребёнком, будем продолжать.', answer: '' }
+      ];
+    }
+
+    function ratingValue() {
+      return specialist.rating || '4.8';
+    }
+
+    function reviewsCount() {
+      return specialist.reviewsCount || getReviews().length || 0;
+    }
+
+    function renderNotFound() {
+      app.innerHTML = `
+        <div class="not-found">
+          <div class="not-found-icon">🔎</div>
+          <h1>Специалист не найден</h1>
+          <p class="muted">Возможно, ссылка устарела или анкета была удалена.</p>
+          <button type="button" id="goCatalogNotFound">В каталог</button>
+        </div>
+      `;
+
+      document.getElementById('goCatalogNotFound').addEventListener('click', function() {
+        sendToTilda('searchCatalog');
+      });
+
+      sendResize();
+    }
+
+    function renderProfile() {
+      const name = fullName(specialist);
+      const price = specialist.hourlyPrice || specialist.price || 1000;
+      const city = specialist.city || 'Город не указан';
+      const about = specialist.about || 'Специалист пока не заполнил описание.';
+      const specialization = specialist.specialization || 'Специалист';
+
+      app.innerHTML = `
+        <section class="profile-card">
+          <div class="photo">
+            ${specialist.photo ? `<img src="${specialist.photo}" alt="${esc(name)}">` : esc(initials(specialist))}
+          </div>
+          <div>
+            <h1>${esc(name)}</h1>
+            <div class="badge">${esc(specialization)}</div>
+          </div>
+          <div class="meta">
+            <span>📍 ${esc(city)}</span>
+            <span class="rating">★ ${esc(ratingValue())}</span>
+            <span>${esc(reviewsCount())} отзывов</span>
+          </div>
+          <div class="price">${esc(price)} ₽/час</div>
+          <p>${esc(about)}</p>
+          <div class="actions">
+            <button type="button" id="messageBtn">✉️ Написать сообщение</button>
+            <button type="button" class="secondary" id="requestBtn">📋 Оставить заявку</button>
+          </div>
+          <div class="notice" id="notice">Заявка отправлена!</div>
+        </section>
+
+        <section class="section-card" id="requestForm">
+          <h2>Оставить заявку</h2>
+          <div class="form">
+            <label>Имя<input id="requestName" placeholder="Ваше имя"></label>
+            <label>Телефон<input id="requestPhone" type="tel" placeholder="+7 900 123-45-67"></label>
+            <label>Комментарий<textarea id="requestComment" placeholder="Расскажите, что нужно"></textarea></label>
+            <button type="button" id="sendRequestBtn">Отправить заявку</button>
+          </div>
+        </section>
+
+        ${educationSection()}
+        ${experienceSection()}
+        ${certificatesSection()}
+        ${reviewsSection()}
+      `;
+
+      bindProfileEvents();
+      sendResize();
+    }
+
+    function educationSection() {
+      const items = getEducation();
+
+      return `
+        <section class="section-card">
+          <h2>Образование</h2>
+          <div class="list">
+            ${items.length ? items.map(function(item) {
+              return `
+                <div class="list-item">
+                  <h3>${esc(item.place || 'Учебное заведение')}</h3>
+                  <p>${esc(item.specialty || item.speciality || 'Специальность')}</p>
+                  <p class="muted">${esc(item.year || '')}</p>
+                </div>
+              `;
+            }).join('') : '<p class="muted">Образование не указано.</p>'}
+          </div>
+        </section>
+      `;
+    }
+
+    function experienceSection() {
+      const items = getExperience();
+
+      return `
+        <section class="section-card">
+          <h2>Опыт работы</h2>
+          <div class="list">
+            ${items.length ? items.map(function(item) {
+              return `
+                <div class="list-item">
+                  <h3>${esc(item.position || 'Должность')}</h3>
+                  <p>${esc(item.org || item.organization || 'Организация')}</p>
+                  <p class="muted">${esc(item.period || ((item.from || '') + ' — ' + (item.to || '')))}</p>
+                  <p>${esc(item.desc || item.description || item.duties || '')}</p>
+                </div>
+              `;
+            }).join('') : '<p class="muted">Опыт работы не указан.</p>'}
+          </div>
+        </section>
+      `;
+    }
+
+    function certificatesSection() {
+      const items = getCertificates();
+
+      return `
+        <section class="section-card">
+          <h2>Сертификаты</h2>
+          ${items.length ? `
+            <div class="cert-grid">
+              ${items.map(function(cert, index) {
+                const isImage = String(cert.type || '').indexOf('image/') === 0 || String(cert.data || '').indexOf('data:image') === 0;
+                return `
+                  <div class="cert" data-index="${index}">
+                    ${isImage ? `<img src="${cert.data}" alt="${esc(cert.name || 'Сертификат')}">` : `<span>PDF<br>${esc(cert.name || 'Сертификат')}</span>`}
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          ` : '<p class="muted">Сертификаты пока не загружены.</p>'}
+        </section>
+      `;
+    }
+
+    function reviewsSection() {
+      const items = getReviews();
+
+      return `
+        <section class="section-card">
+          <h2>Отзывы</h2>
+          <div class="list">
+            ${items.length ? items.map(function(review) {
+              return `
+                <div class="list-item review">
+                  <div>
+                    <h3>${esc(review.name || 'Клиент')}</h3>
+                    <p class="muted">${esc(review.date || '')}</p>
+                  </div>
+                  <div class="rating">${'★'.repeat(Number(review.rating || 0))}</div>
+                  <p>${esc(review.text || '')}</p>
+                  ${review.answer ? `
+                    <div class="answer">
+                      <b>Ответ специалиста</b>
+                      <p>${esc(review.answer)}</p>
+                    </div>
+                  ` : ''}
+                </div>
+              `;
+            }).join('') : '<p class="muted">Отзывов пока нет.</p>'}
+          </div>
+        </section>
+      `;
+    }
+
+    function bindProfileEvents() {
+      document.getElementById('messageBtn').addEventListener('click', function() {
+        if (isLoggedIn()) {
+          sendToTilda('openChat', { specialistId: specialist.id });
+        } else {
+          sendToTilda('goToLogin');
+        }
+      });
+
+      document.getElementById('requestBtn').addEventListener('click', function() {
+        if (!isLoggedIn()) {
+          sendToTilda('goToLogin');
+          return;
+        }
+
+        document.getElementById('requestForm').classList.toggle('show');
+        document.getElementById('requestForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        sendResize();
+      });
+
+      document.getElementById('sendRequestBtn').addEventListener('click', sendRequest);
+
+      document.querySelectorAll('.cert').forEach(function(cert) {
+        cert.addEventListener('click', function() {
+          openCertificate(Number(cert.dataset.index));
+        });
+      });
+    }
+
+    function sendRequest() {
+      const name = document.getElementById('requestName').value.trim();
+      const phone = document.getElementById('requestPhone').value.trim();
+      const comment = document.getElementById('requestComment').value.trim();
+
+      if (!name || !phone || !comment) {
+        alert('Заполните все поля заявки');
+        return;
+      }
+
+      const currentUser = getCurrentUser();
+      const allRequests = safeParse(localStorage.getItem(REQUESTS_KEY), []);
+
+      allRequests.push({
+        id: Date.now(),
+        specialistId: specialist.id,
+        specialistName: fullName(specialist),
+        clientId: currentUser ? currentUser.id : null,
+        clientName: name,
+        phone: phone,
+        comment: comment,
+        status: 'active',
+        createdAt: new Date().toISOString()
+      });
+
+      localStorage.setItem(REQUESTS_KEY, JSON.stringify(allRequests));
+
+      document.getElementById('notice').classList.add('show');
+      document.getElementById('requestName').value = '';
+      document.getElementById('requestPhone').value = '';
+      document.getElementById('requestComment').value = '';
+
+      sendResize();
+
+      setTimeout(function() {
+        document.getElementById('notice').classList.remove('show');
+        sendResize();
+      }, 2500);
+    }
+
+    function openCertificate(index) {
+      const cert = getCertificates()[index];
+      if (!cert) return;
+
+      const isImage = String(cert.type || '').indexOf('image/') === 0 || String(cert.data || '').indexOf('data:image') === 0;
+
+      imageModal.innerHTML = isImage
+        ? `<img src="${cert.data}" alt="${esc(cert.name || 'Сертификат')}">`
+        : `<div class="pdf-box"><h2>${esc(cert.name || 'PDF сертификат')}</h2><p>PDF-файл сохранён в localStorage. Предпросмотр недоступен.</p></div>`;
+
+      modalOverlay.classList.add('show');
+      imageModal.classList.add('show');
+      document.body.classList.add('locked');
+      sendResize();
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('show');
+      imageModal.classList.remove('show');
+      document.body.classList.remove('locked');
+      sendResize();
+    }
+
+    function sendResize() {
+      setTimeout(function() {
+        window.parent.postMessage({
+          action: 'resize',
+          height: document.body.scrollHeight
+        }, '*');
+      }, 50);
+    }
+
+    function init() {
+      document.getElementById('logo').addEventListener('click', function() {
+        sendToTilda('goHome');
+      });
+
+      document.getElementById('backCatalogBtn').addEventListener('click', function() {
+        sendToTilda('searchCatalog');
+      });
+
+      modalOverlay.addEventListener('click', closeModal);
+
+      specialist = findSpecialist();
+
+      if (!specialist) {
+        renderNotFound();
+        return;
+      }
+
+      renderProfile();
+    }
+
+    window.addEventListener('load', function() {
+      window.parent.postMessage({
+        action: 'resize',
+        height: document.body.scrollHeight
+      }, '*');
+    });
+
+    const observer = new ResizeObserver(function() {
+      sendResize();
+    });
+
+    observer.observe(document.body);
+
+    init();
+  </script>
+</body>
+</html>
