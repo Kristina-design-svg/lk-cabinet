@@ -5,267 +5,89 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Вход и регистрация</title>
   <style>
-    * {
-      box-sizing: border-box;
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0; min-width: 320px; min-height: 100%;
+      overflow-x: hidden; background: #F5F5F5;
+      font-family: Arial, sans-serif; color: #000;
     }
-
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      min-width: 320px;
-      min-height: 100%;
-      overflow-x: hidden;
-      background: #F5F5F5;
-      font-family: Arial, sans-serif;
-      color: #000;
-    }
-
-    body {
-      font-size: 16px;
-      line-height: 1.4;
-    }
-
+    body { font-size: 16px; line-height: 1.4; }
     .page {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 16px;
+      min-height: 100vh; display: flex; align-items: center;
+      justify-content: center; padding: 32px 16px;
     }
-
     .card {
-      width: 400px;
-      max-width: 100%;
-      background: #FFFFFF;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      width: 400px; max-width: 100%; background: #FFFFFF;
+      border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       padding: 24px;
     }
-
     .logo {
-      text-align: center;
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 18px;
-      color: #2C4058;
+      text-align: center; font-size: 24px; font-weight: 700;
+      margin-bottom: 18px; color: #2C4058;
     }
-
     .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-      padding: 4px;
-      margin-bottom: 20px;
-      background: #EEF2F6;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 6px;
+      padding: 4px; margin-bottom: 20px; background: #EEF2F6;
       border-radius: 10px;
     }
-
     .tab {
-      height: 44px;
-      border: 0;
-      border-radius: 8px;
-      background: transparent;
-      color: #4B5563;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.15s ease;
+      height: 44px; border: 0; border-radius: 8px;
+      background: transparent; color: #4B5563;
+      font-size: 14px; font-weight: 700; cursor: pointer;
     }
-
-    .tab.active {
-      background: #4A76A8;
-      color: #FFFFFF;
-    }
-
-    .form {
-      display: none;
-    }
-
-    .form.active {
-      display: block;
-    }
-
-    .field {
-      margin-bottom: 12px;
-    }
-
+    .tab.active { background: #4A76A8; color: #FFFFFF; }
+    .form { display: none; }
+    .form.active { display: block; }
+    .field { margin-bottom: 12px; }
     label {
-      display: block;
-      margin-bottom: 6px;
-      font-size: 14px;
-      font-weight: 700;
-      color: #2C4058;
+      display: block; margin-bottom: 6px; font-size: 14px;
+      font-weight: 700; color: #2C4058;
     }
-
-    input,
-    select {
-      width: 100%;
-      height: 44px;
-      border: 1px solid #DCE1E6;
-      border-radius: 8px;
-      padding: 0 12px;
-      background: #FFFFFF;
-      color: #000000;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      outline: none;
-      transition: 0.15s ease;
+    input, select {
+      width: 100%; height: 44px; border: 1px solid #DCE1E6;
+      border-radius: 8px; padding: 0 12px; background: #FFFFFF;
+      font-family: Arial, sans-serif; font-size: 16px; outline: none;
     }
-
-    input:focus,
-    select:focus {
-      border-color: #4A76A8;
-      box-shadow: 0 0 0 3px rgba(74, 118, 168, 0.12);
+    input:focus, select:focus {
+      border-color: #4A76A8; box-shadow: 0 0 0 3px rgba(74,118,168,0.12);
     }
-
-    input.error,
-    select.error {
-      border-color: #E64646;
-      box-shadow: 0 0 0 3px rgba(230, 70, 70, 0.10);
+    input.error, select.error {
+      border-color: #E64646; box-shadow: 0 0 0 3px rgba(230,70,70,0.10);
     }
-
     .role-buttons {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-      margin-bottom: 12px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
     }
-
     .role-btn {
-      min-height: 48px;
-      border: 1px solid #DCE1E6;
-      border-radius: 8px;
-      background: #FFFFFF;
-      color: #2C4058;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.15s ease;
+      min-height: 48px; border: 1px solid #DCE1E6; border-radius: 8px;
+      background: #FFFFFF; color: #2C4058; font-size: 15px;
+      font-weight: 700; cursor: pointer;
     }
-
-    .role-btn.active {
-      border-color: #4A76A8;
-      background: #4A76A8;
-      color: #FFFFFF;
-    }
-
+    .role-btn.active { border-color: #4A76A8; background: #4A76A8; color: #FFFFFF; }
     .checkbox-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      margin: 14px 0;
-      font-size: 14px;
-      color: #2C4058;
+      display: flex; align-items: flex-start; gap: 8px;
+      margin: 14px 0; font-size: 14px; color: #2C4058;
     }
-
-    .checkbox-row input {
-      width: 18px;
-      height: 18px;
-      min-width: 18px;
-      margin: 1px 0 0;
-      padding: 0;
-    }
-
+    .checkbox-row input { width: 18px; height: 18px; min-width: 18px; margin: 1px 0 0; padding: 0; }
     .main-btn {
-      width: 100%;
-      height: 48px;
-      border: 0;
-      border-radius: 8px;
-      background: #4A76A8;
-      color: #FFFFFF;
-      font-size: 16px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.15s ease;
+      width: 100%; height: 48px; border: 0; border-radius: 8px;
+      background: #4A76A8; color: #FFFFFF; font-size: 16px;
+      font-weight: 700; cursor: pointer;
     }
-
-    .main-btn:hover {
-      background: #3F6795;
-    }
-
-    .main-btn:active {
-      transform: translateY(1px);
-    }
-
-    .link-row {
-      margin-top: 14px;
-      text-align: center;
-      font-size: 14px;
-    }
-
-    .link-row a {
-      color: #4A76A8;
-      text-decoration: none;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    .message {
-      display: none;
-      margin-bottom: 14px;
-      padding: 10px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    .message.error {
-      display: block;
-      background: #FFECEC;
-      color: #E64646;
-    }
-
-    .message.success {
-      display: block;
-      background: #EAF7EE;
-      color: #238636;
-    }
-
-    .field-message {
-      display: none;
-      margin-top: 5px;
-      color: #E64646;
-      font-size: 12px;
-      line-height: 1.3;
-    }
-
-    .field-message.show {
-      display: block;
-    }
-
+    .main-btn:hover { background: #3F6795; }
+    .link-row { margin-top: 14px; text-align: center; font-size: 14px; }
+    .link-row a { color: #4A76A8; text-decoration: none; font-weight: 700; cursor: pointer; }
+    .message { display: none; margin-bottom: 14px; padding: 10px 12px; border-radius: 8px; font-size: 14px; font-weight: 700; }
+    .message.error { display: block; background: #FFECEC; color: #E64646; }
+    .message.success { display: block; background: #EAF7EE; color: #238636; }
+    .field-message { display: none; margin-top: 5px; color: #E64646; font-size: 12px; }
+    .field-message.show { display: block; }
     @media (max-width: 767px) {
-      .page {
-        align-items: flex-start;
-        padding: 16px;
-      }
-
-      .card {
-        width: 100%;
-        padding: 20px;
-      }
-
-      .logo {
-        font-size: 22px;
-      }
-
-      .tab {
-        height: 48px;
-        font-size: 15px;
-      }
-
-      .role-buttons {
-        grid-template-columns: 1fr;
-      }
-
-      input,
-      select,
-      .main-btn,
-      .role-btn {
-        width: 100%;
-        min-height: 44px;
-        font-size: 16px;
-      }
+      .page { align-items: flex-start; padding: 16px; }
+      .card { width: 100%; padding: 20px; }
+      .logo { font-size: 22px; }
+      .tab { height: 48px; font-size: 15px; }
+      .role-buttons { grid-template-columns: 1fr; }
+      input, select, .main-btn, .role-btn { width: 100%; min-height: 44px; font-size: 16px; }
     }
   </style>
 </head>
@@ -273,12 +95,10 @@
   <div class="page">
     <div class="card">
       <div class="logo">Войти</div>
-
       <div class="tabs">
         <button class="tab active" id="loginTab" type="button">ВХОД</button>
         <button class="tab" id="registerTab" type="button">РЕГИСТРАЦИЯ</button>
       </div>
-
       <div class="message" id="globalMessage"></div>
 
       <form class="form active" id="loginForm" novalidate>
@@ -287,15 +107,12 @@
           <input type="email" id="loginEmail" autocomplete="email">
           <div class="field-message" id="loginEmailMsg"></div>
         </div>
-
         <div class="field">
           <label for="loginPassword">Пароль</label>
           <input type="password" id="loginPassword" autocomplete="current-password">
           <div class="field-message" id="loginPasswordMsg"></div>
         </div>
-
         <button class="main-btn" type="submit">Войти</button>
-
         <div class="link-row">
           <a id="goRegister">Нет аккаунта? Зарегистрироваться</a>
         </div>
@@ -307,45 +124,38 @@
           <input type="text" id="firstName" autocomplete="given-name">
           <div class="field-message" id="firstNameMsg"></div>
         </div>
-
         <div class="field">
           <label for="lastName">Фамилия</label>
           <input type="text" id="lastName" autocomplete="family-name">
           <div class="field-message" id="lastNameMsg"></div>
         </div>
-
         <div class="field">
           <label for="email">Email</label>
           <input type="email" id="email" autocomplete="email">
           <div class="field-message" id="emailMsg"></div>
         </div>
-
         <div class="field">
           <label for="phone">Телефон</label>
           <input type="tel" id="phone" autocomplete="tel" placeholder="+7 900 123-45-67">
           <div class="field-message" id="phoneMsg"></div>
         </div>
-
         <div class="field">
           <label for="password">Пароль</label>
           <input type="password" id="password" autocomplete="new-password">
           <div class="field-message" id="passwordMsg"></div>
         </div>
-
         <div class="field">
           <label for="passwordRepeat">Повторите пароль</label>
           <input type="password" id="passwordRepeat" autocomplete="new-password">
           <div class="field-message" id="passwordRepeatMsg"></div>
         </div>
-
         <div class="field">
           <label>Роль</label>
           <div class="role-buttons">
-            <button class="role-btn active" type="button" id="roleSpecialist" data-role="specialist">Я специалист</button>
-            <button class="role-btn" type="button" id="roleClient" data-role="client">Я клиент</button>
+            <button class="role-btn active" type="button" id="roleSpecialist">Я специалист</button>
+            <button class="role-btn" type="button" id="roleClient">Я клиент</button>
           </div>
         </div>
-
         <div class="field" id="specializationField">
           <label for="specialization">Специализация</label>
           <select id="specialization">
@@ -357,337 +167,225 @@
           </select>
           <div class="field-message" id="specializationMsg"></div>
         </div>
-
         <label class="checkbox-row">
           <input type="checkbox" id="agree">
           <span>Принимаю условия</span>
         </label>
         <div class="field-message" id="agreeMsg"></div>
-
         <button class="main-btn" type="submit">Зарегистрироваться</button>
       </form>
     </div>
   </div>
 
   <script>
-    var selectedRole = "specialist";
+    (function() {
+      // === ПРОВЕРКА АВТОРИЗАЦИИ ПРИ ЗАГРУЗКЕ ===
+      var urlParams = new URLSearchParams(window.location.search);
+      var isLoggedIn = urlParams.get('logged') === 'true';
 
-    var loginTab = document.getElementById("loginTab");
-    var registerTab = document.getElementById("registerTab");
-    var loginForm = document.getElementById("loginForm");
-    var registerForm = document.getElementById("registerForm");
-    var goRegister = document.getElementById("goRegister");
-    var globalMessage = document.getElementById("globalMessage");
-    var roleSpecialist = document.getElementById("roleSpecialist");
-    var roleClient = document.getElementById("roleClient");
-    var specializationField = document.getElementById("specializationField");
+      if (isLoggedIn) {
+        // Пользователь авторизован — показываем заглушку кабинета
+        document.querySelector('.card').innerHTML = '<div style="text-align:center;padding:40px 0;">' +
+          '<div style="font-size:48px;margin-bottom:16px;">👤</div>' +
+          '<div style="font-size:20px;font-weight:700;margin-bottom:8px;color:#2C4058;">Личный кабинет</div>' +
+          '<div style="color:#818C99;margin-bottom:24px;">Вы успешно вошли в систему</div>' +
+          '<div style="color:#818C99;font-size:14px;">Здесь будет ваш личный кабинет</div>' +
+          '<button onclick="logout()" style="margin-top:24px;padding:12px 32px;border:1px solid #DCE1E6;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;">Выйти</button>' +
+          '</div>';
 
-    function getUsers() {
-      try {
-        return JSON.parse(localStorage.getItem("users") || "[]");
-      } catch (e) {
-        return [];
-      }
-    }
-
-    function saveUsers(users) {
-      localStorage.setItem("users", JSON.stringify(users));
-    }
-
-    function showTab(tabName) {
-      clearAllErrors();
-      hideGlobalMessage();
-
-      if (tabName === "login") {
-        loginTab.classList.add("active");
-        registerTab.classList.remove("active");
-        loginForm.classList.add("active");
-        registerForm.classList.remove("active");
-      } else {
-        registerTab.classList.add("active");
-        loginTab.classList.remove("active");
-        registerForm.classList.add("active");
-        loginForm.classList.remove("active");
-      }
-    }
-
-    function setRole(role) {
-      selectedRole = role;
-
-      if (role === "specialist") {
-        roleSpecialist.classList.add("active");
-        roleClient.classList.remove("active");
-        specializationField.style.display = "block";
-      } else {
-        roleClient.classList.add("active");
-        roleSpecialist.classList.remove("active");
-        specializationField.style.display = "none";
-        clearFieldError("specialization");
-      }
-    }
-
-    function showGlobalMessage(text, type) {
-      globalMessage.textContent = text;
-      globalMessage.className = "message " + type;
-    }
-
-    function hideGlobalMessage() {
-      globalMessage.textContent = "";
-      globalMessage.className = "message";
-    }
-
-    function setFieldError(id, message) {
-      var input = document.getElementById(id);
-      var msg = document.getElementById(id + "Msg");
-
-      if (input) {
-        input.classList.add("error");
-      }
-
-      if (msg) {
-        msg.textContent = message;
-        msg.classList.add("show");
-      }
-    }
-
-    function clearFieldError(id) {
-      var input = document.getElementById(id);
-      var msg = document.getElementById(id + "Msg");
-
-      if (input) {
-        input.classList.remove("error");
-      }
-
-      if (msg) {
-        msg.textContent = "";
-        msg.classList.remove("show");
-      }
-    }
-
-    function clearAllErrors() {
-      var inputs = document.querySelectorAll("input, select");
-      var messages = document.querySelectorAll(".field-message");
-
-      inputs.forEach(function(input) {
-        input.classList.remove("error");
-      });
-
-      messages.forEach(function(msg) {
-        msg.textContent = "";
-        msg.classList.remove("show");
-      });
-    }
-
-    function isEmpty(value) {
-      return !String(value || "").trim();
-    }
-
-    function validateRegister() {
-      clearAllErrors();
-      hideGlobalMessage();
-
-      var isValid = true;
-
-      var firstName = document.getElementById("firstName").value.trim();
-      var lastName = document.getElementById("lastName").value.trim();
-      var email = document.getElementById("email").value.trim();
-      var phone = document.getElementById("phone").value.trim();
-      var password = document.getElementById("password").value;
-      var passwordRepeat = document.getElementById("passwordRepeat").value;
-      var specialization = document.getElementById("specialization").value;
-      var agree = document.getElementById("agree").checked;
-
-      if (isEmpty(firstName)) {
-        setFieldError("firstName", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (isEmpty(lastName)) {
-        setFieldError("lastName", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (isEmpty(email)) {
-        setFieldError("email", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (isEmpty(phone)) {
-        setFieldError("phone", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (isEmpty(password)) {
-        setFieldError("password", "Обязательное поле");
-        isValid = false;
-      } else if (password.length < 6) {
-        setFieldError("password", "Пароль должен быть минимум 6 символов");
-        isValid = false;
-      }
-
-      if (isEmpty(passwordRepeat)) {
-        setFieldError("passwordRepeat", "Обязательное поле");
-        isValid = false;
-      } else if (password !== passwordRepeat) {
-        setFieldError("passwordRepeat", "Пароли должны совпадать");
-        isValid = false;
-      }
-
-      if (selectedRole === "specialist" && isEmpty(specialization)) {
-        setFieldError("specialization", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (!agree) {
-        var agreeMsg = document.getElementById("agreeMsg");
-        agreeMsg.textContent = "Необходимо принять условия";
-        agreeMsg.classList.add("show");
-        isValid = false;
-      }
-
-      return isValid;
-    }
-
-    function validateLogin() {
-      clearAllErrors();
-      hideGlobalMessage();
-
-      var isValid = true;
-      var email = document.getElementById("loginEmail").value.trim();
-      var password = document.getElementById("loginPassword").value;
-
-      if (isEmpty(email)) {
-        setFieldError("loginEmail", "Обязательное поле");
-        isValid = false;
-      }
-
-      if (isEmpty(password)) {
-        setFieldError("loginPassword", "Обязательное поле");
-        isValid = false;
-      }
-
-      return isValid;
-    }
-
-    registerForm.addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      if (!validateRegister()) {
+        window.logout = function() {
+          window.top.location.href = 'https://lkcabinet.tilda.ws/register';
+        };
         return;
       }
 
-      var user = {
-        id: Date.now(),
-        firstName: document.getElementById("firstName").value.trim(),
-        lastName: document.getElementById("lastName").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        password: document.getElementById("password").value,
-        role: selectedRole,
-        specialization: selectedRole === "specialist" ? document.getElementById("specialization").value : ""
-      };
+      // === ЛОГИКА ФОРМЫ ===
+      var selectedRole = "specialist";
+      var loginTab = document.getElementById("loginTab");
+      var registerTab = document.getElementById("registerTab");
+      var loginForm = document.getElementById("loginForm");
+      var registerForm = document.getElementById("registerForm");
+      var goRegister = document.getElementById("goRegister");
+      var globalMessage = document.getElementById("globalMessage");
+      var roleSpecialist = document.getElementById("roleSpecialist");
+      var roleClient = document.getElementById("roleClient");
+      var specializationField = document.getElementById("specializationField");
 
-      var users = getUsers();
-      users.push(user);
-
-      saveUsers(users);
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      localStorage.setItem("isLoggedIn", "true");
-
-      showGlobalMessage("Регистрация успешна! Сейчас перейдём в кабинет...", "success");
-
-      setTimeout(function() {
-        window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
-      }, 1000);
-    });
-
-    loginForm.addEventListener("submit", function(event) {
-      event.preventDefault();
-
-      if (!validateLogin()) {
-        return;
+      function getUsers() {
+        try { return JSON.parse(localStorage.getItem("users") || "[]"); }
+        catch(e) { return []; }
       }
 
-      var email = document.getElementById("loginEmail").value.trim();
-      var password = document.getElementById("loginPassword").value;
-      var users = getUsers();
+      function saveUsers(users) {
+        localStorage.setItem("users", JSON.stringify(users));
+      }
 
-      var user = users.find(function(item) {
-        return item.email === email && item.password === password;
+      function showTab(tabName) {
+        clearAllErrors();
+        hideGlobalMessage();
+        if (tabName === "login") {
+          loginTab.classList.add("active");
+          registerTab.classList.remove("active");
+          loginForm.classList.add("active");
+          registerForm.classList.remove("active");
+        } else {
+          registerTab.classList.add("active");
+          loginTab.classList.remove("active");
+          registerForm.classList.add("active");
+          loginForm.classList.remove("active");
+        }
+      }
+
+      function setRole(role) {
+        selectedRole = role;
+        if (role === "specialist") {
+          roleSpecialist.classList.add("active");
+          roleClient.classList.remove("active");
+          specializationField.style.display = "block";
+        } else {
+          roleClient.classList.add("active");
+          roleSpecialist.classList.remove("active");
+          specializationField.style.display = "none";
+          clearFieldError("specialization");
+        }
+      }
+
+      function showGlobalMessage(text, type) {
+        globalMessage.textContent = text;
+        globalMessage.className = "message " + type;
+      }
+
+      function hideGlobalMessage() {
+        globalMessage.textContent = "";
+        globalMessage.className = "message";
+      }
+
+      function setFieldError(id, message) {
+        var el = document.getElementById(id);
+        var msg = document.getElementById(id + "Msg");
+        if (el) el.classList.add("error");
+        if (msg) { msg.textContent = message; msg.classList.add("show"); }
+      }
+
+      function clearFieldError(id) {
+        var el = document.getElementById(id);
+        var msg = document.getElementById(id + "Msg");
+        if (el) el.classList.remove("error");
+        if (msg) { msg.textContent = ""; msg.classList.remove("show"); }
+      }
+
+      function clearAllErrors() {
+        document.querySelectorAll("input, select").forEach(function(el) { el.classList.remove("error"); });
+        document.querySelectorAll(".field-message").forEach(function(el) { el.textContent = ""; el.classList.remove("show"); });
+      }
+
+      function isEmpty(val) { return !String(val || "").trim(); }
+
+      function validateRegister() {
+        clearAllErrors(); hideGlobalMessage();
+        var valid = true;
+        var fn = document.getElementById("firstName").value.trim();
+        var ln = document.getElementById("lastName").value.trim();
+        var em = document.getElementById("email").value.trim();
+        var ph = document.getElementById("phone").value.trim();
+        var pw = document.getElementById("password").value;
+        var pwr = document.getElementById("passwordRepeat").value;
+        var sp = document.getElementById("specialization").value;
+        var ag = document.getElementById("agree").checked;
+
+        if (isEmpty(fn)) { setFieldError("firstName","Обязательное поле"); valid=false; }
+        if (isEmpty(ln)) { setFieldError("lastName","Обязательное поле"); valid=false; }
+        if (isEmpty(em)) { setFieldError("email","Обязательное поле"); valid=false; }
+        if (isEmpty(ph)) { setFieldError("phone","Обязательное поле"); valid=false; }
+        if (isEmpty(pw)) { setFieldError("password","Обязательное поле"); valid=false; }
+        else if (pw.length<6) { setFieldError("password","Минимум 6 символов"); valid=false; }
+        if (isEmpty(pwr)) { setFieldError("passwordRepeat","Обязательное поле"); valid=false; }
+        else if (pw!==pwr) { setFieldError("passwordRepeat","Пароли не совпадают"); valid=false; }
+        if (selectedRole==="specialist" && isEmpty(sp)) { setFieldError("specialization","Обязательное поле"); valid=false; }
+        if (!ag) { var m=document.getElementById("agreeMsg"); m.textContent="Необходимо принять условия"; m.classList.add("show"); valid=false; }
+        return valid;
+      }
+
+      function validateLogin() {
+        clearAllErrors(); hideGlobalMessage();
+        var valid = true;
+        if (isEmpty(document.getElementById("loginEmail").value.trim())) { setFieldError("loginEmail","Обязательное поле"); valid=false; }
+        if (isEmpty(document.getElementById("loginPassword").value)) { setFieldError("loginPassword","Обязательное поле"); valid=false; }
+        return valid;
+      }
+
+      // РЕГИСТРАЦИЯ
+      registerForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (!validateRegister()) return;
+
+        var user = {
+          id: Date.now(),
+          firstName: document.getElementById("firstName").value.trim(),
+          lastName: document.getElementById("lastName").value.trim(),
+          email: document.getElementById("email").value.trim(),
+          phone: document.getElementById("phone").value.trim(),
+          password: document.getElementById("password").value,
+          role: selectedRole,
+          specialization: selectedRole==="specialist" ? document.getElementById("specialization").value : ""
+        };
+
+        var users = getUsers();
+        users.push(user);
+        saveUsers(users);
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        localStorage.setItem("isLoggedIn", "true");
+
+        showGlobalMessage("Регистрация успешна! Переходим...", "success");
+        setTimeout(function(){
+          window.top.location.href = "https://lkcabinet.tilda.ws/cabinet?logged=true";
+        }, 800);
       });
 
-      if (!user) {
-        showGlobalMessage("Неверный email или пароль", "error");
-        return;
-      }
+      // ВХОД
+      loginForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        if (!validateLogin()) return;
 
-      localStorage.setItem("currentUser", JSON.stringify(user));
-      localStorage.setItem("isLoggedIn", "true");
+        var em = document.getElementById("loginEmail").value.trim();
+        var pw = document.getElementById("loginPassword").value;
+        var users = getUsers();
+        var user = users.find(function(u){ return u.email===em && u.password===pw; });
 
-      window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
-    });
+        if (!user) { showGlobalMessage("Неверный email или пароль","error"); return; }
 
-    loginTab.addEventListener("click", function() {
-      showTab("login");
-    });
+        localStorage.setItem("currentUser", JSON.stringify(user));
+        localStorage.setItem("isLoggedIn", "true");
 
-    registerTab.addEventListener("click", function() {
-      showTab("register");
-    });
+        window.top.location.href = "https://lkcabinet.tilda.ws/cabinet?logged=true";
+      });
 
-    goRegister.addEventListener("click", function() {
-      showTab("register");
-    });
+      loginTab.addEventListener("click", function(){ showTab("login"); });
+      registerTab.addEventListener("click", function(){ showTab("register"); });
+      goRegister.addEventListener("click", function(){ showTab("register"); });
+      roleSpecialist.addEventListener("click", function(){ setRole("specialist"); });
+      roleClient.addEventListener("click", function(){ setRole("client"); });
 
-    roleSpecialist.addEventListener("click", function() {
+      document.querySelectorAll("input, select").forEach(function(el) {
+        el.addEventListener("input", function(){
+          clearFieldError(el.id);
+          if (el.id==="agree"){ var m=document.getElementById("agreeMsg"); m.textContent=""; m.classList.remove("show"); }
+        });
+        el.addEventListener("change", function(){
+          clearFieldError(el.id);
+          if (el.id==="agree"){ var m=document.getElementById("agreeMsg"); m.textContent=""; m.classList.remove("show"); }
+        });
+      });
+
       setRole("specialist");
-    });
 
-    roleClient.addEventListener("click", function() {
-      setRole("client");
-    });
-
-    document.querySelectorAll("input, select").forEach(function(el) {
-      el.addEventListener("input", function() {
-        clearFieldError(el.id);
-        if (el.id === "agree") {
-          var agreeMsg = document.getElementById("agreeMsg");
-          agreeMsg.textContent = "";
-          agreeMsg.classList.remove("show");
-        }
-      });
-
-      el.addEventListener("change", function() {
-        clearFieldError(el.id);
-        if (el.id === "agree") {
-          var agreeMsg = document.getElementById("agreeMsg");
-          agreeMsg.textContent = "";
-          agreeMsg.classList.remove("show");
-        }
-      });
-    });
-
-    function sendResize() {
-      window.parent.postMessage({
-        action: "resize",
-        height: document.body.scrollHeight
-      }, "*");
-    }
-
-    window.addEventListener("load", function() {
-      window.parent.postMessage({
-        action: "resize",
-        height: document.body.scrollHeight
-      }, "*");
-    });
-
-    var resizeObserver = new ResizeObserver(function() {
-      sendResize();
-    });
-
-    resizeObserver.observe(document.body);
-
-    setRole("specialist");
+      // Отправка высоты в Тильду
+      function sendResize() {
+        window.parent.postMessage({ action:"resize", height:document.body.scrollHeight }, "*");
+      }
+      window.addEventListener("load", sendResize);
+      new ResizeObserver(sendResize).observe(document.body);
+    })();
   </script>
 </body>
 </html>
