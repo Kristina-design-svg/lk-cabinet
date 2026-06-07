@@ -6,10 +6,7 @@
   <title>Вход и регистрация</title>
   <style>
     * { box-sizing: border-box; }
-    html, body {
-      margin: 0; padding: 0; min-width: 320px; min-height: 100%;
-      background: #F5F5F5; font-family: Arial, sans-serif; color: #000;
-    }
+    html, body { margin: 0; padding: 0; min-width: 320px; min-height: 100%; background: #F5F5F5; font-family: Arial, sans-serif; color: #000; }
     body { font-size: 16px; line-height: 1.4; }
     .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 32px 16px; }
     .card { width: 400px; max-width: 100%; background: #FFFFFF; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); padding: 24px; }
@@ -43,11 +40,7 @@
     .cabinet-block .subtitle { color: #818C99; margin-bottom: 24px; }
     .cabinet-block .hint { color: #818C99; font-size: 14px; margin-bottom: 24px; }
     .cabinet-block .logout-btn { padding: 12px 32px; border: 1px solid #DCE1E6; border-radius: 8px; background: #fff; cursor: pointer; font-size: 14px; }
-    @media (max-width: 767px) {
-      .page { padding: 16px; }
-      .card { width: 100%; padding: 20px; }
-      .role-buttons { grid-template-columns: 1fr; }
-    }
+    @media (max-width: 767px) { .page { padding: 16px; } .card { width: 100%; padding: 20px; } .role-buttons { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -59,22 +52,12 @@
         <button class="tab" id="registerTab" type="button">РЕГИСТРАЦИЯ</button>
       </div>
       <div class="message" id="globalMessage"></div>
-
       <form class="form active" id="loginForm" novalidate>
-        <div class="field">
-          <label for="loginEmail">Email</label>
-          <input type="email" id="loginEmail" autocomplete="email">
-          <div class="field-message" id="loginEmailMsg"></div>
-        </div>
-        <div class="field">
-          <label for="loginPassword">Пароль</label>
-          <input type="password" id="loginPassword" autocomplete="current-password">
-          <div class="field-message" id="loginPasswordMsg"></div>
-        </div>
+        <div class="field"><label for="loginEmail">Email</label><input type="email" id="loginEmail"><div class="field-message" id="loginEmailMsg"></div></div>
+        <div class="field"><label for="loginPassword">Пароль</label><input type="password" id="loginPassword"><div class="field-message" id="loginPasswordMsg"></div></div>
         <button class="main-btn" type="submit">Войти</button>
         <div class="link-row"><a id="goRegister">Нет аккаунта? Зарегистрироваться</a></div>
       </form>
-
       <form class="form" id="registerForm" novalidate>
         <div class="field"><label for="firstName">Имя</label><input type="text" id="firstName"><div class="field-message" id="firstNameMsg"></div></div>
         <div class="field"><label for="lastName">Фамилия</label><input type="text" id="lastName"><div class="field-message" id="lastNameMsg"></div></div>
@@ -82,26 +65,9 @@
         <div class="field"><label for="phone">Телефон</label><input type="tel" id="phone" placeholder="+7 900 123-45-67"><div class="field-message" id="phoneMsg"></div></div>
         <div class="field"><label for="password">Пароль</label><input type="password" id="password"><div class="field-message" id="passwordMsg"></div></div>
         <div class="field"><label for="passwordRepeat">Повторите пароль</label><input type="password" id="passwordRepeat"><div class="field-message" id="passwordRepeatMsg"></div></div>
-        <div class="field">
-          <label>Роль</label>
-          <div class="role-buttons">
-            <button class="role-btn active" type="button" id="roleSpecialist">Я специалист</button>
-            <button class="role-btn" type="button" id="roleClient">Я клиент</button>
-          </div>
-        </div>
-        <div class="field" id="specializationField">
-          <label for="specialization">Специализация</label>
-          <select id="specialization">
-            <option value="">Выберите</option>
-            <option value="Репетитор английского">Репетитор английского</option>
-            <option value="Репетитор математики">Репетитор математики</option>
-            <option value="Няня">Няня</option>
-            <option value="Другое">Другое</option>
-          </select>
-          <div class="field-message" id="specializationMsg"></div>
-        </div>
-        <label class="checkbox-row"><input type="checkbox" id="agree"><span>Принимаю условия</span></label>
-        <div class="field-message" id="agreeMsg"></div>
+        <div class="field"><label>Роль</label><div class="role-buttons"><button class="role-btn active" type="button" id="roleSpecialist">Я специалист</button><button class="role-btn" type="button" id="roleClient">Я клиент</button></div></div>
+        <div class="field" id="specializationField"><label for="specialization">Специализация</label><select id="specialization"><option value="">Выберите</option><option value="Репетитор английского">Репетитор английского</option><option value="Репетитор математики">Репетитор математики</option><option value="Няня">Няня</option><option value="Другое">Другое</option></select><div class="field-message" id="specializationMsg"></div></div>
+        <label class="checkbox-row"><input type="checkbox" id="agree"><span>Принимаю условия</span></label><div class="field-message" id="agreeMsg"></div>
         <button class="main-btn" type="submit">Зарегистрироваться</button>
       </form>
     </div>
@@ -109,11 +75,7 @@
 
   <script>
     (function() {
-      // Сразу показываем кабинет, если есть флаг в localStorage
-      if (localStorage.getItem("isLoggedIn") === "true") {
-        showCabinet();
-        return;
-      }
+      if (localStorage.getItem("isLoggedIn") === "true") { showCabinet(); return; }
 
       var selectedRole = "specialist";
       var loginTab = document.getElementById("loginTab");
@@ -126,134 +88,68 @@
       var roleClient = document.getElementById("roleClient");
       var specializationField = document.getElementById("specializationField");
 
-      function getUsers() {
-        try { return JSON.parse(localStorage.getItem("users") || "[]"); }
-        catch(e) { return []; }
-      }
-
+      function getUsers() { try { return JSON.parse(localStorage.getItem("users") || "[]"); } catch(e) { return []; } }
       function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
 
       function showTab(t) {
         clearAllErrors(); hideGlobalMessage();
-        if (t === "login") {
-          loginTab.classList.add("active"); registerTab.classList.remove("active");
-          loginForm.classList.add("active"); registerForm.classList.remove("active");
-        } else {
-          registerTab.classList.add("active"); loginTab.classList.remove("active");
-          registerForm.classList.add("active"); loginForm.classList.remove("active");
-        }
+        if (t === "login") { loginTab.classList.add("active"); registerTab.classList.remove("active"); loginForm.classList.add("active"); registerForm.classList.remove("active"); }
+        else { registerTab.classList.add("active"); loginTab.classList.remove("active"); registerForm.classList.add("active"); loginForm.classList.remove("active"); }
       }
 
       function setRole(r) {
         selectedRole = r;
-        if (r === "specialist") {
-          roleSpecialist.classList.add("active"); roleClient.classList.remove("active");
-          specializationField.style.display = "block";
-        } else {
-          roleClient.classList.add("active"); roleSpecialist.classList.remove("active");
-          specializationField.style.display = "none"; clearFieldError("specialization");
-        }
+        if (r === "specialist") { roleSpecialist.classList.add("active"); roleClient.classList.remove("active"); specializationField.style.display = "block"; }
+        else { roleClient.classList.add("active"); roleSpecialist.classList.remove("active"); specializationField.style.display = "none"; clearFieldError("specialization"); }
       }
 
       function showGlobalMessage(txt, type) { globalMessage.textContent = txt; globalMessage.className = "message " + type; }
       function hideGlobalMessage() { globalMessage.textContent = ""; globalMessage.className = "message"; }
 
-      function setFieldError(id, msg) {
-        var el = document.getElementById(id), m = document.getElementById(id + "Msg");
-        if (el) el.classList.add("error");
-        if (m) { m.textContent = msg; m.classList.add("show"); }
-      }
-
-      function clearFieldError(id) {
-        var el = document.getElementById(id), m = document.getElementById(id + "Msg");
-        if (el) el.classList.remove("error");
-        if (m) { m.textContent = ""; m.classList.remove("show"); }
-      }
-
-      function clearAllErrors() {
-        document.querySelectorAll("input, select").forEach(function(e) { e.classList.remove("error"); });
-        document.querySelectorAll(".field-message").forEach(function(e) { e.textContent = ""; e.classList.remove("show"); });
-      }
-
+      function setFieldError(id, msg) { var el = document.getElementById(id), m = document.getElementById(id + "Msg"); if (el) el.classList.add("error"); if (m) { m.textContent = msg; m.classList.add("show"); } }
+      function clearFieldError(id) { var el = document.getElementById(id), m = document.getElementById(id + "Msg"); if (el) el.classList.remove("error"); if (m) { m.textContent = ""; m.classList.remove("show"); } }
+      function clearAllErrors() { document.querySelectorAll("input, select").forEach(function(e) { e.classList.remove("error"); }); document.querySelectorAll(".field-message").forEach(function(e) { e.textContent = ""; e.classList.remove("show"); }); }
       function isEmpty(v) { return !String(v || "").trim(); }
 
       function showCabinet() {
-        document.getElementById("mainCard").innerHTML =
-          '<div class="cabinet-block">' +
-          '<div class="icon">👤</div>' +
-          '<div class="title">Личный кабинет</div>' +
-          '<div class="subtitle">Вы успешно вошли в систему</div>' +
-          '<div class="hint">Здесь будет ваш личный кабинет</div>' +
-          '<button class="logout-btn" onclick="doLogout()">Выйти</button>' +
-          '</div>';
-        window.doLogout = function() {
-          localStorage.removeItem("isLoggedIn");
-          localStorage.removeItem("currentUser");
-          window.top.location.href = "https://lkcabinet.tilda.ws/register";
-        };
+        document.getElementById("mainCard").innerHTML = '<div class="cabinet-block"><div class="icon">👤</div><div class="title">Личный кабинет</div><div class="subtitle">Вы успешно вошли в систему</div><div class="hint">Здесь будет ваш личный кабинет</div><button class="logout-btn" onclick="doLogout()">Выйти</button></div>';
+        window.doLogout = function() { localStorage.removeItem("isLoggedIn"); localStorage.removeItem("currentUser"); window.location.href = "https://lkcabinet.tilda.ws/register"; };
       }
 
       registerForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        clearAllErrors(); hideGlobalMessage();
-
-        var fn = document.getElementById("firstName").value.trim();
-        var ln = document.getElementById("lastName").value.trim();
-        var em = document.getElementById("email").value.trim();
-        var ph = document.getElementById("phone").value.trim();
-        var pw = document.getElementById("password").value;
-        var pwr = document.getElementById("passwordRepeat").value;
-        var sp = document.getElementById("specialization").value;
-        var ag = document.getElementById("agree").checked;
-        var valid = true;
-
+        e.preventDefault(); clearAllErrors(); hideGlobalMessage();
+        var fn = document.getElementById("firstName").value.trim(), ln = document.getElementById("lastName").value.trim(), em = document.getElementById("email").value.trim(), ph = document.getElementById("phone").value.trim(), pw = document.getElementById("password").value, pwr = document.getElementById("passwordRepeat").value, sp = document.getElementById("specialization").value, ag = document.getElementById("agree").checked, valid = true;
         if (isEmpty(fn)) { setFieldError("firstName","Обязательное поле"); valid=false; }
         if (isEmpty(ln)) { setFieldError("lastName","Обязательное поле"); valid=false; }
         if (isEmpty(em)) { setFieldError("email","Обязательное поле"); valid=false; }
         if (isEmpty(ph)) { setFieldError("phone","Обязательное поле"); valid=false; }
-        if (isEmpty(pw)) { setFieldError("password","Обязательное поле"); valid=false; }
-        else if (pw.length<6) { setFieldError("password","Минимум 6 символов"); valid=false; }
-        if (isEmpty(pwr)) { setFieldError("passwordRepeat","Обязательное поле"); valid=false; }
-        else if (pw!==pwr) { setFieldError("passwordRepeat","Пароли не совпадают"); valid=false; }
+        if (isEmpty(pw)) { setFieldError("password","Обязательное поле"); valid=false; } else if (pw.length<6) { setFieldError("password","Минимум 6 символов"); valid=false; }
+        if (isEmpty(pwr)) { setFieldError("passwordRepeat","Обязательное поле"); valid=false; } else if (pw!==pwr) { setFieldError("passwordRepeat","Пароли не совпадают"); valid=false; }
         if (selectedRole==="specialist" && isEmpty(sp)) { setFieldError("specialization","Обязательное поле"); valid=false; }
         if (!ag) { document.getElementById("agreeMsg").textContent="Необходимо принять условия"; document.getElementById("agreeMsg").classList.add("show"); valid=false; }
-
         if (!valid) return;
 
-        var user = {
-          id: Date.now(), firstName: fn, lastName: ln, email: em,
-          phone: ph, password: pw, role: selectedRole,
-          specialization: selectedRole==="specialist" ? sp : ""
-        };
-
-        var users = getUsers();
-        users.push(user);
-        saveUsers(users);
+        var user = { id: Date.now(), firstName: fn, lastName: ln, email: em, phone: ph, password: pw, role: selectedRole, specialization: selectedRole==="specialist" ? sp : "" };
+        var users = getUsers(); users.push(user); saveUsers(users);
         localStorage.setItem("currentUser", JSON.stringify(user));
         localStorage.setItem("isLoggedIn", "true");
-
         showGlobalMessage("Регистрация успешна!", "success");
-        setTimeout(function() {
-          window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
-        }, 800);
+
+        var gotoPage = user.role === "specialist" ? "specialist" : "client";
+        setTimeout(function() { window.location.href = "https://lkcabinet.tilda.ws/cabinet?page=" + gotoPage; }, 800);
       });
 
       loginForm.addEventListener("submit", function(e) {
-        e.preventDefault();
-        clearAllErrors(); hideGlobalMessage();
-
-        var em = document.getElementById("loginEmail").value.trim();
-        var pw = document.getElementById("loginPassword").value;
-
+        e.preventDefault(); clearAllErrors(); hideGlobalMessage();
+        var em = document.getElementById("loginEmail").value.trim(), pw = document.getElementById("loginPassword").value;
         if (isEmpty(em)) { setFieldError("loginEmail","Обязательное поле"); return; }
         if (isEmpty(pw)) { setFieldError("loginPassword","Обязательное поле"); return; }
-
         var user = getUsers().find(function(u) { return u.email===em && u.password===pw; });
         if (!user) { showGlobalMessage("Неверный email или пароль","error"); return; }
-
         localStorage.setItem("currentUser", JSON.stringify(user));
         localStorage.setItem("isLoggedIn", "true");
-        window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
+        var gotoPage = user.role === "specialist" ? "specialist" : "client";
+        window.location.href = "https://lkcabinet.tilda.ws/cabinet?page=" + gotoPage;
       });
 
       loginTab.addEventListener("click", function(){ showTab("login"); });
@@ -261,16 +157,10 @@
       goRegister.addEventListener("click", function(){ showTab("register"); });
       roleSpecialist.addEventListener("click", function(){ setRole("specialist"); });
       roleClient.addEventListener("click", function(){ setRole("client"); });
-
-      document.querySelectorAll("input, select").forEach(function(el) {
-        el.addEventListener("input", function(){ clearFieldError(el.id); });
-      });
-
+      document.querySelectorAll("input, select").forEach(function(el) { el.addEventListener("input", function(){ clearFieldError(el.id); }); });
       setRole("specialist");
 
-      function sendResize() {
-        window.parent.postMessage({ action:"resize", height:document.body.scrollHeight }, "*");
-      }
+      function sendResize() { window.parent.postMessage({ action:"resize", height:document.body.scrollHeight }, "*"); }
       window.addEventListener("load", sendResize);
       new ResizeObserver(sendResize).observe(document.body);
     })();
