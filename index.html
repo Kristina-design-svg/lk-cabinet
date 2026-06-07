@@ -347,7 +347,7 @@
         </div>
 
         <div class="field" id="specializationField">
-          <label for="specialization">Регистрация</label>
+          <label for="specialization">Специализация</label>
           <select id="specialization">
             <option value="">Выберите специализацию</option>
             <option value="Репетитор английского">Репетитор английского</option>
@@ -409,8 +409,6 @@
         registerForm.classList.add("active");
         loginForm.classList.remove("active");
       }
-
-      sendResize();
     }
 
     function setRole(role) {
@@ -426,14 +424,11 @@
         specializationField.style.display = "none";
         clearFieldError("specialization");
       }
-
-      sendResize();
     }
 
     function showGlobalMessage(text, type) {
       globalMessage.textContent = text;
       globalMessage.className = "message " + type;
-      sendResize();
     }
 
     function hideGlobalMessage() {
@@ -578,7 +573,6 @@
       event.preventDefault();
 
       if (!validateRegister()) {
-        sendResize();
         return;
       }
 
@@ -603,7 +597,7 @@
       showGlobalMessage("Регистрация успешна! Сейчас перейдём в кабинет...", "success");
 
       setTimeout(function() {
-        window.parent.postMessage({ action: "goToCabinet" }, "*");
+        window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
       }, 1000);
     });
 
@@ -611,7 +605,6 @@
       event.preventDefault();
 
       if (!validateLogin()) {
-        sendResize();
         return;
       }
 
@@ -631,7 +624,7 @@
       localStorage.setItem("currentUser", JSON.stringify(user));
       localStorage.setItem("isLoggedIn", "true");
 
-      window.parent.postMessage({ action: "goToCabinet" }, "*");
+      window.top.location.href = "https://lkcabinet.tilda.ws/cabinet";
     });
 
     loginTab.addEventListener("click", function() {
