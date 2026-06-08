@@ -27,7 +27,6 @@
     p { margin: 0; }
     input, select, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #FFFFFF; color: var(--text); outline: none; }
     textarea { min-height: 96px; resize: vertical; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,118,168,0.12); }
     label { display: grid; gap: 6px; color: #2C4058; font-weight: 700; }
     .muted { color: var(--muted); }
     .app { min-height: 100vh; }
@@ -41,7 +40,7 @@
     .nav-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 800; }
     .nav-item .count { margin-left: auto; min-width: 20px; height: 20px; display: grid; place-items: center; padding: 0 6px; border-radius: 10px; background: var(--danger); color: #FFFFFF; font-size: 12px; font-weight: 800; }
     .content { min-width: 0; }
-    .page-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 16px; }
+    .page-title { margin-bottom: 16px; }
     .card { padding: 18px; border-radius: var(--radius); background: #FFFFFF; box-shadow: var(--shadow); }
     .grid { display: grid; gap: 16px; }
     .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -60,65 +59,32 @@
     .status { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border-radius: 15px; font-weight: 800; font-size: 13px; }
     .status.good { background: #EAF7EE; color: var(--success); }
     .status.bad { background: #FFECEC; color: var(--danger); }
-    .tabs { display: flex; gap: 18px; margin-bottom: 16px; border-bottom: 1px solid var(--line); overflow-x: auto; }
-    .tab { min-height: 44px; padding: 0 2px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 800; }
-    .list { display: grid; gap: 12px; }
-    .list-item { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #FFFFFF; }
-    .checkbox { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
-    .checkbox input { width: 20px; height: 20px; min-height: 20px; padding: 0; }
     .service-card { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; background: #FFFFFF; }
     .service-price { font-size: 22px; font-weight: 800; color: var(--accent); }
     .review-summary { display: grid; grid-template-columns: 150px minmax(0,1fr); gap: 20px; align-items: center; }
     .big-rating { color: var(--accent); font-size: 48px; font-weight: 800; line-height: 1; }
     .stars { color: var(--warning); letter-spacing: 1px; font-size: 18px; }
-    .messages-layout { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; min-height: 600px; }
-    .dialogs, .chat { min-width: 0; border-radius: var(--radius); background: #FFFFFF; box-shadow: var(--shadow); }
-    .dialog { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; padding: 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
-    .dialog.active { background: var(--accent-soft); }
-    .dialog-avatar, .small-avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-weight: 800; overflow: hidden; }
-    .dialog-avatar img, .small-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .back-chat { display: none; background: #EEF2F6; color: #2C4058; }
-    .chat-header { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--line); font-weight: 800; }
-    .chat-body { height: 460px; overflow: auto; padding: 16px; display: grid; align-content: start; gap: 10px; background: #FAFBFC; }
-    .message { max-width: 78%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #FFFFFF; }
-    .message.out { justify-self: end; border-color: var(--accent); background: var(--accent); color: #FFFFFF; }
-    .chat-form { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 12px; border-top: 1px solid var(--line); }
+    .checkbox { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; }
+    .checkbox input { width: 20px; height: 20px; min-height: 20px; padding: 0; }
     .drawer-overlay, .modal-overlay { position: fixed; inset: 0; display: none; background: rgba(0,0,0,0.38); z-index: 80; }
     .drawer-overlay.show, .modal-overlay.show { display: block; }
     .modal { position: fixed; left: 50%; top: 50%; z-index: 90; display: none; width: min(560px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; transform: translate(-50%, -50%); padding: 20px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 20px 70px rgba(0,0,0,0.25); }
     .modal.show { display: block; }
-    .faq-button { width: 100%; margin-top: 8px; background: #EEF2F6; color: #2C4058; text-align: left; }
-    .faq-answer { display: none; padding: 10px 4px 4px; color: var(--muted); }
-    .faq-answer.show { display: block; }
     .empty { padding: 18px; border-radius: 12px; background: #FFFFFF; box-shadow: var(--shadow); color: var(--muted); }
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 200; background: #2C4058; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 200; background: #2C4058; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
     .toast.show { opacity: 1; }
-    @media (max-width: 1199px) {
-      :root { --sidebar: 200px; }
-      .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .messages-layout { grid-template-columns: 240px minmax(0, 1fr); }
-    }
+    @media (max-width: 1199px) { :root { --sidebar: 200px; } .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
     @media (max-width: 767px) {
       .topbar { height: 58px; padding: 0 12px; }
       .burger { display: grid; place-items: center; }
       .logo { font-size: 17px; }
       .layout { display: block; padding: 12px; }
-      .sidebar { position: fixed; left: 0; top: 0; z-index: 100; width: 280px; height: 100vh; border-radius: 0; transform: translateX(-100%); transition: transform 0.2s ease; }
+      .sidebar { position: fixed; left: 0; top: 0; z-index: 100; width: 280px; height: 100vh; border-radius: 0; transform: translateX(-100%); transition: transform 0.2s; }
       .sidebar.open { transform: translateX(0); }
       .grid.two, .grid.three, .form-row, .profile-card, .review-summary { grid-template-columns: 1fr; }
       .profile-card { justify-items: center; text-align: center; }
-      .page-title { display: grid; }
       .row, .between { flex-direction: column; align-items: stretch; }
-      .row button, .between button { width: 100%; }
-      .messages-layout { display: block; min-height: auto; }
-      .messages-layout.chat-open .dialogs { display: none; }
-      .messages-layout:not(.chat-open) .chat { display: none; }
-      .dialogs, .chat { min-height: 560px; }
-      .back-chat { display: inline-flex; width: auto !important; }
-      .chat-form { grid-template-columns: 1fr; }
       .modal { width: calc(100vw - 20px); max-height: calc(100vh - 20px); padding: 16px; }
-      input, select, textarea, button { font-size: 16px; }
     }
   </style>
 </head>
@@ -127,187 +93,118 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    function sendToTilda(action, data) {
-      window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
-    }
-
-    var USERS_KEY = 'users';
-    var CURRENT_USER_KEY = 'currentUser';
-    var LOGIN_KEY = 'isLoggedIn';
-    var SPECIALIST_DATA_KEY = 'specialistCabinetData';
+    var USERS_KEY = 'users', CURRENT_USER_KEY = 'currentUser', LOGIN_KEY = 'isLoggedIn', DATA_KEY = 'specialistCabinetData';
 
     var defaultData = {
-      section: 'profile', requestTab: 'active', activeDialog: 0, mobileChatOpen: false,
+      section: 'profile', requestTab: 'active', activeDialog: 0,
       profile: { firstName: '', lastName: '', email: '', phone: '', city: 'Москва', specialization: '', about: '', hourlyPrice: 1200, photo: '' },
-      notifications: { requestsEmail: true, messagesEmail: true, sms: false, smsPhone: '' },
-      paid: false, discount: 10,
-      education: [],
-      certificates: [],
-      experience: [],
-      recommendations: [],
+      paid: false,
       services: [{ title: 'Новая услуга', duration: '60 минут', price: 1000, active: true }],
       reviews: [],
       dialogs: [],
       requests: [],
-      supportMessages: [],
       twoFA: false
     };
 
-    var currentUser = null;
-    var data = null;
-    var app = document.getElementById('app');
-    var toast = document.getElementById('toast');
+    var currentUser = null, data = null;
+    var app = document.getElementById('app'), toast = document.getElementById('toast');
 
-    function showToast(text) {
-      toast.textContent = text;
-      toast.classList.add('show');
-      setTimeout(function() { toast.classList.remove('show'); }, 2500);
-    }
-
-    function safeParse(value, fallback) { try { return JSON.parse(value) || fallback; } catch (e) { return fallback; } }
-    function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
-    function esc(value) { return String(value ?? '').replace(/[&<>"']/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; }); }
-    function getInitials() { return ((data.profile.firstName || 'С')[0] || 'С') + ((data.profile.lastName || 'П')[0] || 'П'); }
+    function showToast(text) { toast.textContent = text; toast.classList.add('show'); setTimeout(function() { toast.classList.remove('show'); }, 2500); }
+    function safeParse(v, fb) { try { return JSON.parse(v) || fb; } catch(e) { return fb; } }
+    function clone(o) { return JSON.parse(JSON.stringify(o)); }
+    function esc(v) { return String(v ?? '').replace(/[&<>"']/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; }); }
+    function getInitials() { return ((data.profile.firstName||'С')[0]||'С') + ((data.profile.lastName||'П')[0]||'П'); }
     function getUsers() { return safeParse(localStorage.getItem(USERS_KEY), []); }
     function setUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
 
     function saveCurrentUser() {
       if (!currentUser) return;
-      currentUser.firstName = data.profile.firstName;
-      currentUser.lastName = data.profile.lastName;
-      currentUser.email = data.profile.email;
-      currentUser.phone = data.profile.phone;
-      currentUser.specialization = data.profile.specialization;
-      currentUser.city = data.profile.city;
-      currentUser.about = data.profile.about;
-      currentUser.hourlyPrice = data.profile.hourlyPrice;
-      currentUser.photo = data.profile.photo;
-      currentUser.role = 'specialist';
+      var p = data.profile;
+      currentUser.firstName = p.firstName; currentUser.lastName = p.lastName; currentUser.email = p.email;
+      currentUser.phone = p.phone; currentUser.specialization = p.specialization; currentUser.city = p.city;
+      currentUser.about = p.about; currentUser.hourlyPrice = p.hourlyPrice; currentUser.photo = p.photo; currentUser.role = 'specialist';
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
-      var users = getUsers();
-      var idx = users.findIndex(function(u) { return String(u.id) === String(currentUser.id) || u.email === currentUser.email; });
-      if (idx >= 0) users[idx] = Object.assign({}, users[idx], currentUser);
-      else users.push(currentUser);
+      var users = getUsers(), idx = users.findIndex(function(u) { return String(u.id)===String(currentUser.id)||u.email===currentUser.email; });
+      if (idx>=0) users[idx] = Object.assign({}, users[idx], currentUser); else users.push(currentUser);
       setUsers(users);
     }
 
-    function saveData() {
-      localStorage.setItem(SPECIALIST_DATA_KEY, JSON.stringify(data));
-      saveCurrentUser();
-      sendResize();
-    }
+    function saveData() { localStorage.setItem(DATA_KEY, JSON.stringify(data)); saveCurrentUser(); sendResize(); }
 
     function loadData() {
-      var saved = safeParse(localStorage.getItem(SPECIALIST_DATA_KEY), null);
+      var saved = safeParse(localStorage.getItem(DATA_KEY), null);
       data = Object.assign(clone(defaultData), saved || {});
       data.profile = Object.assign(clone(defaultData.profile), data.profile || {});
-      data.notifications = Object.assign(clone(defaultData.notifications), data.notifications || {});
-      data.profile.firstName = currentUser.firstName || data.profile.firstName || 'Специалист';
-      data.profile.lastName = currentUser.lastName || data.profile.lastName || '';
-      data.profile.email = currentUser.email || data.profile.email || '';
-      data.profile.phone = currentUser.phone || data.profile.phone || '';
-      data.profile.specialization = currentUser.specialization || data.profile.specialization || '';
-      data.profile.city = currentUser.city || data.profile.city || 'Москва';
-      data.profile.about = currentUser.about || data.profile.about || '';
-      data.profile.hourlyPrice = currentUser.hourlyPrice || data.profile.hourlyPrice || 1200;
-      data.profile.photo = currentUser.photo || data.profile.photo || '';
+      var p = data.profile;
+      p.firstName = currentUser.firstName || p.firstName || 'Специалист';
+      p.lastName = currentUser.lastName || p.lastName || '';
+      p.email = currentUser.email || p.email || '';
+      p.phone = currentUser.phone || p.phone || '';
+      p.specialization = currentUser.specialization || p.specialization || '';
+      p.city = currentUser.city || p.city || 'Москва';
+      p.about = currentUser.about || p.about || '';
+      p.hourlyPrice = currentUser.hourlyPrice || p.hourlyPrice || 1200;
+      p.photo = currentUser.photo || p.photo || '';
     }
 
     function checkAccess() {
-      if (localStorage.getItem(LOGIN_KEY) === 'true') {
-        currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
-        if (currentUser) return true;
-      }
+      if (localStorage.getItem(LOGIN_KEY)==='true') { currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null); if (currentUser) return true; }
       var urlParams = new URLSearchParams(window.location.search);
-      var loggedFromUrl = urlParams.get('logged');
-      if (loggedFromUrl === 'true') {
+      if (urlParams.get('logged')==='true') {
         localStorage.setItem(LOGIN_KEY, 'true');
-        currentUser = {
-          id: Date.now(),
-          firstName: urlParams.get('firstName') || 'Специалист',
-          lastName: urlParams.get('lastName') || '',
-          email: urlParams.get('email') || '',
-          phone: urlParams.get('phone') || '',
-          role: 'specialist',
-          specialization: urlParams.get('specialization') || '',
-          photo: ''
-        };
+        currentUser = { id: Date.now(), firstName: urlParams.get('firstName')||'Специалист', lastName: urlParams.get('lastName')||'', email: urlParams.get('email')||'', phone: urlParams.get('phone')||'', role: 'specialist', specialization: urlParams.get('specialization')||'', photo: '' };
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
         return true;
       }
       app.innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><h2>Необходимо войти в аккаунт</h2><br><a href="https://lkcabinet.tilda.ws/register" style="display:inline-block;padding:14px 28px;background:#4A76A8;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">Войти</a></div>';
-      sendResize();
-      return false;
+      sendResize(); return false;
     }
 
-    function unreadCount() { return data.dialogs.reduce(function(s,d) { return s + Number(d.unread||0); }, 0); }
     function activeRequestsCount() { return data.requests.filter(function(r) { return r.status==='active'; }).length; }
-    function averageRating() { if (!data.reviews.length) return '0.0'; return (data.reviews.reduce(function(s,r) { return s+Number(r.rating||0); }, 0) / data.reviews.length).toFixed(1); }
+    function averageRating() { if (!data.reviews.length) return '0.0'; return (data.reviews.reduce(function(s,r) { return s+Number(r.rating||0); },0)/data.reviews.length).toFixed(1); }
 
     function render() {
-      app.innerHTML = '<header class="topbar"><button class="burger" id="burgerBtn">☰</button><div class="logo" id="logoBtn">Кабинет специалиста</div><div class="top-avatar">' + getInitials() + '</div></header>' +
-        '<div class="drawer-overlay" id="drawerOverlay"></div><div class="layout"><aside class="sidebar" id="sidebar">' + sidebarHTML() + '</aside><main class="content">' + contentHTML() + '</main></div>' +
+      app.innerHTML = '<header class="topbar"><button class="burger" id="burgerBtn">☰</button><div class="logo" id="logoBtn">Кабинет специалиста</div><div class="top-avatar">'+getInitials()+'</div></header>'+
+        '<div class="drawer-overlay" id="drawerOverlay"></div><div class="layout"><aside class="sidebar" id="sidebar">'+sidebarHTML()+'</aside><main class="content">'+contentHTML()+'</main></div>'+
         '<div class="modal-overlay" id="modalOverlay"></div><div class="modal" id="modal"></div>';
-      bindBaseEvents();
-      bindSectionEvents();
-      sendResize();
+      bindBaseEvents(); bindSectionEvents(); sendResize();
     }
 
     function sidebarHTML() {
-      return [['profile','👤','Профиль',0],['settings','⚙️','Настройки',0],['education','🎓','Образование',0],['experience','💼','Опыт работы',0],['services','💰','Услуги и расценки',0],['reviews','⭐','Отзывы и рейтинг',0],['messages','✉️','Сообщения',unreadCount()],['requests','📋','Заявки',activeRequestsCount()],['support','🆘','Поддержка',0],['security','🔒','Безопасность',0],['logout','🚪','Выйти',0]]
+      return [['profile','👤','Профиль',0],['settings','⚙️','Настройки',0],['services','💰','Услуги и расценки',0],['reviews','⭐','Отзывы и рейтинг',0],['messages','✉️','Сообщения',0],['requests','📋','Заявки',activeRequestsCount()],['support','🆘','Поддержка',0],['security','🔒','Безопасность',0],['logout','🚪','Выйти',0]]
         .map(function(i) { return '<button class="nav-item'+(data.section===i[0]?' active':'')+'" data-section="'+i[0]+'"><span>'+i[1]+'</span><span>'+i[2]+'</span>'+(i[3]?'<span class="count">'+i[3]+'</span>':'')+'</button>'; }).join('');
     }
 
-    function avatarHTML(size) {
-      var photo = data.profile.photo;
-      if (photo) return '<img src="'+photo+'" alt="Фото">';
-      return getInitials();
-    }
+    function avatarHTML() { return data.profile.photo ? '<img src="'+data.profile.photo+'" alt="Фото">' : getInitials(); }
 
     function contentHTML() {
       var s = data.section;
-      if (s==='profile') return titleHTML('Профиль')+'<div class="card profile-card"><div class="avatar-block"><div class="big-avatar">'+avatarHTML()+'</div><label class="avatar-upload" title="Изменить фото">📷<input id="photoInput" type="file" accept="image/*"></label></div><div class="grid"><h2>'+esc(data.profile.firstName)+' '+esc(data.profile.lastName)+'</h2><p class="muted">'+esc(data.profile.specialization||'Специалист')+' · '+esc(data.profile.city)+'</p><div class="row"><span class="rating">★ '+averageRating()+'</span><span class="muted">'+data.reviews.length+' отзывов</span></div><p>'+esc(data.profile.about||'Информация не указана')+'</p><div class="row"><button id="editProfileBtn">Редактировать</button></div></div></div>';
-      if (s==='settings') return titleHTML('Настройки')+'<div class="grid two"><div class="card"><h2>Основные данные</h2><div class="form"><div class="form-row"><label>Имя<input id="firstName" value="'+esc(data.profile.firstName)+'"></label><label>Фамилия<input id="lastName" value="'+esc(data.profile.lastName)+'"></label></div><div class="form-row"><label>Телефон<input id="phone" value="'+esc(data.profile.phone)+'"></label><label>Email<input id="email" value="'+esc(data.profile.email)+'"></label></div><div class="form-row"><label>Город<input id="city" value="'+esc(data.profile.city)+'"></label><label>Специализация<input id="specialization" value="'+esc(data.profile.specialization)+'"></label></div><label>О себе<textarea id="about">'+esc(data.profile.about)+'</textarea></label><button id="saveSettingsBtn">Сохранить изменения</button></div></div><div class="card"><h2>Смена пароля</h2><div class="form"><label>Новый пароль<input id="newPassword" type="password"></label><label>Повторите пароль<input id="repeatPassword" type="password"></label><button id="changePasswordBtn">Сменить пароль</button></div></div></div>';
-      if (s==='services') return titleHTML('Услуги и расценки')+'<div class="grid"><div class="card between"><h2>Статус анкеты</h2><span class="status '+(data.paid?'good':'bad')+'">'+(data.paid?'Активна':'Не оплачена')+'</span><button id="payAccessBtn">Оплатить доступ</button></div><div class="card row"><button id="addServiceBtn">+ Добавить услугу</button></div><div class="grid three">'+data.services.map(function(s,i){ return '<div class="service-card"><label>Название<input data-service="'+i+'" data-field="title" value="'+esc(s.title)+'"></label><label>Длительность<input data-service="'+i+'" data-field="duration" value="'+esc(s.duration)+'"></label><label>Цена<input data-service="'+i+'" data-field="price" type="number" value="'+esc(s.price)+'"></label><div class="service-price">'+esc(s.price)+'₽</div><label class="checkbox"><input data-service-toggle="'+i+'" type="checkbox" '+(s.active?'checked':'')+'> Активна</label><button class="secondary remove-service" data-index="'+i+'">Удалить</button></div>'; }).join('')+'</div></div>';
-      if (s==='reviews') return titleHTML('Отзывы и рейтинг')+'<div class="card review-summary"><div><div class="big-rating">'+averageRating()+'</div><div class="stars">★★★★★</div></div><div><h2>'+data.reviews.length+' отзывов</h2></div></div><div class="list">'+data.reviews.map(function(r,i){ return '<div class="card"><div class="between"><h3>'+esc(r.name)+'</h3><div class="stars">'+'★'.repeat(Number(r.rating||0))+'</div></div><p>'+esc(r.text)+'</p>'+(r.answer?'<div class="list-item"><b>Ваш ответ</b><p>'+esc(r.answer)+'</p></div>':'<div class="form"><textarea class="review-answer" data-index="'+i+'" placeholder="Ответить"></textarea><button class="save-review-answer" data-index="'+i+'">Ответить</button></div>')+'</div>'; }).join('')+'</div>';
-      if (s==='messages') return titleHTML('Сообщения')+'<p class="muted">Сообщения будут доступны после обращения клиентов.</p>';
-      if (s==='requests') return titleHTML('Заявки')+'<div class="tabs"><button class="tab active">Активные</button><button class="tab">Завершённые</button><button class="tab">Отклонённые</button></div><p class="muted">Заявки появятся после отклика клиентов.</p>';
-      if (s==='support') return titleHTML('Поддержка')+'<div class="card"><p><a href="https://t.me/example">Telegram</a> · <a href="https://wa.me/79000000000">WhatsApp</a></p></div>';
-      if (s==='security') return titleHTML('Безопасность')+'<div class="card form"><button id="privacyBtn">Политика конфиденциальности</button><br><button id="logoutBtn" class="danger">Выйти из аккаунта</button></div>';
-      return '';
+      if (s==='profile') return '<div class="page-title"><h1>Профиль</h1></div><div class="card profile-card"><div class="avatar-block"><div class="big-avatar">'+avatarHTML()+'</div><label class="avatar-upload" title="Изменить фото">📷<input id="photoInput" type="file" accept="image/*"></label></div><div class="grid"><h2>'+esc(data.profile.firstName)+' '+esc(data.profile.lastName)+'</h2><p class="muted">'+esc(data.profile.specialization||'Специалист')+' · '+esc(data.profile.city)+'</p><div class="row"><span class="rating">★ '+averageRating()+'</span><span class="muted">'+data.reviews.length+' отзывов</span></div><p>'+esc(data.profile.about||'Информация не указана')+'</p><div class="row"><button id="editProfileBtn">Редактировать</button></div></div></div>';
+      if (s==='settings') return '<div class="page-title"><h1>Настройки</h1></div><div class="grid two"><div class="card"><h2>Основные данные</h2><div class="form"><div class="form-row"><label>Имя<input id="firstName" value="'+esc(data.profile.firstName)+'"></label><label>Фамилия<input id="lastName" value="'+esc(data.profile.lastName)+'"></label></div><div class="form-row"><label>Телефон<input id="phone" value="'+esc(data.profile.phone)+'"></label><label>Email<input id="email" value="'+esc(data.profile.email)+'"></label></div><div class="form-row"><label>Город<input id="city" value="'+esc(data.profile.city)+'"></label><label>Специализация<input id="specialization" value="'+esc(data.profile.specialization)+'"></label></div><label>О себе<textarea id="about">'+esc(data.profile.about)+'</textarea></label><button id="saveSettingsBtn">Сохранить изменения</button></div></div><div class="card"><h2>Смена пароля</h2><div class="form"><label>Новый пароль<input id="newPassword" type="password"></label><label>Повторите пароль<input id="repeatPassword" type="password"></label><button id="changePasswordBtn">Сменить пароль</button></div></div></div>';
+      if (s==='services') return '<div class="page-title"><h1>Услуги и расценки</h1></div><div class="grid"><div class="card between"><h2>Статус анкеты</h2><span class="status '+(data.paid?'good':'bad')+'">'+(data.paid?'Активна':'Не оплачена')+'</span><button id="payAccessBtn">Оплатить доступ</button></div><div class="card row"><button id="addServiceBtn">+ Добавить услугу</button></div><div class="grid three">'+data.services.map(function(s,i){ return '<div class="service-card"><label>Название<input data-service="'+i+'" data-field="title" value="'+esc(s.title)+'"></label><label>Длительность<input data-service="'+i+'" data-field="duration" value="'+esc(s.duration)+'"></label><label>Цена<input data-service="'+i+'" data-field="price" type="number" value="'+esc(s.price)+'"></label><div class="service-price">'+esc(s.price)+'₽</div><label class="checkbox"><input data-service-toggle="'+i+'" type="checkbox" '+(s.active?'checked':'')+'> Активна</label><button class="secondary remove-service" data-index="'+i+'">Удалить</button></div>'; }).join('')+'</div></div>';
+      if (s==='reviews') return '<div class="page-title"><h1>Отзывы и рейтинг</h1></div><div class="card review-summary"><div><div class="big-rating">'+averageRating()+'</div><div class="stars">★★★★★</div></div><div><h2>'+data.reviews.length+' отзывов</h2></div></div>';
+      if (s==='support') return '<div class="page-title"><h1>Поддержка</h1></div><div class="card"><p>Свяжитесь с нами: <a href="https://t.me/example">Telegram</a> · <a href="https://wa.me/79000000000">WhatsApp</a></p></div>';
+      if (s==='security') return '<div class="page-title"><h1>Безопасность</h1></div><div class="card form"><button id="privacyBtn">Политика конфиденциальности</button><br><button id="logoutBtn" class="danger">Выйти из аккаунта</button></div>';
+      return '<div class="page-title"><h1>'+esc(s)+'</h1></div><p class="muted">Раздел в разработке</p>';
     }
-
-    function titleHTML(title) { return '<div class="page-title"><h1>'+esc(title)+'</h1></div>'; }
 
     function bindBaseEvents() {
       document.getElementById('logoBtn').addEventListener('click', function(){ sendToTilda('goHome'); });
       document.getElementById('burgerBtn').addEventListener('click', function(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('drawerOverlay').classList.add('show'); });
       document.getElementById('drawerOverlay').addEventListener('click', function(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('drawerOverlay').classList.remove('show'); });
-      document.querySelectorAll('.nav-item').forEach(function(b) {
-        b.addEventListener('click', function(){
-          if (b.dataset.section==='logout') { openLogoutModal(); return; }
-          data.section = b.dataset.section;
-          saveData();
-          render();
-        });
-      });
+      document.querySelectorAll('.nav-item').forEach(function(b) { b.addEventListener('click', function(){
+        if (b.dataset.section==='logout') { openLogoutModal(); return; }
+        data.section = b.dataset.section; saveData(); render();
+      });});
     }
 
     function bindSectionEvents() {
       if (data.section==='profile') {
-        var eb = document.getElementById('editProfileBtn');
-        if (eb) eb.addEventListener('click', function(){ data.section='settings'; saveData(); render(); });
-        var pi = document.getElementById('photoInput');
-        if (pi) pi.addEventListener('change', function(e) {
-          var file = e.target.files[0];
-          if (!file) return;
+        var eb = document.getElementById('editProfileBtn'); if (eb) eb.addEventListener('click', function(){ data.section='settings'; saveData(); render(); });
+        var pi = document.getElementById('photoInput'); if (pi) pi.addEventListener('change', function(e) {
+          var file = e.target.files[0]; if (!file) return;
           var reader = new FileReader();
-          reader.onload = function() {
-            data.profile.photo = reader.result;
-            saveData();
-            showToast('Фотография обновлена');
-            render();
-          };
+          reader.onload = function() { data.profile.photo = reader.result; saveData(); showToast('Фотография обновлена'); render(); };
           reader.readAsDataURL(file);
         });
       }
@@ -321,18 +218,14 @@
           data.profile.city=document.getElementById('city').value.trim();
           data.profile.specialization=document.getElementById('specialization').value.trim();
           data.profile.about=document.getElementById('about').value.trim();
-          saveData();
-          showToast('Изменения сохранены');
-          render();
+          saveData(); showToast('Изменения сохранены'); render();
         });
         var pb = document.getElementById('changePasswordBtn');
         if (pb) pb.addEventListener('click', function(){
           var np=document.getElementById('newPassword').value, rp=document.getElementById('repeatPassword').value;
           if (np.length<6) { showToast('Пароль должен быть минимум 6 символов'); return; }
           if (np!==rp) { showToast('Пароли не совпадают'); return; }
-          currentUser.password=np;
-          saveData();
-          showToast('Пароль успешно изменён');
+          currentUser.password=np; saveData(); showToast('Пароль успешно изменён');
         });
       }
       if (data.section==='services') {
@@ -345,7 +238,28 @@
         document.querySelectorAll('[data-service-toggle]').forEach(function(i){ i.addEventListener('change',function(){ data.services[Number(i.dataset.serviceToggle)].active=i.checked; saveData(); render(); }); });
         document.querySelectorAll('.remove-service').forEach(function(b){ b.addEventListener('click',function(){ data.services.splice(Number(b.dataset.index),1); saveData(); render(); }); });
       }
-      if (data.section==='reviews') {
-        document.querySelectorAll('.save-review-answer').forEach(function(b){ b.addEventListener('click',function(){ var i=Number(b.dataset.index); data.reviews[i].answer=document.querySelector('.review-answer[data-index="'+i+'"]').value.trim(); saveData(); render(); }); });
+      if (data.section==='security') {
+        var pb = document.getElementById('privacyBtn'); if (pb) pb.addEventListener('click',function(){ openModal('<h2>Политика конфиденциальности</h2><p>Это текст-заглушка политики конфиденциальности.</p><br><button id="closeModalBtn">Закрыть</button>'); document.getElementById('closeModalBtn').addEventListener('click',closeModal); });
+        var lb = document.getElementById('logoutBtn'); if (lb) lb.addEventListener('click',openLogoutModal);
       }
-      if (data.section==='
+      sendResize();
+    }
+
+    function openLogoutModal() {
+      openModal('<h2>Вы уверены?</h2><p class="muted">После выхода потребуется снова войти.</p><br><div class="row"><button class="danger" id="confirmLogoutBtn">Выйти</button><button class="secondary" id="cancelLogoutBtn">Отмена</button></div>');
+      document.getElementById('confirmLogoutBtn').addEventListener('click',function(){ localStorage.setItem(LOGIN_KEY,'false'); localStorage.removeItem(CURRENT_USER_KEY); sendToTilda('goToLogin'); });
+      document.getElementById('cancelLogoutBtn').addEventListener('click',closeModal);
+    }
+
+    function openModal(html) { document.getElementById('modal').innerHTML=html; document.getElementById('modalOverlay').classList.add('show'); document.getElementById('modal').classList.add('show'); sendResize(); }
+    function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.getElementById('modal').classList.remove('show'); sendResize(); }
+    function sendToTilda(action, data) { window.parent.postMessage(Object.assign({ action: action }, data || {}), '*'); }
+    function sendResize() { setTimeout(function(){ window.parent.postMessage({action:'resize',height:document.body.scrollHeight},'*'); },50); }
+
+    function init() { if (!checkAccess()) return; loadData(); saveData(); render(); }
+    window.addEventListener('load', function(){ window.parent.postMessage({action:'resize',height:document.body.scrollHeight},'*'); });
+    new ResizeObserver(sendResize).observe(document.body);
+    init();
+  </script>
+</body>
+</html>
