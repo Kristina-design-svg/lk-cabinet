@@ -75,8 +75,6 @@
 
   <script>
     (function() {
-      if (localStorage.getItem("isLoggedIn") === "true") { showCabinet(); return; }
-
       var selectedRole = "specialist";
       var loginTab = document.getElementById("loginTab");
       var registerTab = document.getElementById("registerTab");
@@ -90,6 +88,24 @@
 
       function getUsers() { try { return JSON.parse(localStorage.getItem("users") || "[]"); } catch(e) { return []; } }
       function saveUsers(u) { localStorage.setItem("users", JSON.stringify(u)); }
+      function safeParse(value, fallback) { try { return JSON.parse(value) || fallback; } catch(e) { return fallback; } }
+      function sendToTilda(action, data) { window.parent.postMessage(Object.assign({ action: action }, data || {}), "*"); }
+      function cabinetAction(user) { return user && user.role === "specialist" ? "goToSpecialistCabinet" : "goToClientCabinet"; }
+      function goToCabinetByRole(user) {
+        if (!user) return;
+        sendToTilda(cabinetAction(user), { role: user.role, userId: user.id });
+        sendToTilda("goToCabinet", { role: user.role, userId: user.id, page: user.role === "specialist" ? "specialist" : "client" });
+      }
+
+      if (localStorage.getItem("isLoggedIn") === "true") {
+        var loggedUser = safeParse(localStorage.getItem("currentUser"), null);
+        if (loggedUser) {
+          showGlobalMessage("Вы уже вошли. Открываем кабинет...", "success");
+          goToCabinetByRole(loggedUser);
+          return;
+        }
+        localStorage.setItem("isLoggedIn", "false");
+      }
 
       function showTab(t) {
         clearAllErrors(); hideGlobalMessage();
@@ -111,11 +127,6 @@
       function clearAllErrors() { document.querySelectorAll("input, select").forEach(function(e) { e.classList.remove("error"); }); document.querySelectorAll(".field-message").forEach(function(e) { e.textContent = ""; e.classList.remove("show"); }); }
       function isEmpty(v) { return !String(v || "").trim(); }
 
-      function showCabinet() {
-        document.getElementById("mainCard").innerHTML = '<div class="cabinet-block"><div class="icon">👤</div><div class="title">Личный кабинет</div><div class="subtitle">Вы успешно вошли в систему</div><div class="hint">Здесь будет ваш личный кабинет</div><button class="logout-btn" onclick="doLogout()">Выйти</button></div>';
-        window.doLogout = function() { localStorage.removeItem("isLoggedIn"); localStorage.removeItem("currentUser"); window.location.href = "https://lkcabinet.tilda.ws/register"; };
-      }
-
       registerForm.addEventListener("submit", function(e) {
         e.preventDefault(); clearAllErrors(); hideGlobalMessage();
         var fn = document.getElementById("firstName").value.trim(), ln = document.getElementById("lastName").value.trim(), em = document.getElementById("email").value.trim(), ph = document.getElementById("phone").value.trim(), pw = document.getElementById("password").value, pwr = document.getElementById("passwordRepeat").value, sp = document.getElementById("specialization").value, ag = document.getElementById("agree").checked, valid = true;
@@ -129,14 +140,30 @@
         if (!ag) { document.getElementById("agreeMsg").textContent="Необходимо принять условия"; document.getElementById("agreeMsg").classList.add("show"); valid=false; }
         if (!valid) return;
 
-        var user = { id: Date.now(), firstName: fn, lastName: ln, email: em, phone: ph, password: pw, role: selectedRole, specialization: selectedRole==="specialist" ? sp : "" };
+        var user = {
+          id: Date.now(),
+          firstName: fn,
+          lastName: ln,
+          email: em,
+          phone: ph,
+          password: pw,
+          role: selectedRole,
+          specialization: selectedRole==="specialist" ? sp : "",
+          city: "",
+          about: "",
+          photo: "",
+          favorites: selectedRole==="client" ? [] : undefined,
+          isActive: false,
+          rating: 0,
+          reviewsCount: 0,
+          hourlyPrice: selectedRole==="specialist" ? 1000 : undefined,
+          createdAt: new Date().toISOString()
+        };
         var users = getUsers(); users.push(user); saveUsers(users);
         localStorage.setItem("currentUser", JSON.stringify(user));
         localStorage.setItem("isLoggedIn", "true");
-        showGlobalMessage("Регистрация успешна!", "success");
-
-        var gotoPage = user.role === "specialist" ? "specialist" : "client";
-        setTimeout(function() { window.location.href = "https://lkcabinet.tilda.ws/cabinet?page=" + gotoPage; }, 800);
+        showGlobalMessage("Регистрация успешна! Открываем личный кабинет...", "success");
+        setTimeout(function() { goToCabinetByRole(user); }, 800);
       });
 
       loginForm.addEventListener("submit", function(e) {
@@ -148,8 +175,7 @@
         if (!user) { showGlobalMessage("Неверный email или пароль","error"); return; }
         localStorage.setItem("currentUser", JSON.stringify(user));
         localStorage.setItem("isLoggedIn", "true");
-        var gotoPage = user.role === "specialist" ? "specialist" : "client";
-        window.location.href = "https://lkcabinet.tilda.ws/cabinet?page=" + gotoPage;
+        goToCabinetByRole(user);
       });
 
       loginTab.addEventListener("click", function(){ showTab("login"); });
@@ -157,6 +183,7 @@
       goRegister.addEventListener("click", function(){ showTab("register"); });
       roleSpecialist.addEventListener("click", function(){ setRole("specialist"); });
       roleClient.addEventListener("click", function(){ setRole("client"); });
+      document.getElementById("logoText").addEventListener("click", function(){ sendToTilda("goHome"); });
       document.querySelectorAll("input, select").forEach(function(el) { el.addEventListener("input", function(){ clearFieldError(el.id); }); });
       setRole("specialist");
 
