@@ -19,7 +19,6 @@
     button { min-height: 44px; border: 0; border-radius: 8px; padding: 0 16px; background: var(--accent); color: #FFFFFF; font-weight: 700; cursor: pointer; }
     button:hover { background: var(--accent-dark); }
     button.secondary { background: #EEF2F6; color: #2C4058; }
-    button.ghost { background: transparent; color: var(--accent); padding: 0; min-height: auto; }
     button.danger { background: var(--danger); }
     a { color: var(--accent); text-decoration: none; }
     h1 { margin: 0 0 6px; font-size: 28px; }
@@ -52,7 +51,11 @@
     .form { display: grid; gap: 14px; }
     .form-row { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; }
     .profile-card { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 20px; align-items: center; }
-    .big-avatar { width: 120px; height: 120px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-size: 36px; font-weight: 800; }
+    .avatar-block { position: relative; width: 120px; height: 120px; }
+    .big-avatar { width: 120px; height: 120px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-size: 36px; font-weight: 800; overflow: hidden; }
+    .big-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .avatar-upload { position: absolute; bottom: 0; right: 0; width: 36px; height: 36px; border-radius: 50%; background: #FFFFFF; border: 2px solid var(--line); display: grid; place-items: center; cursor: pointer; font-size: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .avatar-upload input { display: none; }
     .rating { display: inline-flex; align-items: center; gap: 8px; color: var(--warning); font-weight: 800; }
     .status { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border-radius: 15px; font-weight: 800; font-size: 13px; }
     .status.good { background: #EAF7EE; color: var(--success); }
@@ -73,7 +76,8 @@
     .dialogs, .chat { min-width: 0; border-radius: var(--radius); background: #FFFFFF; box-shadow: var(--shadow); }
     .dialog { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 10px; padding: 12px; border-bottom: 1px solid var(--line); cursor: pointer; }
     .dialog.active { background: var(--accent-soft); }
-    .dialog-avatar, .small-avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-weight: 800; }
+    .dialog-avatar, .small-avatar { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #FFFFFF; font-weight: 800; overflow: hidden; }
+    .dialog-avatar img, .small-avatar img { width: 100%; height: 100%; object-fit: cover; }
     .back-chat { display: none; background: #EEF2F6; color: #2C4058; }
     .chat-header { height: 60px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-bottom: 1px solid var(--line); font-weight: 800; }
     .chat-body { height: 460px; overflow: auto; padding: 16px; display: grid; align-content: start; gap: 10px; background: #FAFBFC; }
@@ -88,6 +92,8 @@
     .faq-answer { display: none; padding: 10px 4px 4px; color: var(--muted); }
     .faq-answer.show { display: block; }
     .empty { padding: 18px; border-radius: 12px; background: #FFFFFF; box-shadow: var(--shadow); color: var(--muted); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 200; background: #2C4058; color: #FFFFFF; padding: 12px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+    .toast.show { opacity: 1; }
     @media (max-width: 1199px) {
       :root { --sidebar: 200px; }
       .grid.three { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -118,20 +124,21 @@
 </head>
 <body>
   <div class="app" id="app"></div>
+  <div class="toast" id="toast"></div>
 
   <script>
     function sendToTilda(action, data) {
       window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
     }
 
-    const USERS_KEY = 'users';
-    const CURRENT_USER_KEY = 'currentUser';
-    const LOGIN_KEY = 'isLoggedIn';
-    const SPECIALIST_DATA_KEY = 'specialistCabinetData';
+    var USERS_KEY = 'users';
+    var CURRENT_USER_KEY = 'currentUser';
+    var LOGIN_KEY = 'isLoggedIn';
+    var SPECIALIST_DATA_KEY = 'specialistCabinetData';
 
-    const defaultData = {
+    var defaultData = {
       section: 'profile', requestTab: 'active', activeDialog: 0, mobileChatOpen: false,
-      profile: { firstName: '', lastName: '', email: '', phone: '', city: 'Москва', specialization: '', about: '', hourlyPrice: 1200 },
+      profile: { firstName: '', lastName: '', email: '', phone: '', city: 'Москва', specialization: '', about: '', hourlyPrice: 1200, photo: '' },
       notifications: { requestsEmail: true, messagesEmail: true, sms: false, smsPhone: '' },
       paid: false, discount: 10,
       education: [],
@@ -146,14 +153,18 @@
       twoFA: false
     };
 
-    let currentUser = null;
-    let data = null;
-    const app = document.getElementById('app');
+    var currentUser = null;
+    var data = null;
+    var app = document.getElementById('app');
+    var toast = document.getElementById('toast');
 
-    function safeParse(value, fallback) {
-      try { return JSON.parse(value) || fallback; } catch (e) { return fallback; }
+    function showToast(text) {
+      toast.textContent = text;
+      toast.classList.add('show');
+      setTimeout(function() { toast.classList.remove('show'); }, 2500);
     }
 
+    function safeParse(value, fallback) { try { return JSON.parse(value) || fallback; } catch (e) { return fallback; } }
     function clone(obj) { return JSON.parse(JSON.stringify(obj)); }
     function esc(value) { return String(value ?? '').replace(/[&<>"']/g, function(m) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]; }); }
     function getInitials() { return ((data.profile.firstName || 'С')[0] || 'С') + ((data.profile.lastName || 'П')[0] || 'П'); }
@@ -170,6 +181,7 @@
       currentUser.city = data.profile.city;
       currentUser.about = data.profile.about;
       currentUser.hourlyPrice = data.profile.hourlyPrice;
+      currentUser.photo = data.profile.photo;
       currentUser.role = 'specialist';
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
       var users = getUsers();
@@ -198,6 +210,7 @@
       data.profile.city = currentUser.city || data.profile.city || 'Москва';
       data.profile.about = currentUser.about || data.profile.about || '';
       data.profile.hourlyPrice = currentUser.hourlyPrice || data.profile.hourlyPrice || 1200;
+      data.profile.photo = currentUser.photo || data.profile.photo || '';
     }
 
     function checkAccess() {
@@ -205,10 +218,8 @@
         currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
         if (currentUser) return true;
       }
-
       var urlParams = new URLSearchParams(window.location.search);
       var loggedFromUrl = urlParams.get('logged');
-
       if (loggedFromUrl === 'true') {
         localStorage.setItem(LOGIN_KEY, 'true');
         currentUser = {
@@ -218,12 +229,12 @@
           email: urlParams.get('email') || '',
           phone: urlParams.get('phone') || '',
           role: 'specialist',
-          specialization: urlParams.get('specialization') || ''
+          specialization: urlParams.get('specialization') || '',
+          photo: ''
         };
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
         return true;
       }
-
       app.innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><h2>Необходимо войти в аккаунт</h2><br><a href="https://lkcabinet.tilda.ws/register" style="display:inline-block;padding:14px 28px;background:#4A76A8;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">Войти</a></div>';
       sendResize();
       return false;
@@ -234,7 +245,7 @@
     function averageRating() { if (!data.reviews.length) return '0.0'; return (data.reviews.reduce(function(s,r) { return s+Number(r.rating||0); }, 0) / data.reviews.length).toFixed(1); }
 
     function render() {
-      app.innerHTML = '<header class="topbar"><button class="burger" id="burgerBtn">☰</button><div class="logo" id="logoBtn">Кабинет специалиста</div><div class="top-avatar">' + esc(getInitials()) + '</div></header>' +
+      app.innerHTML = '<header class="topbar"><button class="burger" id="burgerBtn">☰</button><div class="logo" id="logoBtn">Кабинет специалиста</div><div class="top-avatar">' + getInitials() + '</div></header>' +
         '<div class="drawer-overlay" id="drawerOverlay"></div><div class="layout"><aside class="sidebar" id="sidebar">' + sidebarHTML() + '</aside><main class="content">' + contentHTML() + '</main></div>' +
         '<div class="modal-overlay" id="modalOverlay"></div><div class="modal" id="modal"></div>';
       bindBaseEvents();
@@ -247,16 +258,23 @@
         .map(function(i) { return '<button class="nav-item'+(data.section===i[0]?' active':'')+'" data-section="'+i[0]+'"><span>'+i[1]+'</span><span>'+i[2]+'</span>'+(i[3]?'<span class="count">'+i[3]+'</span>':'')+'</button>'; }).join('');
     }
 
+    function avatarHTML(size) {
+      var photo = data.profile.photo;
+      if (photo) return '<img src="'+photo+'" alt="Фото">';
+      return getInitials();
+    }
+
     function contentHTML() {
       var s = data.section;
-      if (s==='settings') return titleHTML('Настройки')+'<div class="grid two"><div class="card"><h2>Основные данные</h2><div class="form"><div class="form-row"><label>Имя<input id="firstName" value="'+esc(data.profile.firstName)+'"></label><label>Фамилия<input id="lastName" value="'+esc(data.profile.lastName)+'"></label></div><div class="form-row"><label>Телефон<input id="phone" value="'+esc(data.profile.phone)+'"></label><label>Email<input id="email" value="'+esc(data.profile.email)+'"></label></div><div class="form-row"><label>Город<input id="city" value="'+esc(data.profile.city)+'"></label><label>Специализация<input id="specialization" value="'+esc(data.profile.specialization)+'"></label></div><label>О себе<textarea id="about">'+esc(data.profile.about)+'</textarea></label><button id="saveSettingsBtn">Сохранить</button></div></div><div class="card"><h2>Смена пароля</h2><div class="form"><label>Новый пароль<input id="newPassword" type="password"></label><label>Повторить<input id="repeatPassword" type="password"></label><button id="changePasswordBtn">Сменить пароль</button></div></div></div>';
+      if (s==='profile') return titleHTML('Профиль')+'<div class="card profile-card"><div class="avatar-block"><div class="big-avatar">'+avatarHTML()+'</div><label class="avatar-upload" title="Изменить фото">📷<input id="photoInput" type="file" accept="image/*"></label></div><div class="grid"><h2>'+esc(data.profile.firstName)+' '+esc(data.profile.lastName)+'</h2><p class="muted">'+esc(data.profile.specialization||'Специалист')+' · '+esc(data.profile.city)+'</p><div class="row"><span class="rating">★ '+averageRating()+'</span><span class="muted">'+data.reviews.length+' отзывов</span></div><p>'+esc(data.profile.about||'Информация не указана')+'</p><div class="row"><button id="editProfileBtn">Редактировать</button></div></div></div>';
+      if (s==='settings') return titleHTML('Настройки')+'<div class="grid two"><div class="card"><h2>Основные данные</h2><div class="form"><div class="form-row"><label>Имя<input id="firstName" value="'+esc(data.profile.firstName)+'"></label><label>Фамилия<input id="lastName" value="'+esc(data.profile.lastName)+'"></label></div><div class="form-row"><label>Телефон<input id="phone" value="'+esc(data.profile.phone)+'"></label><label>Email<input id="email" value="'+esc(data.profile.email)+'"></label></div><div class="form-row"><label>Город<input id="city" value="'+esc(data.profile.city)+'"></label><label>Специализация<input id="specialization" value="'+esc(data.profile.specialization)+'"></label></div><label>О себе<textarea id="about">'+esc(data.profile.about)+'</textarea></label><button id="saveSettingsBtn">Сохранить изменения</button></div></div><div class="card"><h2>Смена пароля</h2><div class="form"><label>Новый пароль<input id="newPassword" type="password"></label><label>Повторите пароль<input id="repeatPassword" type="password"></label><button id="changePasswordBtn">Сменить пароль</button></div></div></div>';
       if (s==='services') return titleHTML('Услуги и расценки')+'<div class="grid"><div class="card between"><h2>Статус анкеты</h2><span class="status '+(data.paid?'good':'bad')+'">'+(data.paid?'Активна':'Не оплачена')+'</span><button id="payAccessBtn">Оплатить доступ</button></div><div class="card row"><button id="addServiceBtn">+ Добавить услугу</button></div><div class="grid three">'+data.services.map(function(s,i){ return '<div class="service-card"><label>Название<input data-service="'+i+'" data-field="title" value="'+esc(s.title)+'"></label><label>Длительность<input data-service="'+i+'" data-field="duration" value="'+esc(s.duration)+'"></label><label>Цена<input data-service="'+i+'" data-field="price" type="number" value="'+esc(s.price)+'"></label><div class="service-price">'+esc(s.price)+'₽</div><label class="checkbox"><input data-service-toggle="'+i+'" type="checkbox" '+(s.active?'checked':'')+'> Активна</label><button class="secondary remove-service" data-index="'+i+'">Удалить</button></div>'; }).join('')+'</div></div>';
       if (s==='reviews') return titleHTML('Отзывы и рейтинг')+'<div class="card review-summary"><div><div class="big-rating">'+averageRating()+'</div><div class="stars">★★★★★</div></div><div><h2>'+data.reviews.length+' отзывов</h2></div></div><div class="list">'+data.reviews.map(function(r,i){ return '<div class="card"><div class="between"><h3>'+esc(r.name)+'</h3><div class="stars">'+'★'.repeat(Number(r.rating||0))+'</div></div><p>'+esc(r.text)+'</p>'+(r.answer?'<div class="list-item"><b>Ваш ответ</b><p>'+esc(r.answer)+'</p></div>':'<div class="form"><textarea class="review-answer" data-index="'+i+'" placeholder="Ответить"></textarea><button class="save-review-answer" data-index="'+i+'">Ответить</button></div>')+'</div>'; }).join('')+'</div>';
       if (s==='messages') return titleHTML('Сообщения')+'<p class="muted">Сообщения будут доступны после обращения клиентов.</p>';
       if (s==='requests') return titleHTML('Заявки')+'<div class="tabs"><button class="tab active">Активные</button><button class="tab">Завершённые</button><button class="tab">Отклонённые</button></div><p class="muted">Заявки появятся после отклика клиентов.</p>';
       if (s==='support') return titleHTML('Поддержка')+'<div class="card"><p><a href="https://t.me/example">Telegram</a> · <a href="https://wa.me/79000000000">WhatsApp</a></p></div>';
       if (s==='security') return titleHTML('Безопасность')+'<div class="card form"><button id="privacyBtn">Политика конфиденциальности</button><br><button id="logoutBtn" class="danger">Выйти из аккаунта</button></div>';
-      return titleHTML('Профиль')+'<div class="card profile-card"><div class="big-avatar">'+esc(getInitials())+'</div><div class="grid"><h2>'+esc(data.profile.firstName)+' '+esc(data.profile.lastName)+'</h2><p class="muted">'+esc(data.profile.specialization||'Специалист')+' · '+esc(data.profile.city)+'</p><div class="row"><span class="rating">★ '+averageRating()+'</span><span class="muted">'+data.reviews.length+' отзывов</span></div><p>'+esc(data.profile.about||'Информация не указана')+'</p><div class="row"><button id="editProfileBtn">Редактировать</button></div></div></div>';
+      return '';
     }
 
     function titleHTML(title) { return '<div class="page-title"><h1>'+esc(title)+'</h1></div>'; }
@@ -276,7 +294,23 @@
     }
 
     function bindSectionEvents() {
-      if (data.section==='profile') { var eb = document.getElementById('editProfileBtn'); if (eb) eb.addEventListener('click', function(){ data.section='settings'; saveData(); render(); }); }
+      if (data.section==='profile') {
+        var eb = document.getElementById('editProfileBtn');
+        if (eb) eb.addEventListener('click', function(){ data.section='settings'; saveData(); render(); });
+        var pi = document.getElementById('photoInput');
+        if (pi) pi.addEventListener('change', function(e) {
+          var file = e.target.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function() {
+            data.profile.photo = reader.result;
+            saveData();
+            showToast('Фотография обновлена');
+            render();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
       if (data.section==='settings') {
         var sb = document.getElementById('saveSettingsBtn');
         if (sb) sb.addEventListener('click', function(){
@@ -288,23 +322,23 @@
           data.profile.specialization=document.getElementById('specialization').value.trim();
           data.profile.about=document.getElementById('about').value.trim();
           saveData();
-          alert('Настройки сохранены');
+          showToast('Изменения сохранены');
           render();
         });
         var pb = document.getElementById('changePasswordBtn');
         if (pb) pb.addEventListener('click', function(){
           var np=document.getElementById('newPassword').value, rp=document.getElementById('repeatPassword').value;
-          if (np.length<6) { alert('Минимум 6 символов'); return; }
-          if (np!==rp) { alert('Пароли не совпадают'); return; }
+          if (np.length<6) { showToast('Пароль должен быть минимум 6 символов'); return; }
+          if (np!==rp) { showToast('Пароли не совпадают'); return; }
           currentUser.password=np;
           saveData();
-          alert('Пароль изменён');
+          showToast('Пароль успешно изменён');
         });
       }
       if (data.section==='services') {
         document.getElementById('addServiceBtn').addEventListener('click', function(){ data.services.push({title:'Новая услуга',duration:'60 минут',price:1000,active:true}); saveData(); render(); });
         document.getElementById('payAccessBtn').addEventListener('click', function(){ openModal('<h2>Оплатить доступ</h2><div class="grid"><div class="card"><h3>Базовый</h3><p>500₽/мес</p><button class="payment-btn">Оплатить</button></div><div class="card"><h3>Продвинутый</h3><p>1000₽/мес</p><button class="payment-btn">Оплатить</button></div><div class="card"><h3>Премиум</h3><p>2000₽/мес</p><button class="payment-btn">Оплатить</button></div><button class="secondary" id="closeModalBtn">Закрыть</button></div>');
-          document.querySelectorAll('.payment-btn').forEach(function(b){ b.addEventListener('click',function(){ alert('Платёжная система'); data.paid=true; saveData(); closeModal(); render(); }); });
+          document.querySelectorAll('.payment-btn').forEach(function(b){ b.addEventListener('click',function(){ data.paid=true; saveData(); closeModal(); showToast('Доступ оплачен'); render(); }); });
           document.getElementById('closeModalBtn').addEventListener('click',closeModal);
         });
         document.querySelectorAll('[data-service]').forEach(function(i){ i.addEventListener('input',function(){ data.services[Number(i.dataset.service)][i.dataset.field]=i.dataset.field==='price'?Number(i.value||0):i.value; saveData(); }); });
@@ -314,33 +348,4 @@
       if (data.section==='reviews') {
         document.querySelectorAll('.save-review-answer').forEach(function(b){ b.addEventListener('click',function(){ var i=Number(b.dataset.index); data.reviews[i].answer=document.querySelector('.review-answer[data-index="'+i+'"]').value.trim(); saveData(); render(); }); });
       }
-      if (data.section==='security') {
-        var pb = document.getElementById('privacyBtn'); if (pb) pb.addEventListener('click',function(){ openModal('<h2>Политика конфиденциальности</h2><p>Это текст-заглушка.</p><br><button id="closeModalBtn">Закрыть</button>'); document.getElementById('closeModalBtn').addEventListener('click',closeModal); });
-        var lb = document.getElementById('logoutBtn'); if (lb) lb.addEventListener('click',openLogoutModal);
-      }
-      sendResize();
-    }
-
-    function openLogoutModal() {
-      openModal('<h2>Вы уверены?</h2><p class="muted">После выхода потребуется снова войти.</p><br><div class="row"><button class="danger" id="confirmLogoutBtn">Выйти</button><button class="secondary" id="cancelLogoutBtn">Отмена</button></div>');
-      document.getElementById('confirmLogoutBtn').addEventListener('click',function(){ localStorage.setItem(LOGIN_KEY,'false'); localStorage.removeItem(CURRENT_USER_KEY); sendToTilda('goToLogin'); });
-      document.getElementById('cancelLogoutBtn').addEventListener('click',closeModal);
-    }
-
-    function openModal(html) { document.getElementById('modal').innerHTML=html; document.getElementById('modalOverlay').classList.add('show'); document.getElementById('modal').classList.add('show'); document.getElementById('modalOverlay').addEventListener('click',closeModal); sendResize(); }
-    function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); document.getElementById('modal').classList.remove('show'); sendResize(); }
-    function sendResize() { setTimeout(function(){ window.parent.postMessage({action:'resize',height:document.body.scrollHeight},'*'); },50); }
-
-    function init() {
-      if (!checkAccess()) return;
-      loadData();
-      saveData();
-      render();
-    }
-
-    window.addEventListener('load', function(){ window.parent.postMessage({action:'resize',height:document.body.scrollHeight},'*'); });
-    new ResizeObserver(sendResize).observe(document.body);
-    init();
-  </script>
-</body>
-</html>
+      if (data.section==='
