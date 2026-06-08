@@ -123,6 +123,10 @@
       currentUser.firstName = p.firstName; currentUser.lastName = p.lastName; currentUser.email = p.email;
       currentUser.phone = p.phone; currentUser.specialization = p.specialization; currentUser.city = p.city;
       currentUser.about = p.about; currentUser.hourlyPrice = p.hourlyPrice; currentUser.photo = p.photo; currentUser.role = 'specialist';
+      currentUser.isActive = currentUser.isActive === true;
+      currentUser.services = data.services;
+      currentUser.rating = Number(averageRating());
+      currentUser.reviewsCount = data.reviews.length;
       localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
       var users = getUsers(), idx = users.findIndex(function(u) { return String(u.id)===String(currentUser.id)||u.email===currentUser.email; });
       if (idx>=0) users[idx] = Object.assign({}, users[idx], currentUser); else users.push(currentUser);
@@ -148,7 +152,17 @@
     }
 
     function checkAccess() {
-      if (localStorage.getItem(LOGIN_KEY)==='true') { currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null); if (currentUser) return true; }
+      if (localStorage.getItem(LOGIN_KEY)==='true') {
+        currentUser = safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
+        if (currentUser && currentUser.role === 'specialist') return true;
+        if (currentUser && currentUser.role === 'client') {
+          sendToTilda('goToClientCabinet', { role: 'client', userId: currentUser.id });
+          sendToTilda('goToCabinet', { role: 'client', userId: currentUser.id, page: 'client' });
+          app.innerHTML = '<div class="empty">Открывается кабинет клиента.</div>';
+          sendResize();
+          return false;
+        }
+      }
       var urlParams = new URLSearchParams(window.location.search);
       if (urlParams.get('logged')==='true') {
         localStorage.setItem(LOGIN_KEY, 'true');
@@ -156,12 +170,49 @@
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
         return true;
       }
-      app.innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><h2>Необходимо войти в аккаунт</h2><br><a href="https://lkcabinet.tilda.ws/register" style="display:inline-block;padding:14px 28px;background:#4A76A8;color:#fff;border-radius:8px;text-decoration:none;font-weight:700;">Войти</a></div>';
+      app.innerHTML = '<div class="empty" style="text-align:center;padding:60px 20px;"><h2>Необходимо войти в аккаунт</h2><br><button id="goLoginBtn">Войти</button></div>';
+      setTimeout(function(){ var btn = document.getElementById('goLoginBtn'); if (btn) btn.addEventListener('click', function(){ sendToTilda('goToLogin'); }); sendToTilda('goToLogin'); }, 0);
       sendResize(); return false;
     }
 
     function activeRequestsCount() { return data.requests.filter(function(r) { return r.status==='active'; }).length; }
     function averageRating() { if (!data.reviews.length) return '0.0'; return (data.reviews.reduce(function(s,r) { return s+Number(r.rating||0); },0)/data.reviews.length).toFixed(1); }
+    function isPublished() { return currentUser && currentUser.isActive === true; }
+    function activeServicePrices() {
+      return data.services.filter(function(s) { return s.active; }).map(function(s) { return Number(s.price || 0); }).filter(Boolean).sort(function(a,b) { return a-b; });
+    }
+    function validatePublishProfile() {
+      var missing = [];
+      if (!data.profile.firstName) missing.push('имя');
+      if (!data.profile.phone) missing.push('телефон');
+      if (!data.profile.city) missing.push('город');
+      if (!data.profile.specialization) missing.push('специализацию');
+      if (!data.profile.about) missing.push('описание');
+      if (!data.services.some(function(s) { return s.active && s.title && Number(s.price || 0) > 0; })) missing.push('активную услугу с ценой');
+      return missing;
+    }
+    function publishProfile() {
+      var missing = validatePublishProfile();
+      if (missing.length) {
+        showToast('Заполните: ' + missing.join(', '));
+        return;
+      }
+
+      var prices = activeServicePrices();
+      data.profile.hourlyPrice = prices[0] || Number(data.profile.hourlyPrice || 0) || 1000;
+      currentUser.isActive = true;
+      saveData();
+      showToast('Анкета опубликована в каталоге');
+      sendToTilda('profilePublished', { id: currentUser.id });
+      render();
+    }
+    function unpublishProfile() {
+      currentUser.isActive = false;
+      saveData();
+      showToast('Анкета снята с публикации');
+      sendToTilda('profileUnpublished', { id: currentUser.id });
+      render();
+    }
 
     function render() {
       app.innerHTML = '<header class="topbar"><button class="burger" id="burgerBtn">☰</button><div class="logo" id="logoBtn">Кабинет специалиста</div><div class="top-avatar">'+getInitials()+'</div></header>'+
@@ -181,7 +232,7 @@
       var s = data.section;
       if (s==='profile') return '<div class="page-title"><h1>Профиль</h1></div><div class="card profile-card"><div class="avatar-block"><div class="big-avatar">'+avatarHTML()+'</div><label class="avatar-upload" title="Изменить фото">📷<input id="photoInput" type="file" accept="image/*"></label></div><div class="grid"><h2>'+esc(data.profile.firstName)+' '+esc(data.profile.lastName)+'</h2><p class="muted">'+esc(data.profile.specialization||'Специалист')+' · '+esc(data.profile.city)+'</p><div class="row"><span class="rating">★ '+averageRating()+'</span><span class="muted">'+data.reviews.length+' отзывов</span></div><p>'+esc(data.profile.about||'Информация не указана')+'</p><div class="row"><button id="editProfileBtn">Редактировать</button></div></div></div>';
       if (s==='settings') return '<div class="page-title"><h1>Настройки</h1></div><div class="grid two"><div class="card"><h2>Основные данные</h2><div class="form"><div class="form-row"><label>Имя<input id="firstName" value="'+esc(data.profile.firstName)+'"></label><label>Фамилия<input id="lastName" value="'+esc(data.profile.lastName)+'"></label></div><div class="form-row"><label>Телефон<input id="phone" value="'+esc(data.profile.phone)+'"></label><label>Email<input id="email" value="'+esc(data.profile.email)+'"></label></div><div class="form-row"><label>Город<input id="city" value="'+esc(data.profile.city)+'"></label><label>Специализация<input id="specialization" value="'+esc(data.profile.specialization)+'"></label></div><label>О себе<textarea id="about">'+esc(data.profile.about)+'</textarea></label><button id="saveSettingsBtn">Сохранить изменения</button></div></div><div class="card"><h2>Смена пароля</h2><div class="form"><label>Новый пароль<input id="newPassword" type="password"></label><label>Повторите пароль<input id="repeatPassword" type="password"></label><button id="changePasswordBtn">Сменить пароль</button></div></div></div>';
-      if (s==='services') return '<div class="page-title"><h1>Услуги и расценки</h1></div><div class="grid"><div class="card between"><h2>Статус анкеты</h2><span class="status '+(data.paid?'good':'bad')+'">'+(data.paid?'Активна':'Не оплачена')+'</span><button id="payAccessBtn">Оплатить доступ</button></div><div class="card row"><button id="addServiceBtn">+ Добавить услугу</button></div><div class="grid three">'+data.services.map(function(s,i){ return '<div class="service-card"><label>Название<input data-service="'+i+'" data-field="title" value="'+esc(s.title)+'"></label><label>Длительность<input data-service="'+i+'" data-field="duration" value="'+esc(s.duration)+'"></label><label>Цена<input data-service="'+i+'" data-field="price" type="number" value="'+esc(s.price)+'"></label><div class="service-price">'+esc(s.price)+'₽</div><label class="checkbox"><input data-service-toggle="'+i+'" type="checkbox" '+(s.active?'checked':'')+'> Активна</label><button class="secondary remove-service" data-index="'+i+'">Удалить</button></div>'; }).join('')+'</div></div>';
+      if (s==='services') return '<div class="page-title"><h1>Услуги и расценки</h1></div><div class="grid"><div class="card between"><div><h2>Статус доступа</h2><span class="status '+(data.paid?'good':'bad')+'">'+(data.paid?'Анкета активна':'Не оплачена')+'</span></div><button id="payAccessBtn">Оплатить доступ</button></div><div class="card between"><div><h2>Публикация в каталоге</h2><p class="muted">После публикации клиенты увидят вашу карточку в каталоге и публичном профиле.</p><br><span class="status '+(isPublished()?'good':'bad')+'">'+(isPublished()?'Опубликована':'Не опубликована')+'</span></div><div class="row"><button id="publishProfileBtn">'+(isPublished()?'Обновить карточку':'Опубликовать в каталоге')+'</button>'+(isPublished()?'<button class="secondary" id="unpublishProfileBtn">Снять с публикации</button>':'')+'</div></div><div class="card row"><button id="addServiceBtn">+ Добавить услугу</button></div><div class="grid three">'+data.services.map(function(s,i){ return '<div class="service-card"><label>Название<input data-service="'+i+'" data-field="title" value="'+esc(s.title)+'"></label><label>Длительность<input data-service="'+i+'" data-field="duration" value="'+esc(s.duration)+'"></label><label>Цена<input data-service="'+i+'" data-field="price" type="number" value="'+esc(s.price)+'"></label><div class="service-price">'+esc(s.price)+'₽</div><label class="checkbox"><input data-service-toggle="'+i+'" type="checkbox" '+(s.active?'checked':'')+'> Активна</label><button class="secondary remove-service" data-index="'+i+'">Удалить</button></div>'; }).join('')+'</div></div>';
       if (s==='reviews') return '<div class="page-title"><h1>Отзывы и рейтинг</h1></div><div class="card review-summary"><div><div class="big-rating">'+averageRating()+'</div><div class="stars">★★★★★</div></div><div><h2>'+data.reviews.length+' отзывов</h2></div></div>';
       if (s==='support') return '<div class="page-title"><h1>Поддержка</h1></div><div class="card"><p>Свяжитесь с нами: <a href="https://t.me/example">Telegram</a> · <a href="https://wa.me/79000000000">WhatsApp</a></p></div>';
       if (s==='security') return '<div class="page-title"><h1>Безопасность</h1></div><div class="card form"><button id="privacyBtn">Политика конфиденциальности</button><br><button id="logoutBtn" class="danger">Выйти из аккаунта</button></div>';
@@ -230,6 +281,10 @@
       }
       if (data.section==='services') {
         document.getElementById('addServiceBtn').addEventListener('click', function(){ data.services.push({title:'Новая услуга',duration:'60 минут',price:1000,active:true}); saveData(); render(); });
+        var publishBtn = document.getElementById('publishProfileBtn');
+        if (publishBtn) publishBtn.addEventListener('click', publishProfile);
+        var unpublishBtn = document.getElementById('unpublishProfileBtn');
+        if (unpublishBtn) unpublishBtn.addEventListener('click', unpublishProfile);
         document.getElementById('payAccessBtn').addEventListener('click', function(){ openModal('<h2>Оплатить доступ</h2><div class="grid"><div class="card"><h3>Базовый</h3><p>500₽/мес</p><button class="payment-btn">Оплатить</button></div><div class="card"><h3>Продвинутый</h3><p>1000₽/мес</p><button class="payment-btn">Оплатить</button></div><div class="card"><h3>Премиум</h3><p>2000₽/мес</p><button class="payment-btn">Оплатить</button></div><button class="secondary" id="closeModalBtn">Закрыть</button></div>');
           document.querySelectorAll('.payment-btn').forEach(function(b){ b.addEventListener('click',function(){ data.paid=true; saveData(); closeModal(); showToast('Доступ оплачен'); render(); }); });
           document.getElementById('closeModalBtn').addEventListener('click',closeModal);
