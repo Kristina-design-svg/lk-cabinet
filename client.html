@@ -957,7 +957,8 @@
       }
 
       if (currentUser.role === 'specialist') {
-        sendToTilda('goToCabinet');
+        sendToTilda('goToSpecialistCabinet', { role: 'specialist', userId: currentUser.id });
+        sendToTilda('goToCabinet', { role: 'specialist', userId: currentUser.id, page: 'specialist' });
         app.innerHTML = '<div class="empty">Открывается кабинет специалиста.</div>';
         return false;
       }
