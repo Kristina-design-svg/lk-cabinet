@@ -20,7 +20,7 @@
       --warning: #F5A623;
       --shadow: 0 4px 20px rgba(0,0,0,0.08);
       --radius: 12px;
-      --sidebar: 248px;
+      --sidebar: 228px;
     }
     html, body { margin: 0; min-width: 320px; min-height: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); font: 15px/1.45 Arial, sans-serif; }
     body.locked { overflow: hidden; }
@@ -47,7 +47,7 @@
     .burger { display: grid; place-items: center; width: 44px; padding: 0; background: #EEF2F6; color: #2C4058; font-size: 20px; }
     .brand { margin-right: auto; color: #2C4058; font-size: 20px; font-weight: 800; cursor: pointer; }
     .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #EEF2F6; color: #2C4058; font-weight: 700; }
-    .layout { width: min(100%, 1480px); margin: 0 auto; padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .layout { width: min(100%, 1680px); margin: 0 auto; padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
     .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 10px; overflow: auto; background: #fff; box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
     .sidebar.open { transform: translateX(0); }
     .overlay { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(0,0,0,.38); }
@@ -89,7 +89,8 @@
     .card-meta { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
     .price { color: #2C4058; font-size: 20px; font-weight: 800; }
     .rating { color: var(--warning); font-weight: 800; }
-    .card-actions { display: grid; grid-template-columns: 1fr; gap: 8px; }
+    .card-actions { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+    .card-actions button { flex: 1 1 auto; min-width: max-content; white-space: nowrap; padding-inline: 14px; }
     .empty { padding: 28px 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
     .pagination { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .page-btn { min-width: 44px; background: #EEF2F6; color: #2C4058; }
@@ -100,7 +101,7 @@
     .toast.show { display: block; }
     .message-list { display: grid; gap: 10px; }
     .message-item, .request-item { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
-    .auth-wrap { min-height: calc(100vh - 64px); display: grid; place-items: center; padding: 18px; }
+    .auth-wrap { display: grid; justify-items: center; align-items: start; padding: 24px 0; }
     .auth-card { width: min(100%, 430px); }
     @media (min-width: 768px) {
       .layout { padding: 18px; grid-template-columns: var(--sidebar) minmax(0,1fr); gap: 18px; }
@@ -110,14 +111,17 @@
       .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .grid.three { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .form-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
-      .catalog-shell { grid-template-columns: 280px minmax(0,1fr); }
+      .catalog-shell { grid-template-columns: 260px minmax(0,1fr); }
       .filters { display: block; position: sticky; top: 82px; align-self: start; }
       .mobile-filter { display: none; }
-      .card-actions { grid-template-columns: repeat(3, minmax(0,1fr)); }
       .modal { left: 50%; top: 50%; right: auto; bottom: auto; width: min(720px, calc(100vw - 36px)); transform: translate(-50%, -50%); }
     }
     @media (min-width: 1280px) {
       .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .results-grid { grid-template-columns: repeat(2, minmax(360px, 1fr)); }
+    }
+    @media (min-width: 1760px) {
+      .results-grid { grid-template-columns: repeat(3, minmax(360px, 1fr)); }
     }
   </style>
 </head>
@@ -169,6 +173,9 @@
 
     const app = document.getElementById('app');
     const toast = document.getElementById('toast');
+    let lastSentHeight = 0;
+    let catalogRenderTimer = null;
+    let pendingFocus = null;
 
     function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; } }
     function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
@@ -176,22 +183,58 @@
     function id() { return Date.now() + Math.floor(Math.random() * 1000); }
     function showToast(text) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
     function sendToTilda(action, data = {}) { window.parent.postMessage({ action, ...data }, '*'); }
-    function resize() { setTimeout(() => sendToTilda('resize', { height: document.body.scrollHeight }), 50); }
+    function resize() {
+      setTimeout(() => {
+        const height = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          app ? app.scrollHeight : 0
+        );
+        if (Math.abs(height - lastSentHeight) < 4) return;
+        lastSentHeight = height;
+        sendToTilda('resize', { height });
+      }, 50);
+    }
     function currentUser() { return read(DB.currentUser, null); }
     function setCurrentUser(user) { write(DB.currentUser, user); }
     function users() { return read(DB.users, []); }
     function profiles() { return read(DB.profiles, []); }
     function saveProfiles(items) { write(DB.profiles, items); }
     function initials(item) { return ((item.firstName || 'С')[0] || 'С') + ((item.lastName || 'П')[0] || 'П'); }
+    function avatarHTML(item) { return item && item.photo ? `<img src="${item.photo}" alt="">` : initials(item || {}); }
     function roleTitle(role) { return role === 'tutor' ? 'Репетитор' : role === 'nanny' ? 'Няня' : 'Клиент'; }
     function statusText(status) { return ({ draft:'Черновик', review:'На модерации', published:'Опубликована', hidden:'Скрыта' })[status] || status; }
+    function scheduleCatalogRender(selector, delay = 260) {
+      const node = selector ? document.querySelector(selector) : null;
+      pendingFocus = node ? {
+        selector,
+        start: node.selectionStart || 0,
+        end: node.selectionEnd || node.selectionStart || 0
+      } : null;
+      clearTimeout(catalogRenderTimer);
+      catalogRenderTimer = setTimeout(() => {
+        renderCatalog();
+        restorePendingFocus();
+      }, delay);
+    }
+    function restorePendingFocus() {
+      if (!pendingFocus) return;
+      const node = document.querySelector(pendingFocus.selector);
+      if (node) {
+        node.focus();
+        if (typeof node.setSelectionRange === 'function') {
+          node.setSelectionRange(pendingFocus.start, pendingFocus.end);
+        }
+      }
+      pendingFocus = null;
+    }
 
     function seed() {
       if (localStorage.getItem('mp_seeded_v2')) return;
       const demoUsers = [
-        { id: 101, role: 'tutor', firstName: 'Ирина', lastName: 'Иванова', email: 'tutor@example.ru', password: '123456', phone: '+79001112233' },
-        { id: 102, role: 'nanny', firstName: 'Наталья', lastName: 'Орлова', email: 'nanny@example.ru', password: '123456', phone: '+79004445566' },
-        { id: 103, role: 'client', firstName: 'Анна', lastName: 'Петрова', email: 'client@example.ru', password: '123456', phone: '+79007778899' }
+        { id: 101, role: 'tutor', firstName: 'Ирина', lastName: 'Иванова', email: 'tutor@example.ru', password: '123456', phone: '+79001112233', photo: '' },
+        { id: 102, role: 'nanny', firstName: 'Наталья', lastName: 'Орлова', email: 'nanny@example.ru', password: '123456', phone: '+79004445566', photo: '' },
+        { id: 103, role: 'client', firstName: 'Анна', lastName: 'Петрова', email: 'client@example.ru', password: '123456', phone: '+79007778899', photo: '' }
       ];
       const demoProfiles = [
         {
@@ -340,7 +383,8 @@
           lastName: document.getElementById('regLast').value.trim(),
           email: document.getElementById('regEmail').value.trim(),
           phone: document.getElementById('regPhone').value.trim(),
-          password: document.getElementById('regPassword').value
+          password: document.getElementById('regPassword').value,
+          photo: ''
         };
         if (!user.firstName || !user.lastName || !user.email || !user.phone || user.password.length < 6) return showToast('Заполните все поля, пароль минимум 6 символов');
         if (users().some(u => u.email === user.email)) return showToast('Email уже зарегистрирован');
@@ -364,7 +408,7 @@
         </div>
         <div class="grid two">
           <section class="card profile-card">
-            <div class="avatar">${initials(user)}</div>
+            <div class="avatar">${avatarHTML(user)}</div>
             <div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">${roleTitle(user.role)}</p><p>${esc(user.email)} · ${esc(user.phone)}</p></div>
           </section>
           <section class="card">
@@ -383,7 +427,7 @@
     function renderClientCabinet(user) {
       renderShell(`
         <div class="page-head"><h1>Личный кабинет клиента</h1><p class="muted">Избранные специалисты, заявки и сообщения.</p></div>
-        <section class="card profile-card"><div class="avatar">${initials(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p>${esc(user.email)} · ${esc(user.phone)}</p></div></section>
+        <section class="card profile-card"><div class="avatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p>${esc(user.email)} · ${esc(user.phone)}</p></div></section>
         <br><div class="grid two">
           <section class="card"><h2>Быстрый поиск</h2><p class="muted">Откройте каталог и примените фильтры для репетиторов или нянь.</p><br><button id="goCatalogBtn">Открыть каталог</button></section>
           <section class="card"><h2>Избранное</h2><div class="message-list">${favoriteProfiles().length ? favoriteProfiles().map(p => `<div class="message-item">${cardMini(p)}</div>`).join('') : '<p class="muted">Пока пусто.</p>'}</div></section>
@@ -439,7 +483,7 @@
       const type = user.role;
       const p = profile || {
         id: id(), userId: user.id, type, status: 'draft', views: 0, responses: 0,
-        firstName: user.firstName, lastName: user.lastName, city: '', district: '', photo: '',
+        firstName: user.firstName, lastName: user.lastName, city: '', district: '', photo: user.photo || '',
         rating: 0, reviewsCount: 0, experienceYears: 0, experienceLevel: 'Начинающий', price: 1000,
         about: '', keywords: '', subjects: [], educationLevels: [], lessonFormats: [], tutorSkills: [], teachingLanguages: [],
         childAges: [], employmentTypes: [], nannySkills: [], careMethods: [], extraServices: [],
@@ -552,7 +596,7 @@
           <section>
             <div class="between"><b>Найдено ${items.length}</b><label style="max-width:260px">Сортировка<select id="sortFilter">${sortOptions()}</select></label></div>
             <br>
-            <div class="grid three">${pageItems.length ? pageItems.map(cardHTML).join('') : '<div class="empty">Специалисты не найдены. Измените фильтры или поисковый запрос.</div>'}</div>
+            <div class="grid three results-grid">${pageItems.length ? pageItems.map(cardHTML).join('') : '<div class="empty">Специалисты не найдены. Измените фильтры или поисковый запрос.</div>'}</div>
             <div class="pagination">${Array.from({length: pages}, (_, i) => `<button class="page-btn ${state.page === i + 1 ? 'active' : ''}" data-page="${i + 1}" type="button">${i + 1}</button>`).join('')}</div>
           </section>
         </div>`);
@@ -652,10 +696,16 @@
 
     function bindCatalog() {
       const searchQ = document.getElementById('searchQ');
-      searchQ.oninput = () => { state.search.q = searchQ.value; state.page = 1; renderCatalog(); };
+      searchQ.oninput = () => { state.search.q = searchQ.value; state.page = 1; scheduleCatalogRender('#searchQ'); };
       document.getElementById('typeFilter').onchange = e => { state.search.type = e.target.value; state.page = 1; renderCatalog(); };
       document.getElementById('sortFilter').onchange = e => { state.search.sort = e.target.value; renderCatalog(); };
-      document.querySelectorAll('[data-filter]').forEach(el => el.oninput = el.onchange = () => { state.search[el.dataset.filter] = el.value; state.page = 1; renderCatalog(); });
+      document.querySelectorAll('[data-filter]').forEach(el => {
+        if (el.tagName === 'INPUT') {
+          el.oninput = () => { state.search[el.dataset.filter] = el.value; state.page = 1; scheduleCatalogRender('[data-filter="' + el.dataset.filter + '"]'); };
+        } else {
+          el.onchange = () => { state.search[el.dataset.filter] = el.value; state.page = 1; renderCatalog(); };
+        }
+      });
       document.getElementById('resetFiltersBtn').onclick = () => { Object.keys(state.search).forEach(k => state.search[k] = k === 'type' ? 'all' : k === 'sort' ? 'rating' : ''); state.page = 1; renderCatalog(); };
       document.querySelectorAll('[data-page]').forEach(btn => btn.onclick = () => { state.page = Number(btn.dataset.page); renderCatalog(); window.scrollTo({top:0, behavior:'smooth'}); });
       document.querySelectorAll('[data-favorite]').forEach(btn => btn.onclick = () => addFavorite(btn.dataset.favorite));
@@ -719,17 +769,44 @@
     function renderSettings() {
       if (!requireLogin()) return;
       const user = currentUser();
-      renderShell(`<div class="page-head"><h1>Настройки профиля</h1></div><section class="card form"><div class="form-row"><label>Имя<input id="setFirst" value="${esc(user.firstName)}"></label><label>Фамилия<input id="setLast" value="${esc(user.lastName)}"></label></div><div class="form-row"><label>Email<input id="setEmail" value="${esc(user.email)}"></label><label>Телефон<input id="setPhone" value="${esc(user.phone)}"></label></div><button id="saveSettingsBtn">Сохранить</button></section>`);
+      renderShell(`<div class="page-head"><h1>Настройки профиля</h1></div><section class="card form"><div class="profile-card"><div class="avatar" id="settingsAvatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">Аватар отображается в личном кабинете${user.role === 'client' ? '.' : ' и может использоваться в анкете каталога.'}</p><br><label>Аватар<input id="setPhoto" type="file" accept="image/*"></label></div></div><div class="form-row"><label>Имя<input id="setFirst" value="${esc(user.firstName)}"></label><label>Фамилия<input id="setLast" value="${esc(user.lastName)}"></label></div><div class="form-row"><label>Email<input id="setEmail" value="${esc(user.email)}"></label><label>Телефон<input id="setPhone" value="${esc(user.phone)}"></label></div><button id="saveSettingsBtn">Сохранить</button></section>`);
+      document.getElementById('setPhoto').onchange = event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          user.photo = reader.result;
+          document.getElementById('settingsAvatar').innerHTML = `<img src="${reader.result}" alt="">`;
+          persistUserSettings(user, false);
+          showToast('Аватар обновлен');
+        };
+        reader.readAsDataURL(file);
+      };
       document.getElementById('saveSettingsBtn').onclick = () => {
         user.firstName = document.getElementById('setFirst').value.trim();
         user.lastName = document.getElementById('setLast').value.trim();
         user.email = document.getElementById('setEmail').value.trim();
         user.phone = document.getElementById('setPhone').value.trim();
-        setCurrentUser(user);
-        write(DB.users, users().map(u => String(u.id) === String(user.id) ? user : u));
+        persistUserSettings(user, true);
         showToast('Настройки сохранены');
         render();
       };
+    }
+
+    function persistUserSettings(user, syncNames) {
+      setCurrentUser(user);
+      write(DB.users, users().map(u => String(u.id) === String(user.id) ? Object.assign({}, u, user) : u));
+      if (user.role !== 'client') {
+        saveProfiles(profiles().map(profile => {
+          if (String(profile.userId) !== String(user.id)) return profile;
+          const next = Object.assign({}, profile, { photo: user.photo || profile.photo || '' });
+          if (syncNames) {
+            next.firstName = user.firstName;
+            next.lastName = user.lastName;
+          }
+          return next;
+        }));
+      }
     }
 
     function openModal(html) {
