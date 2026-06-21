@@ -3,63 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Специалист - каталог репетиторов и нянь</title>
+  <title>ПЛАТФОРМА - дизайн Figma</title>
   <style>
     * { box-sizing: border-box; }
     :root {
-      --bg: #F5F5F5;
+      --bg: #F7F9FC;
       --card: #FFFFFF;
-      --accent: #4A76A8;
-      --accent-dark: #3F6795;
-      --accent-soft: #E8F0FA;
-      --text: #000000;
-      --muted: #818C99;
-      --line: #DCE1E6;
+      --accent: #112250;
+      --accent-dark: #112250;
+      --accent-soft: #DDE6F0;
+      --accent-pale: #EEF3F8;
+      --text: #112250;
+      --muted: #617086;
+      --line: #D8E1EC;
       --success: #2EA44F;
       --danger: #E64646;
       --warning: #F5A623;
-      --shadow: 0 4px 20px rgba(0,0,0,0.08);
-      --radius: 12px;
+      --shadow: 0 12px 35px rgba(17,34,80,0.08);
+      --radius: 20px;
       --sidebar: 228px;
     }
     html, body { margin: 0; min-width: 320px; min-height: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); font: 15px/1.45 Arial, sans-serif; }
+    body::before { content: ""; position: fixed; inset: 70px -10vw auto -10vw; z-index: -1; height: 340px; background: url("data:image/svg+xml,%3Csvg width='1200' height='340' viewBox='0 0 1200 340' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-30 98C155 188 270 128 430 84C632 28 705 190 882 160C1010 138 1082 24 1230 94' stroke='%23DDE6F0' stroke-width='24' stroke-linecap='round'/%3E%3Cpath d='M-20 292C180 225 306 300 487 240C658 184 746 75 920 92C1042 104 1135 190 1240 158' stroke='%23EEF3F8' stroke-width='18' stroke-linecap='round'/%3E%3C/svg%3E") center top / cover no-repeat; pointer-events: none; }
     body.locked { overflow: hidden; }
     button, input, select, textarea { font: inherit; }
-    button { min-height: 44px; border: 0; border-radius: 8px; padding: 0 16px; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; transition: .15s ease; }
-    button:hover { background: var(--accent-dark); transform: translateY(-1px); }
-    button.secondary { background: #EEF2F6; color: #2C4058; }
+    button { min-height: 46px; border: 0; border-radius: 999px; padding: 0 20px; background: var(--accent); color: #fff; font-weight: 800; cursor: pointer; transition: .18s ease; letter-spacing: .01em; }
+    button:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(17,34,80,.18); }
+    button.secondary { background: var(--accent-pale); color: var(--accent); }
     button.danger { background: var(--danger); }
     button.success { background: var(--success); }
     button.ghost { background: transparent; color: var(--accent); min-height: 32px; padding: 0; }
-    input, select, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; color: var(--text); outline: none; }
-    textarea { min-height: 96px; resize: vertical; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(74,118,168,.12); }
-    label { display: grid; gap: 6px; color: #2C4058; font-weight: 700; }
+    input, select, textarea { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 999px; padding: 11px 16px; background: #fff; color: var(--text); outline: none; }
+    select { appearance: none; -webkit-appearance: none; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23112250' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px 8px; }
+    textarea { min-height: 108px; resize: vertical; border-radius: 18px; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(17,34,80,.12); }
+    label { display: grid; gap: 7px; color: var(--accent); font-weight: 800; }
     h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 6px; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
-    h2 { margin-bottom: 14px; font-size: 20px; }
+    h1 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 54px); line-height: .98; text-transform: uppercase; letter-spacing: -.01em; }
+    h2 { margin-bottom: 14px; font-size: clamp(20px, 2vw, 28px); text-transform: uppercase; line-height: 1.05; }
     h3 { margin-bottom: 8px; font-size: 17px; }
     p { margin-bottom: 0; }
     a { color: var(--accent); text-decoration: none; }
     .muted { color: var(--muted); }
     .app { min-height: 100vh; }
-    .topbar { position: sticky; top: 0; z-index: 40; height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 20px; background: #fff; border-bottom: 1px solid var(--line); }
-    .burger { display: grid; place-items: center; width: 44px; padding: 0; background: #EEF2F6; color: #2C4058; font-size: 20px; }
-    .brand { margin-right: auto; color: #2C4058; font-size: 20px; font-weight: 800; cursor: pointer; }
-    .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #EEF2F6; color: #2C4058; font-weight: 700; }
-    .layout { width: min(100%, 1680px); margin: 0 auto; padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
-    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 10px; overflow: auto; background: #fff; box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
+    .topbar { position: sticky; top: 0; z-index: 40; height: 72px; display: flex; align-items: center; gap: 14px; padding: 0 clamp(16px, 4vw, 56px); background: rgba(255,255,255,.92); border-bottom: 1px solid rgba(216,225,236,.7); backdrop-filter: blur(14px); }
+    .burger { display: grid; place-items: center; width: 46px; padding: 0; background: var(--accent-pale); color: var(--accent); font-size: 20px; }
+    .brand { margin-right: auto; display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: .02em; }
+    .brand::before { content: ""; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff 0 18%, transparent 19%), var(--accent); box-shadow: 8px 0 0 -3px var(--accent-soft); }
+    .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--accent-pale); color: var(--accent); font-weight: 800; }
+    .layout { width: min(100%, 1440px); margin: 0 auto; padding: clamp(14px, 3vw, 34px); display: grid; grid-template-columns: 1fr; gap: 18px; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 14px; overflow: auto; background: rgba(255,255,255,.96); box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
     .sidebar.open { transform: translateX(0); }
     .overlay { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(0,0,0,.38); }
     .overlay.show { display: block; }
     .nav-title { padding: 12px; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
-    .nav-btn { width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px; margin: 2px 0; padding: 0 12px; border-radius: 8px; background: transparent; color: #2C4058; text-align: left; font-weight: 700; }
-    .nav-btn:hover { background: #F2F5F8; transform: none; }
+    .nav-btn { width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px; margin: 3px 0; padding: 0 14px; border-radius: 999px; background: transparent; color: var(--accent); text-align: left; font-weight: 800; box-shadow: none; }
+    .nav-btn:hover { background: var(--accent-pale); transform: none; box-shadow: none; }
     .nav-btn.active { background: var(--accent-soft); color: var(--accent); }
     .content { min-width: 0; }
-    .page-head { display: grid; gap: 10px; margin-bottom: 14px; }
-    .card { min-width: 0; padding: 16px; border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
-    .grid { display: grid; gap: 14px; }
+    .page-head { display: grid; gap: 12px; margin-bottom: 18px; }
+    .catalog-hero { min-height: 180px; align-content: center; position: relative; padding: clamp(12px, 3vw, 34px) 0; }
+    .catalog-hero::after { content: ""; position: absolute; right: 0; bottom: 0; width: min(42vw, 360px); height: 160px; background: url("data:image/svg+xml,%3Csvg width='360' height='160' viewBox='0 0 360 160' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='260' cy='60' r='34' stroke='%23112250' stroke-width='5'/%3E%3Cpath d='M88 126C142 58 208 38 302 48' stroke='%23DDE6F0' stroke-width='18' stroke-linecap='round'/%3E%3Cpath d='M154 121L206 48L244 134' stroke='%23112250' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='52' y='42' width='66' height='42' rx='10' stroke='%23112250' stroke-width='5'/%3E%3Cpath d='M64 58H104M64 70H92' stroke='%23112250' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") right center / contain no-repeat; opacity: .9; pointer-events: none; }
+    .catalog-hero .muted { max-width: 420px; color: var(--accent); font-weight: 700; }
+    .card { min-width: 0; padding: clamp(18px, 2vw, 28px); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
+    .grid { display: grid; gap: 18px; }
     .grid.two, .grid.three { grid-template-columns: 1fr; }
     .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -68,7 +75,7 @@
     .tabs { display: flex; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
     .tab { min-height: 44px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; }
     .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
-    .pill { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 800; }
+    .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 900; }
     .status { display: inline-flex; min-height: 28px; align-items: center; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 800; }
     .status.draft { background: #EEF2F6; color: #2C4058; }
     .status.review { background: #FFF6E5; color: #A76700; }
@@ -77,30 +84,47 @@
     .avatar { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; font-weight: 800; overflow: hidden; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .profile-card { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 14px; align-items: center; }
-    .catalog-shell { display: grid; gap: 14px; }
+    .catalog-search { margin-bottom: 8px; background: var(--accent-soft); box-shadow: none; }
+    .catalog-search .form-row { align-items: end; }
+    .catalog-search input, .catalog-search select { border-color: transparent; box-shadow: inset 0 0 0 1px rgba(17,34,80,.06); }
+    .catalog-shell { display: grid; gap: 18px; margin-top: 18px; align-items: start; }
+    .catalog-toolbar { margin-bottom: 18px; padding: 16px 18px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .catalog-toolbar label { width: min(100%, 260px); }
     .filters { display: none; }
     .filters.open { display: block; }
-    .filter-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .filter-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
     .check-list { display: grid; gap: 8px; }
-    .check-item { display: flex; gap: 8px; align-items: flex-start; color: #2C4058; font-weight: 600; }
+    .check-item { display: flex; gap: 8px; align-items: flex-start; color: var(--accent); font-weight: 700; }
     .check-item input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; padding: 0; }
-    .specialist-card { display: grid; gap: 12px; padding: 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .specialist-card { display: grid; gap: 14px; padding: clamp(18px, 2vw, 24px); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); border: 1px solid rgba(216,225,236,.65); }
+    .specialist-card:hover { transform: translateY(-3px); box-shadow: 0 18px 42px rgba(17,34,80,.12); transition: .18s ease; }
     .specialist-top { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: center; }
     .card-meta { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
-    .price { color: #2C4058; font-size: 20px; font-weight: 800; }
+    .price { color: var(--accent); font-size: 22px; font-weight: 900; }
     .rating { color: var(--warning); font-weight: 800; }
     .card-actions { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
     .card-actions button { flex: 1 1 auto; min-width: max-content; white-space: nowrap; padding-inline: 14px; }
-    .empty { padding: 28px 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
+    .empty { padding: 34px 18px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
     .pagination { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .page-btn { min-width: 44px; background: #EEF2F6; color: #2C4058; }
     .page-btn.active { background: var(--accent); color: #fff; }
-    .modal { position: fixed; inset: auto 10px 10px; z-index: 120; display: none; max-height: 88vh; overflow: auto; padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 20px 70px rgba(0,0,0,.25); }
+    .modal { position: fixed; inset: auto 10px 10px; z-index: 120; display: none; max-height: 88vh; overflow: auto; padding: 22px; border-radius: 24px; background: #fff; box-shadow: 0 24px 80px rgba(17,34,80,.24); }
     .modal.show { display: block; }
-    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 200; display: none; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 16px; border-radius: 10px; background: #2C4058; color: #fff; font-weight: 700; box-shadow: 0 10px 40px rgba(0,0,0,.2); }
+    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 200; display: none; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 13px 18px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 800; box-shadow: 0 10px 40px rgba(17,34,80,.2); }
     .toast.show { display: block; }
     .message-list { display: grid; gap: 10px; }
-    .message-item, .request-item { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .message-item, .request-item { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+    .chat-layout { display: grid; gap: 14px; }
+    .dialogs-list { display: grid; gap: 8px; align-content: start; }
+    .dialog-btn { width: 100%; min-height: auto; display: grid; grid-template-columns: 48px minmax(0,1fr); gap: 10px; align-items: center; padding: 10px; border-radius: 10px; background: #fff; color: #2C4058; text-align: left; box-shadow: none; border: 1px solid var(--line); }
+    .dialog-btn:hover, .dialog-btn.active { background: var(--accent-soft); transform: none; }
+    .dialog-btn .avatar { width: 48px; height: 48px; font-size: 16px; }
+    .chat-panel { min-height: 520px; display: grid; grid-template-rows: auto minmax(260px, 1fr) auto; overflow: hidden; }
+    .chat-head { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .chat-body { display: grid; align-content: start; gap: 10px; padding: 14px 0; overflow: auto; }
+    .bubble { max-width: min(78%, 560px); padding: 12px 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--accent-pale); color: var(--accent); }
+    .bubble.mine { justify-self: end; border-color: var(--accent); background: var(--accent); color: #fff; }
+    .chat-form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
     .auth-wrap { display: grid; justify-items: center; align-items: start; padding: 24px 0; }
     .auth-card { width: min(100%, 430px); }
     @media (min-width: 768px) {
@@ -112,9 +136,16 @@
       .grid.three { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .form-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .catalog-shell { grid-template-columns: 260px minmax(0,1fr); }
+      .chat-layout { grid-template-columns: 320px minmax(0,1fr); }
       .filters { display: block; position: sticky; top: 82px; align-self: start; }
       .mobile-filter { display: none; }
       .modal { left: 50%; top: 50%; right: auto; bottom: auto; width: min(720px, calc(100vw - 36px)); transform: translate(-50%, -50%); }
+    }
+    @media (max-width: 767px) {
+      .catalog-hero { min-height: auto; }
+      .catalog-hero::after { display: none; }
+      .topbar { padding-inline: 14px; }
+      .brand { font-size: 17px; }
     }
     @media (min-width: 1280px) {
       .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
@@ -135,6 +166,7 @@
       profiles: 'mp_profiles',
       requests: 'mp_requests',
       messages: 'mp_messages',
+      reviews: 'mp_reviews',
       currentUser: 'mp_current_user'
     };
 
@@ -159,6 +191,8 @@
       route: 'catalog',
       cabinetSection: 'profile',
       catalogType: 'all',
+      activeConversationId: null,
+      viewProfileId: null,
       page: 1,
       perPage: 9,
       editingProfileId: null,
@@ -230,7 +264,10 @@
     }
 
     function seed() {
-      if (localStorage.getItem('mp_seeded_v2')) return;
+      if (localStorage.getItem('mp_seeded_v2')) {
+        if (!localStorage.getItem(DB.reviews)) write(DB.reviews, demoReviews());
+        return;
+      }
       const demoUsers = [
         { id: 101, role: 'tutor', firstName: 'Ирина', lastName: 'Иванова', email: 'tutor@example.ru', password: '123456', phone: '+79001112233', photo: '' },
         { id: 102, role: 'nanny', firstName: 'Наталья', lastName: 'Орлова', email: 'nanny@example.ru', password: '123456', phone: '+79004445566', photo: '' },
@@ -266,7 +303,17 @@
       write(DB.profiles, demoProfiles);
       write(DB.requests, []);
       write(DB.messages, []);
+      write(DB.reviews, demoReviews());
       localStorage.setItem('mp_seeded_v2', 'true');
+    }
+
+    function demoReviews() {
+      return [
+        { id: 301, profileId: 201, clientId: 103, clientName: 'Анна Петрова', rating: 5, text: 'Ирина быстро нашла пробелы у ребенка и дала понятный план занятий. После месяца стало спокойнее с математикой.', createdAt: '2026-04-12T12:00:00.000Z' },
+        { id: 302, profileId: 201, clientId: 104, clientName: 'Мария Соколова', rating: 5, text: 'Очень структурные уроки, ребенку комфортно задавать вопросы. Будем продолжать подготовку к ОГЭ.', createdAt: '2026-05-08T12:00:00.000Z' },
+        { id: 303, profileId: 202, clientId: 105, clientName: 'Елена Морозова', rating: 5, text: 'Наталья аккуратная, пунктуальная и очень мягкая в общении с детьми. Дочь быстро привыкла.', createdAt: '2026-03-19T12:00:00.000Z' },
+        { id: 304, profileId: 202, clientId: 103, clientName: 'Анна Петрова', rating: 4, text: 'Хороший контакт с ребенком, прогулки и развивающие игры проходили спокойно. Спасибо.', createdAt: '2026-05-22T12:00:00.000Z' }
+      ];
     }
 
     function renderShell(content) {
@@ -274,7 +321,7 @@
       app.innerHTML = `
         <header class="topbar">
           <button class="burger" id="burgerBtn" type="button">☰</button>
-          <div class="brand" id="homeBtn">Специалист</div>
+          <div class="brand" id="homeBtn">ПЛАТФОРМА</div>
           <div class="user-chip">${user ? esc(user.firstName) + ' · ' + roleTitle(user.role) : 'Гость'}</div>
           ${user ? '<button class="secondary" id="logoutTopBtn" type="button">Выйти</button>' : '<button id="loginTopBtn" type="button">Войти</button>'}
         </header>
@@ -324,6 +371,7 @@
       if (state.route === 'messages') return renderMessages();
       if (state.route === 'requests') return renderRequests();
       if (state.route === 'settings') return renderSettings();
+      if (state.route === 'profile') return renderPublicProfile();
       return renderCatalog();
     }
 
@@ -425,19 +473,21 @@
     }
 
     function renderClientCabinet(user) {
+      const favItems = favoriteProfiles();
       renderShell(`
         <div class="page-head"><h1>Личный кабинет клиента</h1><p class="muted">Избранные специалисты, заявки и сообщения.</p></div>
         <section class="card profile-card"><div class="avatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p>${esc(user.email)} · ${esc(user.phone)}</p></div></section>
         <br><div class="grid two">
           <section class="card"><h2>Быстрый поиск</h2><p class="muted">Откройте каталог и примените фильтры для репетиторов или нянь.</p><br><button id="goCatalogBtn">Открыть каталог</button></section>
-          <section class="card"><h2>Избранное</h2><div class="message-list">${favoriteProfiles().length ? favoriteProfiles().map(p => `<div class="message-item">${cardMini(p)}</div>`).join('') : '<p class="muted">Пока пусто.</p>'}</div></section>
+          <section class="card"><h2>Избранное</h2><div class="message-list">${favItems.length ? favItems.map(favoriteCardHTML).join('') : '<p class="muted">Пока пусто.</p>'}</div></section>
         </div>`);
       document.getElementById('goCatalogBtn').onclick = () => setRoute('catalog');
+      bindFavoriteCards();
     }
 
     function profileManagerHTML(profile) {
       return `
-        <section class="card">
+        <section class="card catalog-search">
           <div class="between">
             <div>
               <h2>${esc(profile.firstName)} ${esc(profile.lastName)}</h2>
@@ -580,9 +630,9 @@
       if (state.page > pages) state.page = pages;
       const pageItems = items.slice((state.page - 1) * state.perPage, state.page * state.perPage);
       renderShell(`
-        <div class="page-head">
-          <h1>Каталог специалистов</h1>
-          <p class="muted">Поиск по имени, услуге, предмету, городу и ключевым словам. Фильтры для нянь и репетиторов меняются автоматически.</p>
+        <div class="page-head catalog-hero">
+          <h1>Найти специалиста</h1>
+          <p class="muted">Репетиторы и няни для каждого этапа обучения, развития и заботы.</p>
         </div>
         <section class="card">
           <div class="form-row">
@@ -594,8 +644,7 @@
         <div class="catalog-shell">
           <aside class="filters card" id="filtersPanel">${filtersHTML()}</aside>
           <section>
-            <div class="between"><b>Найдено ${items.length}</b><label style="max-width:260px">Сортировка<select id="sortFilter">${sortOptions()}</select></label></div>
-            <br>
+            <div class="between catalog-toolbar"><b>Найдено ${items.length}</b><label>Сортировка<select id="sortFilter">${sortOptions()}</select></label></div>
             <div class="grid three results-grid">${pageItems.length ? pageItems.map(cardHTML).join('') : '<div class="empty">Специалисты не найдены. Измените фильтры или поисковый запрос.</div>'}</div>
             <div class="pagination">${Array.from({length: pages}, (_, i) => `<button class="page-btn ${state.page === i + 1 ? 'active' : ''}" data-page="${i + 1}" type="button">${i + 1}</button>`).join('')}</div>
           </section>
@@ -684,14 +733,207 @@
         <div class="price">${esc(p.price)} ₽/час</div>
         <p>${esc(String(p.about || '').slice(0, 150))}${String(p.about || '').length > 150 ? '...' : ''}</p>
         <div class="row">${(p.subjects || p.childAges || []).slice(0, 3).map(x => `<span class="pill">${esc(x)}</span>`).join('')}</div>
-        <div class="card-actions"><button data-write="${p.id}" type="button">Написать</button><button data-request="${p.id}" class="secondary" type="button">Оставить заявку</button><button data-favorite="${p.id}" class="secondary" type="button">В избранное</button></div>
+        <div class="card-actions"><button data-view-profile="${p.id}" type="button">Открыть карточку</button><button data-write="${p.id}" class="secondary" type="button">Написать</button><button data-request="${p.id}" class="secondary" type="button">Оставить заявку</button><button data-favorite="${p.id}" class="secondary" type="button">В избранное</button></div>
       </article>`;
     }
     function cardMini(p) { return `<b>${esc(p.firstName)} ${esc(p.lastName)}</b><p class="muted">${roleTitle(p.type)} · ${esc(p.city)} · ${esc(p.price)} ₽/час</p>`; }
+    function favoriteCardHTML(p) {
+      return `<div class="message-item">
+        <div class="profile-card">
+          <div class="avatar">${avatarHTML(p)}</div>
+          <div>
+            <button class="ghost" data-view-profile="${p.id}" type="button"><b>${esc(p.firstName)} ${esc(p.lastName)}</b></button>
+            <p class="muted">${roleTitle(p.type)} · ${esc(p.city)} · ${esc(p.price)} ₽/час</p>
+            <p>${esc(String(p.about || '').slice(0, 92))}${String(p.about || '').length > 92 ? '...' : ''}</p>
+          </div>
+        </div>
+        <br>
+        <div class="card-actions">
+          <button data-view-profile="${p.id}" type="button">Открыть карточку</button>
+          <button data-write="${p.id}" class="secondary" type="button">Написать</button>
+          <button data-remove-favorite="${p.id}" class="secondary" type="button">Убрать из избранного</button>
+        </div>
+      </div>`;
+    }
     function favoriteProfiles() {
       const user = currentUser();
       const fav = user?.favorites || [];
       return profiles().filter(p => fav.map(String).includes(String(p.id)));
+    }
+    function reviews() { return read(DB.reviews, []); }
+    function saveReviews(items) { write(DB.reviews, items); }
+    function profileReviews(profileId) {
+      return reviews()
+        .filter(review => String(review.profileId) === String(profileId))
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    function stars(value) {
+      const count = Math.max(0, Math.min(5, Number(value) || 0));
+      return '★'.repeat(count) + '☆'.repeat(5 - count);
+    }
+    function reviewsHTML(profile) {
+      const items = profileReviews(profile.id);
+      return `
+        <section class="card">
+          <div class="between">
+            <div>
+              <h2>Отзывы</h2>
+              <p class="muted">${items.length ? 'Отзывы клиентов о работе специалиста.' : 'Пока отзывов нет. Можно стать первым.'}</p>
+            </div>
+            <div class="rating">★ ${esc(profile.rating || '0.0')} · ${items.length} отзывов</div>
+          </div>
+          <br>
+          <div class="message-list">
+            ${items.length ? items.map(review => `<div class="message-item">
+              <div class="between">
+                <div><b>${esc(review.clientName || 'Клиент')}</b><p class="rating">${stars(review.rating)}</p></div>
+                <span class="muted">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</span>
+              </div>
+              <p>${esc(review.text)}</p>
+            </div>`).join('') : '<p class="muted">Отзывов пока нет.</p>'}
+          </div>
+          <br>
+          ${reviewFormHTML(profile)}
+        </section>`;
+    }
+    function reviewFormHTML(profile) {
+      const user = currentUser();
+      if (!user) return '<p class="muted">Войдите как клиент, чтобы оставить отзыв.</p>';
+      if (user.role !== 'client') return '<p class="muted">Отзывы могут оставлять клиенты.</p>';
+      if (String(profile.userId) === String(user.id)) return '<p class="muted">Нельзя оставить отзыв на собственную анкету.</p>';
+      const own = profileReviews(profile.id).find(review => String(review.clientId) === String(user.id));
+      return `<div class="form">
+        <h3>${own ? 'Обновить свой отзыв' : 'Добавить отзыв'}</h3>
+        <div class="form-row">
+          <label>Оценка
+            <select id="reviewRating">
+              ${[5,4,3,2,1].map(v => `<option value="${v}" ${Number(own?.rating || 5) === v ? 'selected' : ''}>${v} ${stars(v)}</option>`).join('')}
+            </select>
+          </label>
+        </div>
+        <label>Текст отзыва<textarea id="reviewText" placeholder="Расскажите, как прошли занятия или работа со специалистом">${esc(own?.text || '')}</textarea></label>
+        <button id="saveReviewBtn" type="button">${own ? 'Сохранить отзыв' : 'Опубликовать отзыв'}</button>
+      </div>`;
+    }
+    function bindReviews(profile) {
+      const btn = document.getElementById('saveReviewBtn');
+      if (!btn) return;
+      btn.onclick = () => saveReview(profile.id);
+    }
+    function saveReview(profileId) {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      if (user.role !== 'client') return showToast('Отзывы могут оставлять клиенты');
+      const text = document.getElementById('reviewText')?.value.trim();
+      const rating = Number(document.getElementById('reviewRating')?.value || 5);
+      if (!text || text.length < 10) return showToast('Напишите отзыв минимум 10 символов');
+      const profile = profiles().find(p => String(p.id) === String(profileId));
+      if (!profile) return showToast('Анкета не найдена');
+      if (String(profile.userId) === String(user.id)) return showToast('Нельзя оставить отзыв на свою анкету');
+      const items = reviews();
+      const existing = items.find(review => String(review.profileId) === String(profileId) && String(review.clientId) === String(user.id));
+      if (existing) {
+        existing.rating = rating;
+        existing.text = text;
+        existing.updatedAt = new Date().toISOString();
+      } else {
+        items.push({
+          id: id(),
+          profileId,
+          clientId: user.id,
+          clientName: `${user.firstName || 'Клиент'} ${user.lastName || ''}`.trim(),
+          rating,
+          text,
+          createdAt: new Date().toISOString()
+        });
+      }
+      saveReviews(items);
+      recalcProfileRating(profileId);
+      showToast(existing ? 'Отзыв обновлен' : 'Отзыв опубликован');
+      renderPublicProfile();
+    }
+    function recalcProfileRating(profileId) {
+      const items = profileReviews(profileId);
+      const rating = items.length ? (items.reduce((sum, item) => sum + Number(item.rating || 0), 0) / items.length).toFixed(1) : 0;
+      saveProfiles(profiles().map(profile => String(profile.id) === String(profileId)
+        ? Object.assign({}, profile, { rating, reviewsCount: items.length })
+        : profile
+      ));
+    }
+    function bindFavoriteCards() {
+      document.querySelectorAll('[data-view-profile]').forEach(btn => btn.onclick = () => openPublicProfile(btn.dataset.viewProfile));
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
+      document.querySelectorAll('[data-remove-favorite]').forEach(btn => btn.onclick = () => removeFavorite(btn.dataset.removeFavorite));
+    }
+    function removeFavorite(profileId) {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      user.favorites = (user.favorites || []).filter(id => String(id) !== String(profileId));
+      setCurrentUser(user);
+      write(DB.users, users().map(u => String(u.id) === String(user.id) ? user : u));
+      showToast('Удалено из избранного');
+      renderClientCabinet(user);
+    }
+    function openPublicProfile(profileId) {
+      state.viewProfileId = profileId;
+      state.route = 'profile';
+      render();
+    }
+
+    function renderPublicProfile() {
+      const profile = profiles().find(p => String(p.id) === String(state.viewProfileId));
+      if (!profile) {
+        renderShell(`<div class="empty"><h1>Специалист не найден</h1><p>Анкета могла быть удалена или скрыта.</p><br><button id="backCatalogBtn">В каталог</button></div>`);
+        document.getElementById('backCatalogBtn').onclick = () => setRoute('catalog');
+        return;
+      }
+      profile.views = Number(profile.views || 0) + 1;
+      saveProfile(profile);
+      const tags = [].concat(profile.subjects || [], profile.childAges || [], profile.lessonFormats || [], profile.employmentTypes || []).slice(0, 8);
+      renderShell(`
+        <div class="page-head">
+          <button class="secondary" id="backCabinetBtn" type="button">← Назад</button>
+          <h1>${esc(profile.firstName)} ${esc(profile.lastName)}</h1>
+          <p class="muted">${roleTitle(profile.type)} · ${esc(profile.city)}${profile.district ? ', ' + esc(profile.district) : ''}</p>
+        </div>
+        <section class="card">
+          <div class="profile-card">
+            <div class="avatar">${avatarHTML(profile)}</div>
+            <div>
+              <h2>${esc(profile.firstName)} ${esc(profile.lastName)}</h2>
+              <p><span class="pill">${roleTitle(profile.type)}</span></p>
+              <p class="rating">★ ${esc(profile.rating || '0.0')} · ${esc(profile.reviewsCount || 0)} отзывов</p>
+              <p class="price">${esc(profile.price)} ₽/час</p>
+            </div>
+          </div>
+          <br>
+          <div class="row">${tags.map(x => `<span class="pill">${esc(x)}</span>`).join('')}</div>
+          <br>
+          <h2>О специалисте</h2>
+          <p>${esc(profile.about || 'Описание пока не заполнено.')}</p>
+          <br>
+          <div class="grid three">
+            <div><b>${esc(profile.experienceLevel || 'Не указан')}</b><p class="muted">уровень опыта</p></div>
+            <div><b>${esc(profile.experienceYears || 0)} лет</b><p class="muted">опыт работы</p></div>
+            <div><b>${esc(profile.views || 0)}</b><p class="muted">просмотров</p></div>
+          </div>
+          <br>
+          <div class="card-actions">
+            <button data-write="${profile.id}" type="button">Написать</button>
+            <button data-request="${profile.id}" class="secondary" type="button">Оставить заявку</button>
+            <button data-favorite="${profile.id}" class="secondary" type="button">В избранное</button>
+          </div>
+        </section>
+        <br>
+        ${reviewsHTML(profile)}`);
+      document.getElementById('backCabinetBtn').onclick = () => {
+        state.route = currentUser()?.role === 'client' ? 'cabinet' : 'catalog';
+        render();
+      };
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
+      document.querySelectorAll('[data-request]').forEach(btn => btn.onclick = () => makeRequest(btn.dataset.request));
+      document.querySelectorAll('[data-favorite]').forEach(btn => btn.onclick = () => addFavorite(btn.dataset.favorite));
+      bindReviews(profile);
     }
 
     function bindCatalog() {
@@ -708,8 +950,9 @@
       });
       document.getElementById('resetFiltersBtn').onclick = () => { Object.keys(state.search).forEach(k => state.search[k] = k === 'type' ? 'all' : k === 'sort' ? 'rating' : ''); state.page = 1; renderCatalog(); };
       document.querySelectorAll('[data-page]').forEach(btn => btn.onclick = () => { state.page = Number(btn.dataset.page); renderCatalog(); window.scrollTo({top:0, behavior:'smooth'}); });
+      document.querySelectorAll('[data-view-profile]').forEach(btn => btn.onclick = () => openPublicProfile(btn.dataset.viewProfile));
       document.querySelectorAll('[data-favorite]').forEach(btn => btn.onclick = () => addFavorite(btn.dataset.favorite));
-      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => sendMessage(btn.dataset.write));
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
       document.querySelectorAll('[data-request]').forEach(btn => btn.onclick = () => makeRequest(btn.dataset.request));
       const mobileFilterBtn = document.getElementById('mobileFilterBtn');
       mobileFilterBtn.onclick = () => document.getElementById('filtersPanel').classList.toggle('open');
@@ -733,15 +976,47 @@
       write(DB.users, users().map(u => String(u.id) === String(user.id) ? user : u));
       showToast('Добавлено в избранное');
     }
-    function sendMessage(profileId) {
+    function conversations() { return read(DB.messages, []); }
+    function saveConversations(items) { write(DB.messages, items); }
+    function findOrCreateConversation(profileId) {
       if (!requireLogin()) return;
       const profile = profiles().find(p => String(p.id) === String(profileId));
-      const list = read(DB.messages, []);
-      list.push({ id: id(), profileId, userId: currentUser().id, text: 'Здравствуйте! Хочу уточнить детали сотрудничества.', createdAt: new Date().toISOString() });
-      write(DB.messages, list);
-      profile.responses = Number(profile.responses || 0) + 1;
-      saveProfile(profile);
-      showToast('Сообщение отправлено');
+      const user = currentUser();
+      if (!profile) return null;
+      if (user.role !== 'client') {
+        showToast('Написать специалисту можно из клиентского аккаунта');
+        return null;
+      }
+      if (String(profile.userId) === String(user.id)) {
+        showToast('Это ваша анкета');
+        return null;
+      }
+      let list = conversations();
+      let conversation = list.find(item => {
+        if (String(item.profileId) !== String(profile.id)) return false;
+        return String(item.clientId) === String(user.id);
+      });
+      if (!conversation) {
+        conversation = {
+          id: id(),
+          profileId: profile.id,
+          specialistUserId: profile.userId,
+          clientId: user.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          messages: []
+        };
+        list.push(conversation);
+        saveConversations(list);
+      }
+      return conversation;
+    }
+    function openChat(profileId) {
+      const conversation = findOrCreateConversation(profileId);
+      if (!conversation) return;
+      state.activeConversationId = conversation.id;
+      state.route = 'messages';
+      renderMessages();
     }
     function makeRequest(profileId) {
       if (!requireLogin()) return;
@@ -757,8 +1032,80 @@
     function renderMessages() {
       if (!requireLogin()) return;
       const user = currentUser();
-      const list = read(DB.messages, []).filter(m => String(m.userId) === String(user.id) || profiles().some(p => String(p.id) === String(m.profileId) && String(p.userId) === String(user.id)));
-      renderShell(`<div class="page-head"><h1>Сообщения</h1><p class="muted">Все переписки по специалистам и клиентам.</p></div><section class="card message-list">${list.length ? list.map(m => `<div class="message-item"><b>${new Date(m.createdAt).toLocaleString('ru-RU')}</b><p>${esc(m.text)}</p></div>`).join('') : '<p class="muted">Сообщений пока нет.</p>'}</section>`);
+      const list = conversations().filter(item => {
+        if (String(item.clientId) === String(user.id)) return true;
+        if (String(item.specialistUserId) === String(user.id)) return true;
+        return false;
+      });
+      if (!state.activeConversationId && list.length) state.activeConversationId = list[0].id;
+      const active = list.find(item => String(item.id) === String(state.activeConversationId)) || list[0] || null;
+      const activeProfile = active ? profiles().find(p => String(p.id) === String(active.profileId)) : null;
+      renderShell(`
+        <div class="page-head"><h1>Сообщения</h1><p class="muted">Диалоги между клиентами и специалистами.</p></div>
+        <div class="chat-layout">
+          <section class="card dialogs-list">
+            ${list.length ? list.map(item => dialogButtonHTML(item)).join('') : '<p class="muted">Диалогов пока нет. Нажмите «Написать» в каталоге.</p>'}
+          </section>
+          <section class="card chat-panel">
+            ${active ? chatPanelHTML(active, activeProfile, user) : '<div class="empty">Выберите диалог или напишите специалисту из каталога.</div>'}
+          </section>
+        </div>`);
+      document.querySelectorAll('[data-dialog]').forEach(btn => btn.onclick = () => { state.activeConversationId = Number(btn.dataset.dialog); renderMessages(); });
+      const input = document.getElementById('chatInput');
+      const send = document.getElementById('sendChatBtn');
+      if (input && send && active) {
+        const submit = () => sendChatMessage(active.id);
+        send.onclick = submit;
+        input.onkeydown = event => { if (event.key === 'Enter') { event.preventDefault(); submit(); } };
+        setTimeout(() => {
+          const body = document.getElementById('chatBody');
+          if (body) body.scrollTop = body.scrollHeight;
+        }, 0);
+      }
+    }
+    function dialogButtonHTML(conversation) {
+      const profile = profiles().find(p => String(p.id) === String(conversation.profileId));
+      const client = users().find(u => String(u.id) === String(conversation.clientId));
+      const user = currentUser();
+      const title = user.role === 'client'
+        ? `${profile?.firstName || 'Специалист'} ${profile?.lastName || ''}`.trim()
+        : `${client?.firstName || 'Клиент'} ${client?.lastName || ''}`.trim();
+      const last = conversation.messages[conversation.messages.length - 1];
+      const avatarSource = user.role === 'client' ? profile : client;
+      return `<button class="dialog-btn ${String(state.activeConversationId) === String(conversation.id) ? 'active' : ''}" data-dialog="${conversation.id}" type="button">
+        <div class="avatar">${avatarHTML(avatarSource || {})}</div>
+        <div><b>${esc(title || 'Диалог')}</b><p class="muted">${last ? esc(last.text).slice(0, 54) : 'Диалог создан'}</p></div>
+      </button>`;
+    }
+    function chatPanelHTML(conversation, profile, user) {
+      const client = users().find(u => String(u.id) === String(conversation.clientId));
+      const title = user.role === 'client'
+        ? `${profile?.firstName || 'Специалист'} ${profile?.lastName || ''}`.trim()
+        : `${client?.firstName || 'Клиент'} ${client?.lastName || ''}`.trim();
+      return `
+        <div class="chat-head"><h2>${esc(title || 'Диалог')}</h2><p class="muted">${profile ? roleTitle(profile.type) + ' · ' + esc(profile.city || '') : 'Переписка'}</p></div>
+        <div class="chat-body" id="chatBody">
+          ${conversation.messages.length ? conversation.messages.map(message => `<div class="bubble ${String(message.senderId) === String(user.id) ? 'mine' : ''}"><p>${esc(message.text)}</p><small>${new Date(message.createdAt).toLocaleString('ru-RU')}</small></div>`).join('') : '<p class="muted">Напишите первое сообщение.</p>'}
+        </div>
+        <div class="chat-form"><input id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" type="button">Отправить</button></div>`;
+    }
+    function sendChatMessage(conversationId) {
+      const input = document.getElementById('chatInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+      const user = currentUser();
+      const list = conversations();
+      const conversation = list.find(item => String(item.id) === String(conversationId));
+      if (!conversation) return;
+      conversation.messages.push({ id: id(), senderId: user.id, text, createdAt: new Date().toISOString(), isRead: false });
+      conversation.updatedAt = new Date().toISOString();
+      const profile = profiles().find(p => String(p.id) === String(conversation.profileId));
+      if (profile && String(profile.userId) !== String(user.id) && conversation.messages.length === 1) {
+        profile.responses = Number(profile.responses || 0) + 1;
+        saveProfile(profile);
+      }
+      saveConversations(list);
+      renderMessages();
     }
     function renderRequests() {
       if (!requireLogin()) return;
