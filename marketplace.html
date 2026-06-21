@@ -72,9 +72,9 @@
     .between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
     .form { display: grid; gap: 12px; }
     .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
-    .tabs { display: flex; gap: 12px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
-    .tab { min-height: 44px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; }
-    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+    .tab, .tab:hover { min-height: 44px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; box-shadow: none; transform: none; }
+    .tab.active, .tab.active:hover { color: var(--accent); border-bottom-color: var(--accent); background: transparent; box-shadow: none; }
     .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 900; }
     .status { display: inline-flex; min-height: 28px; align-items: center; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 800; }
     .status.draft { background: #EEF2F6; color: #2C4058; }
@@ -217,6 +217,13 @@
     function id() { return Date.now() + Math.floor(Math.random() * 1000); }
     function showToast(text) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
     function sendToTilda(action, data = {}) { window.parent.postMessage({ action, ...data }, '*'); }
+    function goHome() {
+      if (window.parent && window.parent !== window) {
+        sendToTilda('goHome', { url: 'https://lkcabinet.tilda.ws/' });
+      } else {
+        window.location.href = 'https://lkcabinet.tilda.ws/';
+      }
+    }
     function resize() {
       setTimeout(() => {
         const height = Math.max(
@@ -232,11 +239,36 @@
     function currentUser() { return read(DB.currentUser, null); }
     function setCurrentUser(user) { write(DB.currentUser, user); }
     function users() { return read(DB.users, []); }
+    function safeUsers() {
+      const demoEmails = ['tutor@example.ru', 'nanny@example.ru', 'client@example.ru'];
+      const cleaned = users().filter(user => !demoEmails.includes(String(user.email || '').toLowerCase()) && user.role !== 'admin');
+      if (cleaned.length !== users().length) {
+        write(DB.users, cleaned);
+        const current = currentUser();
+        if (current && (demoEmails.includes(String(current.email || '').toLowerCase()) || current.role === 'admin')) {
+          localStorage.removeItem(DB.currentUser);
+        }
+      }
+      return cleaned;
+    }
     function profiles() { return read(DB.profiles, []); }
     function saveProfiles(items) { write(DB.profiles, items); }
     function initials(item) { return ((item.firstName || 'С')[0] || 'С') + ((item.lastName || 'П')[0] || 'П'); }
     function avatarHTML(item) { return item && item.photo ? `<img src="${item.photo}" alt="">` : initials(item || {}); }
     function roleTitle(role) { return role === 'tutor' ? 'Репетитор' : role === 'nanny' ? 'Няня' : 'Клиент'; }
+    function registrationLeadData(user) {
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        roleTitle: roleTitle(user.role),
+        createdAt: user.createdAt || new Date().toISOString(),
+        source: 'marketplace'
+      };
+    }
     function statusText(status) { return ({ draft:'Черновик', review:'На модерации', published:'Опубликована', hidden:'Скрыта' })[status] || status; }
     function scheduleCatalogRender(selector, delay = 260) {
       const node = selector ? document.querySelector(selector) : null;
@@ -266,13 +298,9 @@
     function seed() {
       if (localStorage.getItem('mp_seeded_v2')) {
         if (!localStorage.getItem(DB.reviews)) write(DB.reviews, demoReviews());
+        safeUsers();
         return;
       }
-      const demoUsers = [
-        { id: 101, role: 'tutor', firstName: 'Ирина', lastName: 'Иванова', email: 'tutor@example.ru', password: '123456', phone: '+79001112233', photo: '' },
-        { id: 102, role: 'nanny', firstName: 'Наталья', lastName: 'Орлова', email: 'nanny@example.ru', password: '123456', phone: '+79004445566', photo: '' },
-        { id: 103, role: 'client', firstName: 'Анна', lastName: 'Петрова', email: 'client@example.ru', password: '123456', phone: '+79007778899', photo: '' }
-      ];
       const demoProfiles = [
         {
           id: 201, userId: 101, type: 'tutor', status: 'published', views: 128, responses: 17,
@@ -299,12 +327,13 @@
           homeVisit: false, homeWork: true, workConditions: ['Работа с несколькими детьми'], territories: ['На территории специалиста','На территории клиента']
         }
       ];
-      write(DB.users, demoUsers);
+      write(DB.users, []);
       write(DB.profiles, demoProfiles);
       write(DB.requests, []);
       write(DB.messages, []);
       write(DB.reviews, demoReviews());
       localStorage.setItem('mp_seeded_v2', 'true');
+      safeUsers();
     }
 
     function demoReviews() {
@@ -354,7 +383,7 @@
     function bindShell() {
       document.getElementById('burgerBtn').onclick = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); document.body.classList.add('locked'); };
       document.getElementById('overlay').onclick = closeDrawer;
-      document.getElementById('homeBtn').onclick = () => setRoute('catalog');
+      document.getElementById('homeBtn').onclick = goHome;
       const login = document.getElementById('loginTopBtn');
       if (login) login.onclick = () => setRoute('auth');
       const logout = document.getElementById('logoutTopBtn');
@@ -401,14 +430,15 @@
       setAuthTab('login');
       document.getElementById('authBox').innerHTML = `
         <div class="form">
-          <label>Email<input id="loginEmail" type="email" value="client@example.ru"></label>
-          <label>Пароль<input id="loginPassword" type="password" value="123456"></label>
+          <label>Email<input id="loginEmail" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" value=""></label>
+          <label>Пароль<input id="loginPassword" type="password" autocomplete="new-password" value=""></label>
           <button id="loginBtn" type="button">Войти</button>
         </div>`;
       document.getElementById('loginBtn').onclick = () => {
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
-        const user = users().find(u => u.email === email && u.password === password);
+        if (email.toLowerCase() === 'admin' || password.toLowerCase() === 'admin') return showToast('Неверный email или пароль');
+        const user = safeUsers().find(u => u.email === email && u.password === password && u.role !== 'admin');
         if (!user) return showToast('Неверный email или пароль');
         setCurrentUser(user);
         state.route = user.role === 'client' ? 'catalog' : 'cabinet';
@@ -419,9 +449,9 @@
       setAuthTab('register');
       document.getElementById('authBox').innerHTML = `
         <div class="form">
-          <div class="form-row"><label>Имя<input id="regFirst"></label><label>Фамилия<input id="regLast"></label></div>
-          <div class="form-row"><label>Email<input id="regEmail" type="email"></label><label>Телефон<input id="regPhone" type="tel"></label></div>
-          <div class="form-row"><label>Пароль<input id="regPassword" type="password"></label><label>Тип аккаунта<select id="regRole"><option value="tutor">Репетитор</option><option value="nanny">Няня</option><option value="client">Клиент</option></select></label></div>
+          <div class="form-row"><label>Имя<input id="regFirst" autocomplete="given-name"></label><label>Фамилия<input id="regLast" autocomplete="family-name"></label></div>
+          <div class="form-row"><label>Email<input id="regEmail" type="email" autocomplete="off" autocapitalize="none" spellcheck="false"></label><label>Телефон<input id="regPhone" type="tel" autocomplete="tel"></label></div>
+          <div class="form-row"><label>Пароль<input id="regPassword" type="password" autocomplete="new-password"></label><label>Тип аккаунта<select id="regRole"><option value="tutor">Репетитор</option><option value="nanny">Няня</option><option value="client">Клиент</option></select></label></div>
           <button id="registerBtn" type="button">Создать аккаунт</button>
         </div>`;
       document.getElementById('registerBtn').onclick = () => {
@@ -432,11 +462,14 @@
           email: document.getElementById('regEmail').value.trim(),
           phone: document.getElementById('regPhone').value.trim(),
           password: document.getElementById('regPassword').value,
-          photo: ''
+          photo: '',
+          createdAt: new Date().toISOString()
         };
         if (!user.firstName || !user.lastName || !user.email || !user.phone || user.password.length < 6) return showToast('Заполните все поля, пароль минимум 6 символов');
-        if (users().some(u => u.email === user.email)) return showToast('Email уже зарегистрирован');
-        write(DB.users, users().concat(user));
+        if (user.email.toLowerCase() === 'admin' || user.password.toLowerCase() === 'admin') return showToast('Используйте другой email и пароль');
+        if (safeUsers().some(u => u.email === user.email)) return showToast('Email уже зарегистрирован');
+        write(DB.users, safeUsers().concat(user));
+        sendToTilda('registrationLead', { user: registrationLeadData(user) });
         setCurrentUser(user);
         state.route = user.role === 'client' ? 'catalog' : 'cabinet';
         render();
