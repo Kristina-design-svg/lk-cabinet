@@ -3,71 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ПЛАТФОРМА - дизайн Figma</title>
+  <title>ПЛАТФОРМА - каталог репетиторов и нянь</title>
   <style>
     * { box-sizing: border-box; }
     :root {
-      --bg: #F7F9FC;
+      --bg: #F5F5F5;
       --card: #FFFFFF;
       --accent: #112250;
       --accent-dark: #112250;
-      --accent-soft: #DDE6F0;
-      --accent-pale: #EEF3F8;
-      --text: #112250;
-      --muted: #617086;
-      --line: #D8E1EC;
+      --accent-soft: #E9EDF6;
+      --text: #000000;
+      --muted: #818C99;
+      --line: #DCE1E6;
       --success: #2EA44F;
       --danger: #E64646;
       --warning: #F5A623;
-      --shadow: 0 12px 35px rgba(17,34,80,0.08);
-      --radius: 20px;
+      --shadow: 0 4px 20px rgba(0,0,0,0.08);
+      --radius: 12px;
       --sidebar: 228px;
     }
     html, body { margin: 0; min-width: 320px; min-height: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); font: 15px/1.45 Arial, sans-serif; }
-    body::before { content: ""; position: fixed; inset: 70px -10vw auto -10vw; z-index: -1; height: 340px; background: url("data:image/svg+xml,%3Csvg width='1200' height='340' viewBox='0 0 1200 340' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M-30 98C155 188 270 128 430 84C632 28 705 190 882 160C1010 138 1082 24 1230 94' stroke='%23DDE6F0' stroke-width='24' stroke-linecap='round'/%3E%3Cpath d='M-20 292C180 225 306 300 487 240C658 184 746 75 920 92C1042 104 1135 190 1240 158' stroke='%23EEF3F8' stroke-width='18' stroke-linecap='round'/%3E%3C/svg%3E") center top / cover no-repeat; pointer-events: none; }
     body.locked { overflow: hidden; }
     button, input, select, textarea { font: inherit; }
-    button { min-height: 46px; border: 0; border-radius: 999px; padding: 0 20px; background: var(--accent); color: #fff; font-weight: 800; cursor: pointer; transition: .18s ease; letter-spacing: .01em; }
-    button:hover { background: var(--accent-dark); transform: translateY(-2px); box-shadow: 0 10px 24px rgba(17,34,80,.18); }
-    button.secondary { background: var(--accent-pale); color: var(--accent); }
+    button { min-height: 44px; border: 0; border-radius: 8px; padding: 0 16px; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; transition: .15s ease; }
+    button:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    button.secondary { background: #EEF2F6; color: #2C4058; }
     button.danger { background: var(--danger); }
     button.success { background: var(--success); }
     button.ghost { background: transparent; color: var(--accent); min-height: 32px; padding: 0; }
-    input, select, textarea { width: 100%; min-height: 46px; border: 1px solid var(--line); border-radius: 999px; padding: 11px 16px; background: #fff; color: var(--text); outline: none; }
+    input, select, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; color: var(--text); outline: none; }
     select { appearance: none; -webkit-appearance: none; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23112250' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px 8px; }
-    textarea { min-height: 108px; resize: vertical; border-radius: 18px; }
+    textarea { min-height: 96px; resize: vertical; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(17,34,80,.12); }
     input.field-error, select.field-error, textarea.field-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(230,70,70,.14) !important; }
-    label { display: grid; gap: 7px; color: var(--accent); font-weight: 800; }
+    label { display: grid; gap: 6px; color: #2C4058; font-weight: 700; }
     h1, h2, h3, p { margin-top: 0; }
-    h1 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 54px); line-height: .98; text-transform: uppercase; letter-spacing: -.01em; }
-    h2 { margin-bottom: 14px; font-size: clamp(20px, 2vw, 28px); text-transform: uppercase; line-height: 1.05; }
+    h1 { margin-bottom: 6px; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
+    h2 { margin-bottom: 14px; font-size: 20px; }
     h3 { margin-bottom: 8px; font-size: 17px; }
     p { margin-bottom: 0; }
     a { color: var(--accent); text-decoration: none; }
     .muted { color: var(--muted); }
     .app { min-height: 100vh; }
-    .topbar { position: sticky; top: 0; z-index: 40; height: 72px; display: flex; align-items: center; gap: 14px; padding: 0 clamp(16px, 4vw, 56px); background: rgba(255,255,255,.92); border-bottom: 1px solid rgba(216,225,236,.7); backdrop-filter: blur(14px); }
-    .burger { display: grid; place-items: center; width: 46px; padding: 0; background: var(--accent-pale); color: var(--accent); font-size: 20px; }
-    .brand { margin-right: auto; display: inline-flex; align-items: center; gap: 8px; color: var(--accent); font-size: 18px; font-weight: 900; cursor: pointer; text-transform: uppercase; letter-spacing: .02em; }
-    .brand::before { content: ""; width: 24px; height: 24px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff 0 18%, transparent 19%), var(--accent); box-shadow: 8px 0 0 -3px var(--accent-soft); }
-    .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 14px; border-radius: 999px; background: var(--accent-pale); color: var(--accent); font-weight: 800; }
-    .layout { width: min(100%, 1440px); margin: 0 auto; padding: clamp(14px, 3vw, 34px); display: grid; grid-template-columns: 1fr; gap: 18px; }
-    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 14px; overflow: auto; background: rgba(255,255,255,.96); box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
+    .topbar { position: sticky; top: 0; z-index: 40; height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 20px; background: #fff; border-bottom: 1px solid var(--line); }
+    .burger { display: grid; place-items: center; width: 44px; padding: 0; background: #EEF2F6; color: #2C4058; font-size: 20px; }
+    .brand { margin-right: auto; color: #2C4058; font-size: 20px; font-weight: 800; cursor: pointer; }
+    .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #EEF2F6; color: #2C4058; font-weight: 700; }
+    .layout { width: min(100%, 1680px); margin: 0 auto; padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 10px; overflow: auto; background: #fff; box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
     .sidebar.open { transform: translateX(0); }
     .overlay { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(0,0,0,.38); }
     .overlay.show { display: block; }
     .nav-title { padding: 12px; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
-    .nav-btn { width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px; margin: 3px 0; padding: 0 14px; border-radius: 999px; background: transparent; color: var(--accent); text-align: left; font-weight: 800; box-shadow: none; }
-    .nav-btn:hover { background: var(--accent-pale); transform: none; box-shadow: none; }
+    .nav-btn { width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px; margin: 2px 0; padding: 0 12px; border-radius: 8px; background: transparent; color: #2C4058; text-align: left; font-weight: 700; }
+    .nav-btn:hover { background: #F2F5F8; transform: none; }
     .nav-btn.active { background: var(--accent-soft); color: var(--accent); }
     .content { min-width: 0; }
-    .page-head { display: grid; gap: 12px; margin-bottom: 18px; }
-    .catalog-hero { min-height: 180px; align-content: center; position: relative; padding: clamp(12px, 3vw, 34px) 0; }
-    .catalog-hero::after { content: ""; position: absolute; right: 0; bottom: 0; width: min(42vw, 360px); height: 160px; background: url("data:image/svg+xml,%3Csvg width='360' height='160' viewBox='0 0 360 160' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='260' cy='60' r='34' stroke='%23112250' stroke-width='5'/%3E%3Cpath d='M88 126C142 58 208 38 302 48' stroke='%23DDE6F0' stroke-width='18' stroke-linecap='round'/%3E%3Cpath d='M154 121L206 48L244 134' stroke='%23112250' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3Crect x='52' y='42' width='66' height='42' rx='10' stroke='%23112250' stroke-width='5'/%3E%3Cpath d='M64 58H104M64 70H92' stroke='%23112250' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E") right center / contain no-repeat; opacity: .9; pointer-events: none; }
-    .catalog-hero .muted { max-width: 420px; color: var(--accent); font-weight: 700; }
-    .card { min-width: 0; padding: clamp(18px, 2vw, 28px); border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
-    .grid { display: grid; gap: 18px; }
+    .page-head { display: grid; gap: 10px; margin-bottom: 14px; }
+    .card { min-width: 0; padding: 16px; border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
+    .grid { display: grid; gap: 14px; }
     .grid.two, .grid.three { grid-template-columns: 1fr; }
     .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
     .between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
@@ -76,7 +70,7 @@
     .tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
     .tab, .tab:hover { min-height: 44px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; box-shadow: none; transform: none; }
     .tab.active, .tab.active:hover { color: var(--accent); border-bottom-color: var(--accent); background: transparent; box-shadow: none; }
-    .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 0 14px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 900; }
+    .pill { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 800; }
     .status { display: inline-flex; min-height: 28px; align-items: center; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 800; }
     .status.draft { background: #EEF2F6; color: #2C4058; }
     .status.review { background: #FFF6E5; color: #A76700; }
@@ -85,36 +79,33 @@
     .avatar { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; font-weight: 800; overflow: hidden; }
     .avatar img { width: 100%; height: 100%; object-fit: cover; }
     .profile-card { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 14px; align-items: center; }
-    .catalog-search { margin-bottom: 8px; background: var(--accent-soft); box-shadow: none; }
-    .catalog-search .form-row { align-items: end; }
-    .catalog-search input, .catalog-search select { border-color: transparent; box-shadow: inset 0 0 0 1px rgba(17,34,80,.06); }
-    .catalog-shell { display: grid; gap: 18px; margin-top: 18px; align-items: start; }
-    .catalog-toolbar { margin-bottom: 18px; padding: 16px 18px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .catalog-search { margin-bottom: 6px; }
+    .catalog-shell { display: grid; gap: 16px; margin-top: 14px; align-items: start; }
+    .catalog-toolbar { margin-bottom: 16px; padding: 12px 14px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
     .catalog-toolbar label { width: min(100%, 260px); }
     .filters { display: none; }
     .filters.open { display: block; }
-    .filter-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .filter-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
     .check-list { display: grid; gap: 8px; }
-    .check-item { display: flex; gap: 8px; align-items: flex-start; color: var(--accent); font-weight: 700; }
+    .check-item { display: flex; gap: 8px; align-items: flex-start; color: #2C4058; font-weight: 600; }
     .check-item input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; padding: 0; }
-    .specialist-card { display: grid; gap: 14px; padding: clamp(18px, 2vw, 24px); border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); border: 1px solid rgba(216,225,236,.65); }
-    .specialist-card:hover { transform: translateY(-3px); box-shadow: 0 18px 42px rgba(17,34,80,.12); transition: .18s ease; }
+    .specialist-card { display: grid; gap: 12px; padding: 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
     .specialist-top { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: center; }
     .card-meta { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
-    .price { color: var(--accent); font-size: 22px; font-weight: 900; }
+    .price { color: #2C4058; font-size: 20px; font-weight: 800; }
     .rating { color: var(--warning); font-weight: 800; }
     .card-actions { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
     .card-actions button { flex: 1 1 auto; min-width: max-content; white-space: nowrap; padding-inline: 14px; }
-    .empty { padding: 34px 18px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
+    .empty { padding: 28px 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
     .pagination { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
     .page-btn { min-width: 44px; background: #EEF2F6; color: #2C4058; }
     .page-btn.active { background: var(--accent); color: #fff; }
-    .modal { position: fixed; inset: auto 10px 10px; z-index: 120; display: none; max-height: 88vh; overflow: auto; padding: 22px; border-radius: 24px; background: #fff; box-shadow: 0 24px 80px rgba(17,34,80,.24); }
+    .modal { position: fixed; inset: auto 10px 10px; z-index: 120; display: none; max-height: 88vh; overflow: auto; padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 20px 70px rgba(0,0,0,.25); }
     .modal.show { display: block; }
-    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 200; display: none; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 13px 18px; border-radius: 999px; background: var(--accent); color: #fff; font-weight: 800; box-shadow: 0 10px 40px rgba(17,34,80,.2); }
+    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 200; display: none; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 16px; border-radius: 10px; background: #2C4058; color: #fff; font-weight: 700; box-shadow: 0 10px 40px rgba(0,0,0,.2); }
     .toast.show { display: block; }
     .message-list { display: grid; gap: 10px; }
-    .message-item, .request-item { padding: 16px; border: 1px solid var(--line); border-radius: 18px; background: #fff; }
+    .message-item, .request-item { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
     .chat-layout { display: grid; gap: 14px; }
     .dialogs-list { display: grid; gap: 8px; align-content: start; }
     .dialog-btn { width: 100%; min-height: auto; display: grid; grid-template-columns: 48px minmax(0,1fr); gap: 10px; align-items: center; padding: 10px; border-radius: 10px; background: #fff; color: #2C4058; text-align: left; box-shadow: none; border: 1px solid var(--line); }
@@ -123,7 +114,7 @@
     .chat-panel { min-height: 520px; display: grid; grid-template-rows: auto minmax(260px, 1fr) auto; overflow: hidden; }
     .chat-head { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
     .chat-body { display: grid; align-content: start; gap: 10px; padding: 14px 0; overflow: auto; }
-    .bubble { max-width: min(78%, 560px); padding: 12px 14px; border: 1px solid var(--line); border-radius: 18px; background: var(--accent-pale); color: var(--accent); }
+    .bubble { max-width: min(78%, 560px); padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #F7F8FA; color: #2C4058; }
     .bubble.mine { justify-self: end; border-color: var(--accent); background: var(--accent); color: #fff; }
     .chat-form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
     .auth-wrap { display: grid; justify-items: center; align-items: start; padding: 24px 0; }
@@ -143,13 +134,9 @@
       .modal { left: 50%; top: 50%; right: auto; bottom: auto; width: min(720px, calc(100vw - 36px)); transform: translate(-50%, -50%); }
     }
     @media (max-width: 767px) {
-      .catalog-hero { min-height: auto; }
-      .catalog-hero::after { display: none; }
-      .topbar { padding-inline: 14px; }
-      .brand { font-size: 17px; }
-      .modal { inset: 10px; max-height: none; height: calc((var(--app-vh, 1vh) * 100) - 20px); overflow-y: auto; padding-bottom: max(98px, calc(84px + env(safe-area-inset-bottom))); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
-      .modal .form { padding-bottom: 88px; }
-      .modal > .row:last-child { position: sticky; bottom: -1px; z-index: 2; margin: 18px -22px -22px; padding: 12px 22px max(14px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255,255,255,.88), #fff 28%); border-top: 1px solid var(--line); }
+      .modal { inset: 10px; max-height: none; height: calc((var(--app-vh, 1vh) * 100) - 20px); overflow-y: auto; padding-bottom: max(92px, calc(78px + env(safe-area-inset-bottom))); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+      .modal .form { padding-bottom: 84px; }
+      .modal > .row:last-child { position: sticky; bottom: -1px; z-index: 2; margin: 16px -16px -16px; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255,255,255,.88), #fff 28%); border-top: 1px solid var(--line); }
       .modal > .row:last-child button { flex: 1 1 100%; }
     }
     @media (min-width: 1280px) {
@@ -494,22 +481,35 @@
     function showLogin() {
       setAuthTab('login');
       document.getElementById('authBox').innerHTML = `
-        <div class="form">
+        <form class="form" id="loginForm" novalidate>
           <label>Email<input id="loginEmail" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" value=""></label>
           <label>Пароль<input id="loginPassword" type="password" autocomplete="new-password" value=""></label>
-          <button id="loginBtn" type="button">Войти</button>
-        </div>`;
-      document.getElementById('loginBtn').onclick = () => {
+          <button id="loginBtn" type="submit">Войти</button>
+        </form>`;
+      const loginUser = () => {
         const email = document.getElementById('loginEmail').value.trim().toLowerCase();
         const password = document.getElementById('loginPassword').value;
+        clearFieldErrors(document.getElementById('authBox'));
         if (!email || !password) return showToast('Введите email и пароль');
         if (email.toLowerCase() === 'admin' || password.toLowerCase() === 'admin') return showToast('Неверный email или пароль');
         const user = safeUsers().find(u => String(u.email || '').toLowerCase() === email && u.password === password && u.role !== 'admin');
-        if (!user) return showToast('Неверный email или пароль');
+        if (!user) {
+          markInvalid(document.getElementById('loginEmail'));
+          markInvalid(document.getElementById('loginPassword'));
+          return showToast('Неверный email или пароль');
+        }
         setCurrentUser(user);
         localStorage.setItem('mp_is_logged_in', 'true');
         state.route = user.role === 'client' ? 'catalog' : 'cabinet';
         render();
+      };
+      document.getElementById('loginForm').onsubmit = event => {
+        event.preventDefault();
+        loginUser();
+      };
+      document.getElementById('loginBtn').onclick = event => {
+        event.preventDefault();
+        loginUser();
       };
     }
     function showRegister() {
@@ -557,6 +557,9 @@
       if (user.role === 'client') return renderClientCabinet(user);
       const ownProfiles = profiles().filter(p => String(p.userId) === String(user.id));
       const active = ownProfiles[0];
+      const editingProfile = state.editingProfileId === 'new'
+        ? newProfileDraft(user)
+        : ownProfiles.find(p => String(p.id) === String(state.editingProfileId));
       renderShell(`
         <div class="page-head">
           <h1>Личный кабинет ${roleTitle(user.role).toLowerCase()}</h1>
@@ -575,9 +578,10 @@
           </section>
         </div>
         <br>
-        ${active ? profileManagerHTML(active) : '<div class="empty">Нажмите «Разместить анкету», заполните поля, и анкета появится в каталоге.</div>'}`);
+        ${editingProfile ? profileFormHTML(editingProfile) : active ? profileManagerHTML(active) : '<div class="empty">Нажмите «Разместить анкету», заполните поля, и анкета появится в каталоге.</div>'}`);
       document.getElementById('createProfileBtn').onclick = () => openProfileForm(active || null);
       bindProfileActions();
+      if (editingProfile) bindProfileForm(editingProfile);
     }
 
     function renderClientCabinet(user) {
@@ -638,17 +642,27 @@
 
     function openProfileForm(profile) {
       const user = currentUser();
-      const type = user.role;
-      const p = profile || {
-        id: id(), userId: user.id, type, status: 'draft', views: 0, responses: 0,
+      state.editingProfileId = profile ? profile.id : 'new';
+      render();
+    }
+
+    function newProfileDraft(user) {
+      return {
+        id: id(), userId: user.id, type: user.role, status: 'draft', views: 0, responses: 0,
         firstName: user.firstName, lastName: user.lastName, city: '', district: '', photo: user.photo || '',
         rating: 0, reviewsCount: 0, experienceYears: 0, experienceLevel: 'Начинающий', price: 1000,
         about: '', keywords: '', subjects: [], educationLevels: [], lessonFormats: [], tutorSkills: [], teachingLanguages: [],
         childAges: [], employmentTypes: [], nannySkills: [], careMethods: [], extraServices: [],
         weekdays: [], timeFrom: '09:00', timeTo: '18:00', homeVisit: false, homeWork: false, workConditions: [], territories: []
       };
-      openModal(`
-        <h2>${profile ? 'Редактировать анкету' : 'Разместить анкету'}</h2>
+    }
+
+    function profileFormHTML(p) {
+      const type = p.type;
+      const isExisting = profiles().some(profile => String(profile.id) === String(p.id));
+      return `
+        <section class="card">
+        <h2>${isExisting ? 'Редактировать анкету' : 'Разместить анкету'}</h2>
         <div class="form" id="profileForm">
           <div class="form-row"><label>Имя<input id="pfFirst" value="${esc(p.firstName)}"></label><label>Фамилия<input id="pfLast" value="${esc(p.lastName)}"></label></div>
           <div class="form-row"><label>Город<input id="pfCity" value="${esc(p.city)}"></label><label>Район<input id="pfDistrict" value="${esc(p.district)}"></label></div>
@@ -659,8 +673,12 @@
           ${type === 'tutor' ? tutorFields(p) : nannyFields(p)}
           ${commonFields(p)}
           <div class="row"><button id="saveDraftBtn" type="button" class="secondary">Сохранить черновик</button><button id="sendReviewBtn" type="button">Сохранить и опубликовать</button><button id="closeModalBtn" type="button" class="secondary">Закрыть</button></div>
-        </div>`);
-      document.getElementById('closeModalBtn').onclick = closeModal;
+        </div>
+        </section>`;
+    }
+
+    function bindProfileForm(p) {
+      document.getElementById('closeModalBtn').onclick = () => { state.editingProfileId = null; render(); };
       document.getElementById('pfPhoto').onchange = event => {
         const file = event.target.files[0];
         if (!file) return;
@@ -732,7 +750,7 @@
         return showToast('Заполните имя, город, описание и стоимость');
       }
       saveProfile(p);
-      closeModal();
+      state.editingProfileId = null;
       showToast(status === 'published' ? 'Анкета опубликована' : 'Черновик сохранен');
       render();
     }
@@ -749,9 +767,9 @@
       if (state.page > pages) state.page = pages;
       const pageItems = items.slice((state.page - 1) * state.perPage, state.page * state.perPage);
       renderShell(`
-        <div class="page-head catalog-hero">
-          <h1>Найти специалиста</h1>
-          <p class="muted">Репетиторы и няни для каждого этапа обучения, развития и заботы.</p>
+        <div class="page-head">
+          <h1>Каталог специалистов</h1>
+          <p class="muted">Поиск по имени, услуге, предмету, городу и ключевым словам. Фильтры для нянь и репетиторов меняются автоматически.</p>
         </div>
         <section class="card">
           <div class="form-row">
