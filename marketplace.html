@@ -37,6 +37,7 @@
     select { appearance: none; -webkit-appearance: none; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23112250' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px 8px; }
     textarea { min-height: 108px; resize: vertical; border-radius: 18px; }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(17,34,80,.12); }
+    input.field-error, select.field-error, textarea.field-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(230,70,70,.14) !important; }
     label { display: grid; gap: 7px; color: var(--accent); font-weight: 800; }
     h1, h2, h3, p { margin-top: 0; }
     h1 { margin-bottom: 8px; font-size: clamp(28px, 4vw, 54px); line-height: .98; text-transform: uppercase; letter-spacing: -.01em; }
@@ -146,6 +147,10 @@
       .catalog-hero::after { display: none; }
       .topbar { padding-inline: 14px; }
       .brand { font-size: 17px; }
+      .modal { inset: 10px; max-height: none; height: calc((var(--app-vh, 1vh) * 100) - 20px); overflow-y: auto; padding-bottom: max(98px, calc(84px + env(safe-area-inset-bottom))); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+      .modal .form { padding-bottom: 88px; }
+      .modal > .row:last-child { position: sticky; bottom: -1px; z-index: 2; margin: 18px -22px -22px; padding: 12px 22px max(14px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255,255,255,.88), #fff 28%); border-top: 1px solid var(--line); }
+      .modal > .row:last-child button { flex: 1 1 100%; }
     }
     @media (min-width: 1280px) {
       .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
@@ -217,6 +222,9 @@
     function id() { return Date.now() + Math.floor(Math.random() * 1000); }
     function showToast(text) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
     function sendToTilda(action, data = {}) { window.parent.postMessage({ action, ...data }, '*'); }
+    function setViewportHeight() {
+      document.documentElement.style.setProperty('--app-vh', `${window.innerHeight * 0.01}px`);
+    }
     function goHome() {
       if (window.parent && window.parent !== window) {
         sendToTilda('goHome', { url: 'https://lkcabinet.tilda.ws/' });
@@ -267,6 +275,21 @@
         roleTitle: roleTitle(user.role),
         createdAt: user.createdAt || new Date().toISOString(),
         source: 'marketplace'
+      };
+    }
+    function requestLeadData(profile, request) {
+      const user = currentUser() || {};
+      return {
+        id: request.id,
+        clientName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        clientEmail: user.email || '',
+        clientPhone: user.phone || '',
+        specialistName: profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() : '',
+        specialistType: profile ? roleTitle(profile.type) : '',
+        specialistCity: profile?.city || '',
+        text: request.text,
+        createdAt: request.createdAt,
+        source: 'marketplace-request'
       };
     }
     function statusText(status) { return ({ draft:'Черновик', review:'На модерации', published:'Опубликована', hidden:'Скрыта' })[status] || status; }
@@ -426,6 +449,48 @@
       document.getElementById('loginTab').classList.toggle('active', type === 'login');
       document.getElementById('registerTab').classList.toggle('active', type === 'register');
     }
+    function clearFieldErrors(scope = document) {
+      scope.querySelectorAll('.field-error').forEach(field => field.classList.remove('field-error'));
+    }
+    function markInvalid(field) {
+      if (!field) return;
+      field.classList.add('field-error');
+    }
+    function isEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+    }
+    function validateRegistrationForm() {
+      const fields = [
+        document.getElementById('regFirst'),
+        document.getElementById('regLast'),
+        document.getElementById('regEmail'),
+        document.getElementById('regPhone'),
+        document.getElementById('regPassword'),
+        document.getElementById('regRole')
+      ];
+      clearFieldErrors(document.getElementById('authBox'));
+      let valid = true;
+      fields.forEach(field => {
+        if (!String(field.value || '').trim()) {
+          markInvalid(field);
+          valid = false;
+        }
+      });
+      const email = document.getElementById('regEmail');
+      const password = document.getElementById('regPassword');
+      if (email.value.trim() && !isEmail(email.value)) {
+        markInvalid(email);
+        showToast('Введите корректный email');
+        return false;
+      }
+      if (password.value && password.value.length < 8) {
+        markInvalid(password);
+        showToast('Пароль должен быть минимум 8 символов');
+        return false;
+      }
+      if (!valid) showToast('Заполните обязательные поля');
+      return valid;
+    }
     function showLogin() {
       setAuthTab('login');
       document.getElementById('authBox').innerHTML = `
@@ -435,12 +500,14 @@
           <button id="loginBtn" type="button">Войти</button>
         </div>`;
       document.getElementById('loginBtn').onclick = () => {
-        const email = document.getElementById('loginEmail').value.trim();
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
         const password = document.getElementById('loginPassword').value;
+        if (!email || !password) return showToast('Введите email и пароль');
         if (email.toLowerCase() === 'admin' || password.toLowerCase() === 'admin') return showToast('Неверный email или пароль');
-        const user = safeUsers().find(u => u.email === email && u.password === password && u.role !== 'admin');
+        const user = safeUsers().find(u => String(u.email || '').toLowerCase() === email && u.password === password && u.role !== 'admin');
         if (!user) return showToast('Неверный email или пароль');
         setCurrentUser(user);
+        localStorage.setItem('mp_is_logged_in', 'true');
         state.route = user.role === 'client' ? 'catalog' : 'cabinet';
         render();
       };
@@ -459,21 +526,29 @@
           id: id(), role: document.getElementById('regRole').value,
           firstName: document.getElementById('regFirst').value.trim(),
           lastName: document.getElementById('regLast').value.trim(),
-          email: document.getElementById('regEmail').value.trim(),
+          email: document.getElementById('regEmail').value.trim().toLowerCase(),
           phone: document.getElementById('regPhone').value.trim(),
           password: document.getElementById('regPassword').value,
           photo: '',
           createdAt: new Date().toISOString()
         };
-        if (!user.firstName || !user.lastName || !user.email || !user.phone || user.password.length < 6) return showToast('Заполните все поля, пароль минимум 6 символов');
+        if (!validateRegistrationForm()) return;
         if (user.email.toLowerCase() === 'admin' || user.password.toLowerCase() === 'admin') return showToast('Используйте другой email и пароль');
-        if (safeUsers().some(u => u.email === user.email)) return showToast('Email уже зарегистрирован');
+        if (safeUsers().some(u => u.email === user.email)) {
+          markInvalid(document.getElementById('regEmail'));
+          return showToast('Этот email уже зарегистрирован');
+        }
         write(DB.users, safeUsers().concat(user));
         sendToTilda('registrationLead', { user: registrationLeadData(user) });
         setCurrentUser(user);
+        localStorage.setItem('mp_is_logged_in', 'true');
         state.route = user.role === 'client' ? 'catalog' : 'cabinet';
         render();
       };
+      document.querySelectorAll('#authBox input, #authBox select').forEach(field => {
+        field.oninput = () => field.classList.remove('field-error');
+        field.onchange = () => field.classList.remove('field-error');
+      });
     }
 
     function renderCabinet() {
@@ -644,7 +719,18 @@
         workConditions: selectedChecks('workConditions'), timeFrom: document.getElementById('pfTimeFrom').value, timeTo: document.getElementById('pfTimeTo').value,
         homeVisit: document.getElementById('pfHomeVisit').checked, homeWork: document.getElementById('pfHomeWork').checked
       });
-      if (!p.firstName || !p.city || !p.about || !p.price) return showToast('Заполните имя, город, описание и стоимость');
+      clearFieldErrors(document.getElementById('profileForm'));
+      const requiredProfileFields = [
+        ['pfFirst', p.firstName],
+        ['pfCity', p.city],
+        ['pfAbout', p.about],
+        ['pfPrice', p.price]
+      ];
+      const missing = requiredProfileFields.filter(([, value]) => !String(value || '').trim() || Number(value) === 0);
+      if (missing.length) {
+        missing.forEach(([fieldId]) => markInvalid(document.getElementById(fieldId)));
+        return showToast('Заполните имя, город, описание и стоимость');
+      }
       saveProfile(p);
       closeModal();
       showToast(status === 'published' ? 'Анкета опубликована' : 'Черновик сохранен');
@@ -908,6 +994,7 @@
       renderClientCabinet(user);
     }
     function openPublicProfile(profileId) {
+      if (!requireLogin()) return;
       state.viewProfileId = profileId;
       state.route = 'profile';
       render();
@@ -1055,10 +1142,12 @@
       if (!requireLogin()) return;
       const profile = profiles().find(p => String(p.id) === String(profileId));
       const list = read(DB.requests, []);
-      list.push({ id: id(), profileId, specialistUserId: profile.userId, clientId: currentUser().id, status: 'new', text: 'Новая заявка из каталога', createdAt: new Date().toISOString() });
+      const request = { id: id(), profileId, specialistUserId: profile.userId, clientId: currentUser().id, status: 'new', text: 'Новая заявка из каталога', createdAt: new Date().toISOString() };
+      list.push(request);
       write(DB.requests, list);
       profile.responses = Number(profile.responses || 0) + 1;
       saveProfile(profile);
+      sendToTilda('requestLead', { request: requestLeadData(profile, request) });
       showToast('Заявка отправлена');
     }
 
@@ -1190,11 +1279,14 @@
     }
 
     function openModal(html) {
+      setViewportHeight();
       document.getElementById('modal').innerHTML = html;
       document.getElementById('modalOverlay').classList.add('show');
       document.getElementById('modal').classList.add('show');
       document.body.classList.add('locked');
       document.getElementById('modalOverlay').onclick = closeModal;
+      document.getElementById('modal').scrollTop = 0;
+      closeDrawer();
       resize();
     }
     function closeModal() {
@@ -1205,12 +1297,16 @@
     }
     function doLogout() {
       localStorage.removeItem(DB.currentUser);
-      state.route = 'catalog';
+      localStorage.removeItem('mp_is_logged_in');
+      state.activeConversationId = null;
+      state.viewProfileId = null;
+      state.route = 'auth';
       showToast('Вы вышли из аккаунта');
       render();
     }
 
-    window.addEventListener('load', resize);
+    window.addEventListener('load', () => { setViewportHeight(); resize(); });
+    window.addEventListener('resize', () => { setViewportHeight(); resize(); });
     new ResizeObserver(resize).observe(document.body);
     render();
   </script>
