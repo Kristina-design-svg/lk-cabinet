@@ -565,6 +565,7 @@
           <h1>Личный кабинет ${roleTitle(user.role).toLowerCase()}</h1>
           <p class="muted">Создайте анкету, отслеживайте статус, просмотры и отклики.</p>
         </div>
+        ${editingProfile ? profileFormHTML(editingProfile) : `
         <div class="grid two">
           <section class="card profile-card">
             <div class="avatar">${avatarHTML(user)}</div>
@@ -578,10 +579,13 @@
           </section>
         </div>
         <br>
-        ${editingProfile ? profileFormHTML(editingProfile) : active ? profileManagerHTML(active) : '<div class="empty">Нажмите «Разместить анкету», заполните поля, и анкета появится в каталоге.</div>'}`);
-      document.getElementById('createProfileBtn').onclick = () => openProfileForm(active || null);
+        ${active ? profileManagerHTML(active) : '<div class="empty">Нажмите «Разместить анкету», заполните поля, и анкета появится в каталоге.</div>'}`}`);
+      const createProfileBtn = document.getElementById('createProfileBtn');
+      if (createProfileBtn) createProfileBtn.onclick = () => openProfileForm(active || null);
       bindProfileActions();
-      if (editingProfile) bindProfileForm(editingProfile);
+      if (editingProfile) {
+        bindProfileForm(editingProfile);
+      }
     }
 
     function renderClientCabinet(user) {
@@ -661,7 +665,7 @@
       const type = p.type;
       const isExisting = profiles().some(profile => String(profile.id) === String(p.id));
       return `
-        <section class="card">
+        <section class="card" id="profileFormCard">
         <h2>${isExisting ? 'Редактировать анкету' : 'Разместить анкету'}</h2>
         <div class="form" id="profileForm">
           <div class="form-row"><label>Имя<input id="pfFirst" value="${esc(p.firstName)}"></label><label>Фамилия<input id="pfLast" value="${esc(p.lastName)}"></label></div>
@@ -1256,7 +1260,7 @@
     function renderSettings() {
       if (!requireLogin()) return;
       const user = currentUser();
-      renderShell(`<div class="page-head"><h1>Настройки профиля</h1></div><section class="card form"><div class="profile-card"><div class="avatar" id="settingsAvatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">Аватар отображается в личном кабинете${user.role === 'client' ? '.' : ' и может использоваться в анкете каталога.'}</p><br><label>Аватар<input id="setPhoto" type="file" accept="image/*"></label></div></div><div class="form-row"><label>Имя<input id="setFirst" value="${esc(user.firstName)}"></label><label>Фамилия<input id="setLast" value="${esc(user.lastName)}"></label></div><div class="form-row"><label>Email<input id="setEmail" value="${esc(user.email)}"></label><label>Телефон<input id="setPhone" value="${esc(user.phone)}"></label></div><button id="saveSettingsBtn">Сохранить</button></section>`);
+      renderShell(`<div class="page-head"><h1>Настройки профиля</h1></div><section class="card form" id="settingsForm"><div class="profile-card"><div class="avatar" id="settingsAvatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">Аватар отображается в личном кабинете${user.role === 'client' ? '.' : ' и может использоваться в анкете каталога.'}</p><br><label>Аватар<input id="setPhoto" type="file" accept="image/*"></label></div></div><div class="form-row"><label>Имя<input id="setFirst" value="${esc(user.firstName)}"></label><label>Фамилия<input id="setLast" value="${esc(user.lastName)}"></label></div><div class="form-row"><label>Email<input id="setEmail" type="email" value="${esc(user.email)}"></label><label>Телефон<input id="setPhone" value="${esc(user.phone)}"></label></div><section class="card"><h2>Смена пароля</h2><div class="form-row"><label>Текущий пароль<input id="setCurrentPassword" type="password" autocomplete="current-password"></label><label>Новый пароль<input id="setNewPassword" type="password" autocomplete="new-password"></label></div><label>Повторите новый пароль<input id="setRepeatPassword" type="password" autocomplete="new-password"></label><p class="muted">Оставьте поля пустыми, если не хотите менять пароль.</p></section><button id="saveSettingsBtn">Сохранить</button></section>`);
       document.getElementById('setPhoto').onchange = event => {
         const file = event.target.files[0];
         if (!file) return;
@@ -1270,14 +1274,52 @@
         reader.readAsDataURL(file);
       };
       document.getElementById('saveSettingsBtn').onclick = () => {
+        clearFieldErrors(document.getElementById('settingsForm'));
         user.firstName = document.getElementById('setFirst').value.trim();
         user.lastName = document.getElementById('setLast').value.trim();
-        user.email = document.getElementById('setEmail').value.trim();
+        user.email = document.getElementById('setEmail').value.trim().toLowerCase();
         user.phone = document.getElementById('setPhone').value.trim();
+        const currentPassword = document.getElementById('setCurrentPassword').value;
+        const newPassword = document.getElementById('setNewPassword').value;
+        const repeatPassword = document.getElementById('setRepeatPassword').value;
+        if (!user.firstName || !user.lastName || !user.email || !user.phone || !isEmail(user.email)) {
+          [['setFirst', user.firstName], ['setLast', user.lastName], ['setEmail', user.email], ['setPhone', user.phone]].forEach(([id, value]) => {
+            if (!String(value || '').trim()) markInvalid(document.getElementById(id));
+          });
+          if (user.email && !isEmail(user.email)) markInvalid(document.getElementById('setEmail'));
+          return showToast('Проверьте обязательные поля');
+        }
+        const emailBusy = safeUsers().some(u => String(u.id) !== String(user.id) && String(u.email || '').toLowerCase() === user.email);
+        if (emailBusy) {
+          markInvalid(document.getElementById('setEmail'));
+          return showToast('Этот email уже зарегистрирован');
+        }
+        if (currentPassword || newPassword || repeatPassword) {
+          if (currentPassword !== user.password) {
+            markInvalid(document.getElementById('setCurrentPassword'));
+            return showToast('Текущий пароль указан неверно');
+          }
+          if (newPassword.length < 8) {
+            markInvalid(document.getElementById('setNewPassword'));
+            return showToast('Новый пароль должен быть минимум 8 символов');
+          }
+          if (newPassword !== repeatPassword) {
+            markInvalid(document.getElementById('setRepeatPassword'));
+            return showToast('Пароли не совпадают');
+          }
+          if (newPassword.toLowerCase() === 'admin') {
+            markInvalid(document.getElementById('setNewPassword'));
+            return showToast('Используйте другой пароль');
+          }
+          user.password = newPassword;
+        }
         persistUserSettings(user, true);
         showToast('Настройки сохранены');
         render();
       };
+      document.querySelectorAll('#settingsForm input').forEach(field => {
+        field.oninput = () => field.classList.remove('field-error');
+      });
     }
 
     function persistUserSettings(user, syncNames) {
