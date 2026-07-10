@@ -3,1215 +3,1537 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Каталог специалистов</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <title>ПЛАТФОРМА - каталог специалистов</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     :root {
       --bg: #F5F5F5;
       --card: #FFFFFF;
-      --accent: #4A76A8;
-      --accent-dark: #3F6795;
-      --accent-soft: #E8F0FA;
+      --accent: #112250;
+      --accent-dark: #112250;
+      --accent-soft: #E9EDF6;
       --text: #000000;
       --muted: #818C99;
       --line: #DCE1E6;
-      --danger: #E64646;
       --success: #2EA44F;
+      --danger: #E64646;
       --warning: #F5A623;
       --shadow: 0 4px 20px rgba(0,0,0,0.08);
       --radius: 12px;
+      --sidebar: 228px;
     }
-
-    html,
-    body {
-      margin: 0;
-      min-width: 320px;
-      min-height: 100%;
-      overflow-x: hidden;
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Manrope', Arial, sans-serif;
-      font-size: 15px;
-      line-height: 1.45;
+    html, body { margin: 0; min-width: 320px; min-height: 100%; overflow-x: hidden; background: var(--bg); color: var(--text); font: 15px/1.45 Arial, sans-serif; }
+    body.locked { overflow: hidden; }
+    button, input, select, textarea { font: inherit; }
+    button { min-height: 44px; border: 0; border-radius: 8px; padding: 0 16px; background: var(--accent); color: #fff; font-weight: 700; cursor: pointer; transition: .15s ease; }
+    button:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    button.secondary { background: #EEF2F6; color: #2C4058; }
+    button.danger { background: var(--danger); }
+    button.success { background: var(--success); }
+    button.ghost { background: transparent; color: var(--accent); min-height: 32px; padding: 0; }
+    input, select, textarea { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: #fff; color: var(--text); outline: none; }
+    select { appearance: none; -webkit-appearance: none; padding-right: 42px; background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23112250' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' fill='none'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 16px center; background-size: 12px 8px; }
+    textarea { min-height: 96px; resize: vertical; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(17,34,80,.12); }
+    input.field-error, select.field-error, textarea.field-error { border-color: var(--danger) !important; box-shadow: 0 0 0 3px rgba(230,70,70,.14) !important; }
+    label { display: grid; gap: 6px; color: #2C4058; font-weight: 700; }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 { margin-bottom: 6px; font-size: clamp(24px, 3vw, 34px); line-height: 1.15; }
+    h2 { margin-bottom: 14px; font-size: 20px; }
+    h3 { margin-bottom: 8px; font-size: 17px; }
+    p { margin-bottom: 0; }
+    a { color: var(--accent); text-decoration: none; }
+    .muted { color: var(--muted); }
+    .app { min-height: 100vh; }
+    .topbar { position: sticky; top: 0; z-index: 40; height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 20px; background: #fff; border-bottom: 1px solid var(--line); }
+    .burger { display: grid; place-items: center; width: 44px; padding: 0; background: #EEF2F6; color: #2C4058; font-size: 20px; }
+    .brand { margin-right: auto; color: #2C4058; font-size: 20px; font-weight: 800; cursor: pointer; }
+    .user-chip { display: none; align-items: center; gap: 8px; min-height: 40px; padding: 0 12px; border-radius: 20px; background: #EEF2F6; color: #2C4058; font-weight: 700; }
+    .layout { width: min(100%, 1680px); margin: 0 auto; padding: 14px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+    .sidebar { position: fixed; inset: 0 auto 0 0; z-index: 100; width: min(86vw, 292px); padding: 10px; overflow: auto; background: #fff; box-shadow: var(--shadow); transform: translateX(-105%); transition: transform .2s ease; }
+    .sidebar.open { transform: translateX(0); }
+    .overlay { position: fixed; inset: 0; z-index: 90; display: none; background: rgba(0,0,0,.38); }
+    .overlay.show { display: block; }
+    .nav-title { padding: 12px; color: var(--muted); font-size: 12px; font-weight: 800; text-transform: uppercase; }
+    .nav-btn { width: 100%; min-height: 46px; display: flex; align-items: center; gap: 10px; margin: 2px 0; padding: 0 12px; border-radius: 8px; background: transparent; color: #2C4058; text-align: left; font-weight: 700; }
+    .nav-btn:hover { background: #F2F5F8; transform: none; }
+    .nav-btn.active { background: var(--accent-soft); color: var(--accent); }
+    .content { min-width: 0; }
+    .page-head { display: grid; gap: 10px; margin-bottom: 14px; }
+    .card { min-width: 0; padding: 16px; border-radius: var(--radius); background: var(--card); box-shadow: var(--shadow); }
+    .grid { display: grid; gap: 14px; }
+    .grid.two, .grid.three { grid-template-columns: 1fr; }
+    .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .between { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+    .form { display: grid; gap: 12px; }
+    .form-row { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .tabs { display: flex; gap: 8px; overflow-x: auto; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+    .tab, .tab:hover { min-height: 44px; border-radius: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--muted); white-space: nowrap; box-shadow: none; transform: none; }
+    .tab.active, .tab.active:hover { color: var(--accent); border-bottom-color: var(--accent); background: transparent; box-shadow: none; }
+    .pill { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 14px; background: var(--accent-soft); color: var(--accent); font-size: 13px; font-weight: 800; }
+    .status { display: inline-flex; min-height: 28px; align-items: center; padding: 0 10px; border-radius: 14px; font-size: 13px; font-weight: 800; }
+    .status.draft { background: #EEF2F6; color: #2C4058; }
+    .status.review { background: #FFF6E5; color: #A76700; }
+    .status.published { background: #EAF7EE; color: var(--success); }
+    .status.hidden { background: #FFECEC; color: var(--danger); }
+    .avatar { width: 72px; height: 72px; display: grid; place-items: center; border-radius: 50%; background: var(--accent); color: #fff; font-size: 24px; font-weight: 800; overflow: hidden; }
+    .avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .profile-card { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 14px; align-items: center; }
+    .catalog-search { margin-bottom: 6px; }
+    .catalog-shell { display: grid; gap: 16px; margin-top: 14px; align-items: start; }
+    .catalog-toolbar { margin-bottom: 16px; padding: 12px 14px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .catalog-toolbar label { width: min(100%, 260px); }
+    .filters { display: none; }
+    .filters.open { display: block; }
+    .filter-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .check-list { display: grid; gap: 8px; }
+    .check-item { display: flex; gap: 8px; align-items: flex-start; color: #2C4058; font-weight: 600; }
+    .check-item input { width: 18px; height: 18px; min-height: 18px; margin-top: 2px; padding: 0; }
+    .specialist-card { display: grid; gap: 12px; padding: 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); }
+    .specialist-top { display: grid; grid-template-columns: 72px minmax(0,1fr); gap: 12px; align-items: center; }
+    .card-meta { display: flex; gap: 8px; flex-wrap: wrap; color: var(--muted); font-size: 14px; }
+    .price { color: #2C4058; font-size: 20px; font-weight: 800; }
+    .rating { color: var(--warning); font-weight: 800; }
+    .card-actions { display: flex; align-items: stretch; gap: 8px; flex-wrap: wrap; }
+    .card-actions button { flex: 1 1 auto; min-width: max-content; white-space: nowrap; padding-inline: 14px; }
+    .empty { padding: 28px 16px; border-radius: var(--radius); background: #fff; box-shadow: var(--shadow); text-align: center; color: var(--muted); }
+    .pagination { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .page-btn { min-width: 44px; background: #EEF2F6; color: #2C4058; }
+    .page-btn.active { background: var(--accent); color: #fff; }
+    .modal { position: fixed; inset: auto 10px 10px; z-index: 120; display: none; max-height: 88vh; overflow: auto; padding: 16px; border-radius: 16px; background: #fff; box-shadow: 0 20px 70px rgba(0,0,0,.25); }
+    .modal.show { display: block; }
+    .toast { position: fixed; left: 50%; bottom: 24px; z-index: 200; display: none; transform: translateX(-50%); max-width: calc(100vw - 32px); padding: 12px 16px; border-radius: 10px; background: #2C4058; color: #fff; font-weight: 700; box-shadow: 0 10px 40px rgba(0,0,0,.2); }
+    .toast.show { display: block; }
+    .message-list { display: grid; gap: 10px; }
+    .message-item, .request-item { padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #fff; }
+    .chat-layout { display: grid; gap: 14px; }
+    .dialogs-list { display: grid; gap: 8px; align-content: start; }
+    .dialog-btn { width: 100%; min-height: auto; display: grid; grid-template-columns: 48px minmax(0,1fr); gap: 10px; align-items: center; padding: 10px; border-radius: 10px; background: #fff; color: #2C4058; text-align: left; box-shadow: none; border: 1px solid var(--line); }
+    .dialog-btn:hover, .dialog-btn.active { background: var(--accent-soft); transform: none; }
+    .dialog-btn .avatar { width: 48px; height: 48px; font-size: 16px; }
+    .chat-panel { min-height: 520px; display: grid; grid-template-rows: auto minmax(260px, 1fr) auto; overflow: hidden; }
+    .chat-head { padding-bottom: 12px; border-bottom: 1px solid var(--line); }
+    .chat-body { display: grid; align-content: start; gap: 10px; padding: 14px 0; overflow: auto; }
+    .bubble { max-width: min(78%, 560px); padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: #F7F8FA; color: #2C4058; }
+    .bubble.mine { justify-self: end; border-color: var(--accent); background: var(--accent); color: #fff; }
+    .chat-form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+    .auth-wrap { display: grid; justify-items: center; align-items: start; padding: 24px 0; }
+    .auth-card { width: min(100%, 430px); }
+    @media (min-width: 768px) {
+      .layout { padding: 18px; grid-template-columns: var(--sidebar) minmax(0,1fr); gap: 18px; }
+      .burger { display: none; }
+      .sidebar { position: sticky; top: 82px; width: auto; height: calc(100vh - 100px); transform: none; border-radius: var(--radius); }
+      .user-chip { display: inline-flex; }
+      .grid.two { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .grid.three { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .form-row { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .catalog-shell { grid-template-columns: 260px minmax(0,1fr); }
+      .chat-layout { grid-template-columns: 320px minmax(0,1fr); }
+      .filters { display: block; position: sticky; top: 82px; align-self: start; }
+      .mobile-filter { display: none; }
+      .modal { left: 50%; top: 50%; right: auto; bottom: auto; width: min(720px, calc(100vw - 36px)); transform: translate(-50%, -50%); }
     }
-
-    body.locked {
-      overflow: hidden;
-    }
-
-    button,
-    input,
-    select,
-    textarea {
-      font-family: 'Manrope', Arial, sans-serif;
-      font-size: 15px;
-    }
-
-    button {
-      min-height: 44px;
-      border: 0;
-      border-radius: 8px;
-      padding: 0 16px;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-weight: 700;
-      cursor: pointer;
-      transition: 0.15s ease;
-    }
-
-    button:hover {
-      background: var(--accent-dark);
-    }
-
-    button:active {
-      transform: translateY(1px);
-    }
-
-    button.secondary {
-      background: #EEF2F6;
-      color: #2C4058;
-    }
-
-    button.secondary:hover {
-      background: #E3EAF2;
-    }
-
-    button.icon {
-      min-width: 44px;
-      padding: 0 12px;
-    }
-
-    h1,
-    h2,
-    h3,
-    p {
-      margin-top: 0;
-    }
-
-    h1 {
-      margin-bottom: 6px;
-      font-size: clamp(24px, 3vw, 34px);
-      line-height: 1.15;
-    }
-
-    h2 {
-      margin-bottom: 14px;
-      font-size: 20px;
-      line-height: 1.2;
-    }
-
-    h3 {
-      margin-bottom: 8px;
-      font-size: 18px;
-      line-height: 1.25;
-    }
-
-    p {
-      margin-bottom: 0;
-    }
-
-    a {
-      color: var(--accent);
-      text-decoration: none;
-    }
-
-    input,
-    select {
-      width: 100%;
-      min-height: 44px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 10px 12px;
-      background: #FFFFFF;
-      color: var(--text);
-      outline: none;
-    }
-
-    input:focus,
-    select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(74,118,168,0.12);
-    }
-
-    label {
-      display: grid;
-      gap: 6px;
-      color: #2C4058;
-      font-weight: 700;
-    }
-
-    .muted {
-      color: var(--muted);
-    }
-
-    .page {
-      min-height: 100vh;
-    }
-
-    .topbar {
-      position: sticky;
-      top: 0;
-      z-index: 40;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 0 24px;
-      background: #FFFFFF;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .logo {
-      margin-right: auto;
-      color: #2C4058;
-      font-size: 20px;
-      font-weight: 800;
-      cursor: pointer;
-    }
-
-    .top-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .container {
-      width: min(100%, 1480px);
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .hero {
-      display: grid;
-      gap: 16px;
-      margin-bottom: 18px;
-    }
-
-    .search-card,
-    .filters-card,
-    .card {
-      border-radius: var(--radius);
-      background: var(--card);
-      box-shadow: var(--shadow);
-    }
-
-    .search-card {
-      padding: 18px;
-    }
-
-    .search-input {
-      height: 52px;
-      padding: 0 16px;
-      font-size: 16px;
-    }
-
-    .toolbar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) 240px;
-      gap: 14px;
-      align-items: start;
-      margin-bottom: 18px;
-    }
-
-    .filters-card {
-      padding: 16px;
-    }
-
-    .filters-head {
-      display: none;
-      margin-bottom: 12px;
-    }
-
-    .filters-grid {
-      display: grid;
-      grid-template-columns: minmax(170px, 1fr) minmax(150px, 1fr) 120px 120px minmax(250px, 1.2fr) minmax(250px, 1.2fr) auto;
-      gap: 10px;
-      align-items: end;
-    }
-
-    .filter-group {
-      display: grid;
-      gap: 6px;
-    }
-
-    .segmented {
-      display: flex;
-      gap: 6px;
-      flex-wrap: wrap;
-    }
-
-    .segmented button {
-      min-height: 38px;
-      padding: 0 10px;
-      background: #EEF2F6;
-      color: #2C4058;
-      font-size: 13px;
-      white-space: nowrap;
-    }
-
-    .segmented button.active {
-      background: var(--accent);
-      color: #FFFFFF;
-    }
-
-    .sort-card {
-      padding: 16px;
-    }
-
-    .mobile-filter-btn {
-      display: none;
-    }
-
-    .results-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin: 18px 0 14px;
-    }
-
-    .results-count {
-      color: #2C4058;
-      font-weight: 800;
-      font-size: 18px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 16px;
-    }
-
-    .specialist-card {
-      display: grid;
-      gap: 14px;
-      min-width: 0;
-      padding: 18px;
-      border-radius: var(--radius);
-      background: #FFFFFF;
-      box-shadow: var(--shadow);
-    }
-
-    .photo {
-      width: 160px;
-      height: 160px;
-      display: grid;
-      place-items: center;
-      justify-self: center;
-      overflow: hidden;
-      border-radius: 50%;
-      background: var(--accent);
-      color: #FFFFFF;
-      font-size: 42px;
-      font-weight: 800;
-    }
-
-    .photo img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
-    .card-main {
-      text-align: center;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      min-height: 28px;
-      padding: 0 10px;
-      border-radius: 14px;
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-size: 13px;
-      font-weight: 800;
-    }
-
-    .meta {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      flex-wrap: wrap;
-      color: var(--muted);
-    }
-
-    .rating {
-      color: var(--warning);
-      font-weight: 800;
-    }
-
-    .price {
-      color: #2C4058;
-      font-size: 20px;
-      font-weight: 800;
-    }
-
-    .description {
-      color: #2C4058;
-    }
-
-    .card-actions {
-      display: grid;
-      grid-template-columns: 1fr 52px;
-      gap: 8px;
-    }
-
-    .write-btn {
-      grid-column: span 2;
-    }
-
-    .empty-state {
-      display: grid;
-      justify-items: center;
-      gap: 10px;
-      padding: 54px 20px;
-      border-radius: var(--radius);
-      background: #FFFFFF;
-      box-shadow: var(--shadow);
-      text-align: center;
-    }
-
-    .empty-icon {
-      font-size: 46px;
-    }
-
-    .pagination {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 20px;
-      flex-wrap: wrap;
-    }
-
-    .page-btn {
-      min-width: 44px;
-      background: #EEF2F6;
-      color: #2C4058;
-    }
-
-    .page-btn.active {
-      background: var(--accent);
-      color: #FFFFFF;
-    }
-
-    .toast {
-      position: fixed;
-      left: 50%;
-      bottom: 24px;
-      z-index: 100;
-      display: none;
-      transform: translateX(-50%);
-      max-width: calc(100vw - 32px);
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: #2C4058;
-      color: #FFFFFF;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-      font-weight: 700;
-    }
-
-    .toast.show {
-      display: block;
-    }
-
-    .filters-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 80;
-      display: none;
-      background: rgba(0,0,0,0.38);
-    }
-
-    .filters-overlay.show {
-      display: block;
-    }
-
-    @media (max-width: 1199px) {
-      .container {
-        padding: 18px;
-      }
-
-      .toolbar {
-        grid-template-columns: 1fr;
-      }
-
-      .filters-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-
-      .grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-      }
-    }
-
     @media (max-width: 767px) {
-      body {
-        font-size: 16px;
-      }
-
-      .topbar {
-        height: auto;
-        min-height: 64px;
-        align-items: stretch;
-        flex-wrap: wrap;
-        padding: 12px 16px;
-      }
-
-      .logo {
-        width: 100%;
-        margin: 0;
-        font-size: 18px;
-      }
-
-      .top-actions {
-        width: 100%;
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-      }
-
-      .top-actions button {
-        width: 100%;
-      }
-
-      .container {
-        padding: 16px;
-      }
-
-      .search-card {
-        padding: 14px;
-      }
-
-      .search-input {
-        height: 48px;
-        font-size: 16px;
-      }
-
-      .toolbar {
-        display: block;
-      }
-
-      .mobile-filter-btn {
-        display: block;
-        width: 100%;
-        margin: 12px 0;
-      }
-
-      .filters-card {
-        position: fixed;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        z-index: 90;
-        max-height: 88vh;
-        overflow: auto;
-        padding: 16px;
-        border-radius: 16px 16px 0 0;
-        transform: translateY(105%);
-        transition: transform 0.2s ease;
-      }
-
-      .filters-card.open {
-        transform: translateY(0);
-      }
-
-      .filters-head {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-      }
-
-      .filters-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .sort-card {
-        margin-bottom: 14px;
-      }
-
-      .results-head {
-        display: grid;
-        gap: 8px;
-      }
-
-      .grid {
-        grid-template-columns: 1fr;
-      }
-
-      .card-actions {
-        grid-template-columns: 1fr 52px;
-      }
-
-      button,
-      input,
-      select {
-        min-height: 44px;
-        font-size: 16px;
-      }
+      .modal { inset: 10px; max-height: none; height: calc((var(--app-vh, 1vh) * 100) - 20px); overflow-y: auto; padding-bottom: max(92px, calc(78px + env(safe-area-inset-bottom))); -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+      .modal .form { padding-bottom: 84px; }
+      .modal > .row:last-child { position: sticky; bottom: -1px; z-index: 2; margin: 16px -16px -16px; padding: 12px 16px max(12px, env(safe-area-inset-bottom)); background: linear-gradient(180deg, rgba(255,255,255,.88), #fff 28%); border-top: 1px solid var(--line); }
+      .modal > .row:last-child button { flex: 1 1 100%; }
+    }
+    @media (min-width: 1280px) {
+      .grid.three { grid-template-columns: repeat(3, minmax(0,1fr)); }
+      .results-grid { grid-template-columns: repeat(2, minmax(360px, 1fr)); }
+    }
+    @media (min-width: 1760px) {
+      .results-grid { grid-template-columns: repeat(3, minmax(360px, 1fr)); }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <header class="topbar">
-      <div class="logo" id="logo">Каталог специалистов</div>
-      <div class="top-actions">
-        <button class="secondary" id="loginBtn" type="button">Войти</button>
-        <button id="registerBtn" type="button">Регистрация</button>
-      </div>
-    </header>
-
-    <main class="container">
-      <section class="hero">
-        <div>
-          <h1>Найдите репетитора или няню</h1>
-          <p class="muted">Выбирайте специалистов по городу, цене, рейтингу и опыту.</p>
-        </div>
-
-        <div class="search-card">
-          <input class="search-input" id="queryInput" placeholder="Поиск по имени, предмету или городу...">
-        </div>
-      </section>
-
-      <button class="mobile-filter-btn" id="openFiltersBtn" type="button">⚙️ Фильтры</button>
-
-      <div class="toolbar">
-        <section class="filters-card" id="filtersCard">
-          <div class="filters-head">
-            <h2>Фильтры</h2>
-            <button class="secondary" id="closeFiltersBtn" type="button">Закрыть</button>
-          </div>
-
-          <div class="filters-grid">
-            <label>Специализация
-              <select id="specializationSelect"></select>
-            </label>
-
-            <label>Город
-              <select id="citySelect"></select>
-            </label>
-
-            <label>Цена от
-              <input id="priceFrom" type="number" min="0" placeholder="0">
-            </label>
-
-            <label>Цена до
-              <input id="priceTo" type="number" min="0" placeholder="3000">
-            </label>
-
-            <div class="filter-group">
-              <label>Рейтинг</label>
-              <div class="segmented" id="ratingButtons">
-                <button type="button" data-rating="">Любой</button>
-                <button type="button" data-rating="4">★ 4.0+</button>
-                <button type="button" data-rating="4.5">★ 4.5+</button>
-                <button type="button" data-rating="4.8">★ 4.8+</button>
-              </div>
-            </div>
-
-            <div class="filter-group">
-              <label>Опыт</label>
-              <div class="segmented" id="experienceButtons">
-                <button type="button" data-exp="">Любой</button>
-                <button type="button" data-exp="1">От 1 года</button>
-                <button type="button" data-exp="3">От 3 лет</button>
-                <button type="button" data-exp="5">От 5 лет</button>
-              </div>
-            </div>
-
-            <button class="secondary" id="resetBtn" type="button">Сбросить фильтры</button>
-          </div>
-        </section>
-
-        <section class="sort-card card">
-          <label>Сортировка
-            <select id="sortSelect">
-              <option value="rating">По рейтингу</option>
-              <option value="priceAsc">По цене: дешёвые сначала</option>
-              <option value="priceDesc">По цене: дорогие сначала</option>
-              <option value="reviews">По отзывам</option>
-            </select>
-          </label>
-        </section>
-      </div>
-
-      <div class="results-head">
-        <div class="results-count" id="resultsCount">Найдено 0 специалистов</div>
-      </div>
-
-      <section class="grid" id="resultsGrid"></section>
-      <div class="pagination" id="pagination"></div>
-    </main>
-
-    <div class="filters-overlay" id="filtersOverlay"></div>
-    <div class="toast" id="toast"></div>
-  </div>
+  <div id="app" class="app"></div>
+  <div id="toast" class="toast"></div>
 
   <script>
-    function sendToTilda(action, data) {
-      window.parent.postMessage(Object.assign({ action: action }, data || {}), '*');
-    }
-
-    const USERS_KEY = 'users';
-    const CURRENT_USER_KEY = 'currentUser';
-    const LOGIN_KEY = 'isLoggedIn';
-    const PAGE_SIZE = 12;
-
-    let allSpecialists = [];
-    let filteredSpecialists = [];
-    let currentPage = 1;
-
-    const filters = {
-      query: '',
-      specialization: '',
-      city: '',
-      priceFrom: '',
-      priceTo: '',
-      rating: '',
-      experience: '',
-      sort: 'rating'
+    window.MP_PAGE = "catalog";
+    const DB = {
+      users: 'mp_users',
+      profiles: 'mp_profiles',
+      requests: 'mp_requests',
+      messages: 'mp_messages',
+      reviews: 'mp_reviews',
+      currentUser: 'mp_current_user'
     };
 
-    const sampleSpecialists = [
-      {
-        id: 101,
-        firstName: 'Ирина',
-        lastName: 'Иванова',
-        role: 'specialist',
-        isActive: true,
-        specialization: 'Репетитор по математике',
-        city: 'Москва',
-        rating: 4.8,
-        reviewsCount: 36,
-        hourlyPrice: 1200,
-        experience: 8,
-        about: 'Готовлю к ОГЭ и помогаю закрывать пробелы в школьной программе. Работаю спокойно и системно.',
-        photo: ''
-      },
-      {
-        id: 102,
-        firstName: 'Ольга',
-        lastName: 'Смирнова',
-        role: 'specialist',
-        isActive: true,
-        specialization: 'Репетитор по английскому',
-        city: 'Санкт-Петербург',
-        rating: 4.9,
-        reviewsCount: 42,
-        hourlyPrice: 1500,
-        experience: 6,
-        about: 'Английский для школьников и дошкольников. Помогаю говорить увереннее и не бояться ошибок.',
-        photo: ''
-      },
-      {
-        id: 103,
-        firstName: 'Наталья',
-        lastName: 'Орлова',
-        role: 'specialist',
-        isActive: true,
-        specialization: 'Няня',
-        city: 'Москва',
-        rating: 4.7,
-        reviewsCount: 21,
-        hourlyPrice: 1000,
-        experience: 10,
-        about: 'Няня с педагогическим опытом. Прогулки, режим дня, развивающие занятия, спокойное сопровождение.',
-        photo: ''
+    const APP_PAGE = window.MP_PAGE || 'all';
+    const PAGE_FILES = {
+      auth: 'auth.html',
+      client: 'client-cabinet.html',
+      specialist: 'specialist-cabinet.html',
+      catalog: 'catalog.html',
+      profile: 'specialist-card.html'
+    };
+    const CRM_ENDPOINT = window.MP_CRM_ENDPOINT || '';
+
+    const filters = {
+      tutorSubjects: ['Литература','Математика','Русский язык','Окружающий мир','Алгебра','Геометрия','История','Обществознание','География','Биология','Химия','Физика','Информатика','Иностранные языки','Гуманитарные науки','Естественные науки','Технические науки','Социальные науки','Искусства и дизайн'],
+      educationLevels: ['Дошкольное образование','Начальная школа','Средняя школа','Высшее образование'],
+      experienceLevels: ['Начинающий','Средний','Опытный'],
+      lessonFormats: ['Индивидуальные','Групповые','Онлайн','Очные'],
+      tutorSkills: ['Подготовка к ЕГЭ','Подготовка к ОГЭ','Подготовка к олимпиадам','Методика Монтессори','Собственные методики'],
+      teachingLanguages: ['Русский','Английский','Другие языки'],
+      childAges: ['Новорожденные','До 1 года','От 1 до 3 лет','От 3 до 6 лет','От 6 лет'],
+      employmentTypes: ['Полный день','Частичная занятость','Временная работа','С проживанием','Автоняня'],
+      nannySkills: ['Педагогическое образование','Психологическое образование','Первая помощь','Иностранные языки','Работа с детьми с особенностями развития'],
+      careMethods: ['Игровые методики','Развивающие занятия'],
+      extraServices: ['Приготовление пищи','Уборка после детей','Помощь с уроками'],
+      weekdays: ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'],
+      workConditions: ['Работа с несколькими детьми','Наличие домашних животных'],
+      territories: ['На территории специалиста','На территории клиента']
+    };
+
+    const state = {
+      route: 'catalog',
+      cabinetSection: 'profile',
+      catalogType: 'all',
+      activeConversationId: null,
+      initialChatProfileId: null,
+      viewProfileId: null,
+      page: 1,
+      perPage: 9,
+      editingProfileId: null,
+      search: {
+        q: '', type: 'all', city: '', district: '', priceMin: '', priceMax: '',
+        ratingMin: '', reviewsMin: '', experienceLevel: '', sort: 'rating',
+        subject: '', educationLevel: '', lessonFormat: '', tutorSkill: '', language: '',
+        childAge: '', employmentType: '', nannySkill: '', careMethod: '', extraService: '',
+        weekday: '', territory: '', homeVisit: '', homeWork: '', multipleChildren: '', pets: ''
       }
-    ];
+    };
 
-    function safeParse(value, fallback) {
-      try {
-        return JSON.parse(value) || fallback;
-      } catch (e) {
-        return fallback;
+    const app = document.getElementById('app');
+    const toast = document.getElementById('toast');
+    let lastSentHeight = 0;
+    let catalogRenderTimer = null;
+    let pendingFocus = null;
+
+    function read(key, fallback) { try { return JSON.parse(localStorage.getItem(key)) || fallback; } catch(e) { return fallback; } }
+    function write(key, value) { localStorage.setItem(key, JSON.stringify(value)); }
+    function esc(v) { return String(v ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m])); }
+    function id() { return Date.now() + Math.floor(Math.random() * 1000); }
+    function showToast(text) { toast.textContent = text; toast.classList.add('show'); setTimeout(() => toast.classList.remove('show'), 2200); }
+    function sendToTilda(action, data = {}) { window.parent.postMessage({ action, ...data }, '*'); }
+    function sendCrmEvent(type, payload = {}) {
+      if (!CRM_ENDPOINT) return Promise.resolve(null);
+      return fetch(CRM_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type,
+          payload,
+          page: APP_PAGE,
+          url: window.location.href,
+          createdAt: new Date().toISOString()
+        })
+      }).catch(error => {
+        console.warn('CRM event failed', error);
+        return null;
+      });
+    }
+    function setViewportHeight() {
+      document.documentElement.style.setProperty('--app-vh', `${window.innerHeight * 0.01}px`);
+    }
+    function isSplitMode() { return APP_PAGE !== 'all'; }
+    function pageForRoute(route, user = currentUser()) {
+      if (route === 'auth') return 'auth';
+      if (route === 'catalog') return 'catalog';
+      if (route === 'profile') return 'profile';
+      if (route === 'cabinet' || route === 'messages' || route === 'requests' || route === 'settings') {
+        return user && user.role === 'client' ? 'client' : 'specialist';
       }
+      return 'catalog';
     }
-
-    function esc(value) {
-      return String(value ?? '').replace(/[&<>"']/g, function(match) {
-        return {
-          '&': '&amp;',
-          '<': '&lt;',
-          '>': '&gt;',
-          '"': '&quot;',
-          "'": '&#039;'
-        }[match];
+    function goToPage(page, params = {}) {
+      if (!isSplitMode()) return false;
+      const file = PAGE_FILES[page];
+      if (!file) return false;
+      const search = new URLSearchParams();
+      Object.entries(params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') search.set(key, value);
       });
+      window.location.href = file + (search.toString() ? '?' + search.toString() : '');
+      return true;
     }
-
-    function getUsers() {
-      return safeParse(localStorage.getItem(USERS_KEY), []);
-    }
-
-    function setUsers(users) {
-      localStorage.setItem(USERS_KEY, JSON.stringify(users));
-    }
-
-    function isLoggedIn() {
-      return localStorage.getItem(LOGIN_KEY) === 'true';
-    }
-
-    function getCurrentUser() {
-      return safeParse(localStorage.getItem(CURRENT_USER_KEY), null);
-    }
-
-    function setCurrentUser(user) {
-      localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
-    }
-
-    function seedIfEmpty() {
-      const users = getUsers();
-      const hasActiveSpecialists = users.some(function(user) {
-        return user.role === 'specialist' && user.isActive === true;
-      });
-
-      if (!hasActiveSpecialists) {
-        setUsers(users.concat(sampleSpecialists));
-      }
-    }
-
-    function loadSpecialists() {
-      allSpecialists = getUsers().filter(function(user) {
-        return user.role === 'specialist' && user.isActive === true;
-      });
-    }
-
-    function readUrlParams() {
-      const params = new URLSearchParams(window.location.search);
-      filters.query = params.get('query') || '';
-      filters.specialization = params.get('specialization') || '';
-      filters.city = params.get('city') || '';
-      filters.priceFrom = params.get('priceFrom') || '';
-      filters.priceTo = params.get('priceTo') || '';
-      filters.rating = params.get('rating') || '';
-      filters.experience = params.get('experience') || '';
-      filters.sort = params.get('sort') || 'rating';
-      currentPage = Number(params.get('page') || 1);
-    }
-
-    function updateUrl() {
-      const params = new URLSearchParams();
-
-      Object.keys(filters).forEach(function(key) {
-        if (filters[key]) {
-          params.set(key, filters[key]);
-        }
-      });
-
-      if (currentPage > 1) {
-        params.set('page', currentPage);
-      }
-
-      const query = params.toString();
-      const url = query ? window.location.pathname + '?' + query : window.location.pathname;
-      history.pushState(null, '', url);
-    }
-
-    function uniqueValues(field) {
-      const values = allSpecialists.map(function(item) {
-        return item[field] || '';
-      }).filter(Boolean);
-
-      return Array.from(new Set(values)).sort();
-    }
-
-    function fillSelects() {
-      const specializationSelect = document.getElementById('specializationSelect');
-      const citySelect = document.getElementById('citySelect');
-
-      specializationSelect.innerHTML = '<option value="">Любая</option>' + uniqueValues('specialization').map(function(value) {
-        return `<option value="${esc(value)}" ${filters.specialization === value ? 'selected' : ''}>${esc(value)}</option>`;
-      }).join('');
-
-      citySelect.innerHTML = '<option value="">Любой</option>' + uniqueValues('city').map(function(value) {
-        return `<option value="${esc(value)}" ${filters.city === value ? 'selected' : ''}>${esc(value)}</option>`;
-      }).join('');
-    }
-
-    function applyInputs() {
-      document.getElementById('queryInput').value = filters.query;
-      document.getElementById('priceFrom').value = filters.priceFrom;
-      document.getElementById('priceTo').value = filters.priceTo;
-      document.getElementById('sortSelect').value = filters.sort;
-
-      document.querySelectorAll('[data-rating]').forEach(function(button) {
-        button.classList.toggle('active', button.dataset.rating === filters.rating);
-      });
-
-      document.querySelectorAll('[data-exp]').forEach(function(button) {
-        button.classList.toggle('active', button.dataset.exp === filters.experience);
-      });
-    }
-
-    function applyFilters() {
-      const q = filters.query.trim().toLowerCase();
-      const priceFrom = Number(filters.priceFrom || 0);
-      const priceTo = Number(filters.priceTo || 0);
-      const rating = Number(filters.rating || 0);
-      const experience = Number(filters.experience || 0);
-
-      filteredSpecialists = allSpecialists.filter(function(item) {
-        const name = `${item.firstName || ''} ${item.lastName || ''}`.toLowerCase();
-        const specialization = String(item.specialization || '').toLowerCase();
-        const city = String(item.city || '').toLowerCase();
-        const price = Number(item.hourlyPrice || item.price || 0);
-        const itemRating = Number(item.rating || 0);
-        const itemExperience = Number(item.experience || 0);
-
-        if (q && !(name.includes(q) || specialization.includes(q) || city.includes(q))) return false;
-        if (filters.specialization && item.specialization !== filters.specialization) return false;
-        if (filters.city && item.city !== filters.city) return false;
-        if (priceFrom && price < priceFrom) return false;
-        if (priceTo && price > priceTo) return false;
-        if (rating && itemRating < rating) return false;
-        if (experience && itemExperience < experience) return false;
-
+    function goToRoute(route, params = {}) {
+      const user = currentUser();
+      const page = pageForRoute(route, user);
+      if (isSplitMode() && APP_PAGE !== page) {
+        goToPage(page, Object.assign({ route }, params));
         return true;
-      });
-
-      filteredSpecialists.sort(function(a, b) {
-        if (filters.sort === 'priceAsc') {
-          return Number(a.hourlyPrice || a.price || 0) - Number(b.hourlyPrice || b.price || 0);
-        }
-        if (filters.sort === 'priceDesc') {
-          return Number(b.hourlyPrice || b.price || 0) - Number(a.hourlyPrice || a.price || 0);
-        }
-        if (filters.sort === 'reviews') {
-          return Number(b.reviewsCount || 0) - Number(a.reviewsCount || 0);
-        }
-        return Number(b.rating || 0) - Number(a.rating || 0);
-      });
-
-      const pages = Math.max(1, Math.ceil(filteredSpecialists.length / PAGE_SIZE));
-      if (currentPage > pages) {
-        currentPage = pages;
+      }
+      state.route = route;
+      state.page = 1;
+      Object.assign(state, params);
+      render();
+      return true;
+    }
+    function goToCabinetForUser(user) {
+      if (isSplitMode()) {
+        return goToPage(user.role === 'client' ? 'client' : 'specialist', { route: 'cabinet' });
+      }
+      state.route = 'cabinet';
+      render();
+      return true;
+    }
+    function goToAuthPage() {
+      if (isSplitMode()) return goToPage('auth');
+      state.route = 'auth';
+      render();
+      return true;
+    }
+    function applyInitialPage() {
+      const params = new URLSearchParams(window.location.search);
+      const route = params.get('route');
+      const profileId = params.get('profileId') || params.get('id');
+      const chatProfileId = params.get('chatProfileId');
+      if (profileId) state.viewProfileId = profileId;
+      if (chatProfileId) state.initialChatProfileId = chatProfileId;
+      if (APP_PAGE === 'auth') state.route = 'auth';
+      if (APP_PAGE === 'catalog') state.route = 'catalog';
+      if (APP_PAGE === 'profile') state.route = 'profile';
+      if (APP_PAGE === 'client' || APP_PAGE === 'specialist') {
+        state.route = ['messages', 'requests', 'settings', 'cabinet'].includes(route) ? route : 'cabinet';
+      }
+      if (APP_PAGE === 'all' && route) state.route = route;
+    }
+    function enforcePageAccess() {
+      if (!isSplitMode()) return false;
+      const user = currentUser();
+      if (APP_PAGE === 'auth' && user) {
+        goToCabinetForUser(user);
+        return true;
+      }
+      if ((APP_PAGE === 'client' || APP_PAGE === 'specialist') && !user) {
+        goToPage('auth');
+        return true;
+      }
+      if (APP_PAGE === 'client' && user.role !== 'client') {
+        goToPage('specialist', { route: 'cabinet' });
+        return true;
+      }
+      if (APP_PAGE === 'specialist' && user.role === 'client') {
+        goToPage('client', { route: 'cabinet' });
+        return true;
+      }
+      if (APP_PAGE === 'profile' && !user) {
+        goToPage('auth');
+        return true;
+      }
+      return false;
+    }
+    function goHome() {
+      if (window.parent && window.parent !== window) {
+        sendToTilda('goHome', { url: 'https://lkcabinet.tilda.ws/' });
+      } else {
+        window.location.href = 'https://lkcabinet.tilda.ws/';
       }
     }
-
-    function renderResults() {
-      const grid = document.getElementById('resultsGrid');
-      const count = document.getElementById('resultsCount');
-
-      count.textContent = 'Найдено ' + filteredSpecialists.length + ' специалистов';
-
-      if (!allSpecialists.length) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1;">
-            <div class="empty-icon">🧑‍🏫</div>
-            <h2>Пока нет специалистов</h2>
-            <p class="muted">Станьте первым специалистом на площадке.</p>
-            <button type="button" id="beFirstBtn">Стать первым</button>
-          </div>
-        `;
-        document.getElementById('pagination').innerHTML = '';
-        document.getElementById('beFirstBtn').addEventListener('click', function() {
-          sendToTilda('goToRegister');
-        });
-        sendResize();
-        return;
-      }
-
-      if (!filteredSpecialists.length) {
-        grid.innerHTML = `
-          <div class="empty-state" style="grid-column: 1 / -1;">
-            <div class="empty-icon">🔎</div>
-            <h2>Специалисты не найдены</h2>
-            <p class="muted">Попробуйте изменить фильтры.</p>
-            <button type="button" id="emptyResetBtn">Сбросить</button>
-          </div>
-        `;
-        document.getElementById('pagination').innerHTML = '';
-        document.getElementById('emptyResetBtn').addEventListener('click', resetFilters);
-        sendResize();
-        return;
-      }
-
-      const start = (currentPage - 1) * PAGE_SIZE;
-      const pageItems = filteredSpecialists.slice(start, start + PAGE_SIZE);
-
-      grid.innerHTML = pageItems.map(cardHTML).join('');
-      renderPagination();
-      bindCardEvents();
-      sendResize();
-    }
-
-    function cardHTML(item) {
-      const name = `${item.firstName || ''} ${item.lastName || ''}`.trim() || 'Специалист';
-      const initials = ((item.firstName || 'С')[0] || 'С') + ((item.lastName || 'П')[0] || 'П');
-      const price = item.hourlyPrice || item.price || 0;
-      const about = String(item.about || 'Описание пока не заполнено.');
-      const shortAbout = about.length > 100 ? about.slice(0, 100) + '...' : about;
-
-      return `
-        <article class="specialist-card">
-          <div class="photo">
-            ${item.photo ? `<img src="${item.photo}" alt="${esc(name)}">` : esc(initials)}
-          </div>
-
-          <div class="card-main">
-            <h3>${esc(name)}</h3>
-            <div class="badge">${esc(item.specialization || 'Специалист')}</div>
-          </div>
-
-          <div class="meta">
-            <span>📍 ${esc(item.city || 'Город не указан')}</span>
-          </div>
-
-          <div class="meta">
-            <span class="rating">★ ${esc(item.rating || '4.8')}</span>
-            <span>${esc(item.reviewsCount || 0)} отзывов</span>
-          </div>
-
-          <div class="price">${esc(price)}₽/час</div>
-          <p class="description">${esc(shortAbout)}</p>
-
-          <div class="card-actions">
-            <button type="button" class="details-btn" data-id="${esc(item.id)}">Подробнее</button>
-            <button type="button" class="favorite-btn icon" data-id="${esc(item.id)}">❤️</button>
-            <button type="button" class="write-btn" data-id="${esc(item.id)}">✉️ Написать</button>
-          </div>
-        </article>
-      `;
-    }
-
-    function renderPagination() {
-      const pagination = document.getElementById('pagination');
-      const pages = Math.ceil(filteredSpecialists.length / PAGE_SIZE);
-
-      if (pages <= 1) {
-        pagination.innerHTML = '';
-        return;
-      }
-
-      let html = '';
-
-      for (let i = 1; i <= pages; i++) {
-        html += `<button type="button" class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
-      }
-
-      pagination.innerHTML = html;
-
-      pagination.querySelectorAll('.page-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-          currentPage = Number(button.dataset.page);
-          updateAndRender();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
-    }
-
-    function bindCardEvents() {
-      document.querySelectorAll('.details-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-          sendToTilda('viewSpecialist', { id: button.dataset.id });
-        });
-      });
-
-      document.querySelectorAll('.favorite-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-          if (!isLoggedIn()) {
-            showToast('Войдите, чтобы добавить в избранное');
-            return;
-          }
-
-          const user = getCurrentUser();
-
-          if (!user) {
-            showToast('Войдите, чтобы добавить в избранное');
-            return;
-          }
-
-          user.favorites = user.favorites || [];
-
-          if (!user.favorites.map(String).includes(String(button.dataset.id))) {
-            user.favorites.push(button.dataset.id);
-          }
-
-          setCurrentUser(user);
-          updateUserInUsers(user);
-          showToast('Добавлено в избранное');
-        });
-      });
-
-      document.querySelectorAll('.write-btn').forEach(function(button) {
-        button.addEventListener('click', function() {
-          if (!isLoggedIn()) {
-            sendToTilda('goToLogin');
-            return;
-          }
-
-          sendToTilda('openChat', { specialistId: button.dataset.id });
-        });
-      });
-    }
-
-    function updateUserInUsers(user) {
-      const users = getUsers();
-      const index = users.findIndex(function(item) {
-        return String(item.id) === String(user.id) || item.email === user.email;
-      });
-
-      if (index >= 0) {
-        users[index] = Object.assign({}, users[index], user);
-        setUsers(users);
-      }
-    }
-
-    function resetFilters() {
-      filters.query = '';
-      filters.specialization = '';
-      filters.city = '';
-      filters.priceFrom = '';
-      filters.priceTo = '';
-      filters.rating = '';
-      filters.experience = '';
-      filters.sort = 'rating';
-      currentPage = 1;
-      fillSelects();
-      applyInputs();
-      updateAndRender();
-      closeFilters();
-    }
-
-    function updateAndRender() {
-      applyFilters();
-      updateUrl();
-      renderResults();
-      applyInputs();
-    }
-
-    function bindControls() {
-      document.getElementById('logo').addEventListener('click', function() {
-        sendToTilda('goHome');
-      });
-
-      document.getElementById('loginBtn').addEventListener('click', function() {
-        sendToTilda('goToLogin');
-      });
-
-      document.getElementById('registerBtn').addEventListener('click', function() {
-        sendToTilda('goToRegister');
-      });
-
-      document.getElementById('queryInput').addEventListener('input', function(e) {
-        filters.query = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.getElementById('specializationSelect').addEventListener('change', function(e) {
-        filters.specialization = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.getElementById('citySelect').addEventListener('change', function(e) {
-        filters.city = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.getElementById('priceFrom').addEventListener('input', function(e) {
-        filters.priceFrom = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.getElementById('priceTo').addEventListener('input', function(e) {
-        filters.priceTo = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.getElementById('sortSelect').addEventListener('change', function(e) {
-        filters.sort = e.target.value;
-        currentPage = 1;
-        updateAndRender();
-      });
-
-      document.querySelectorAll('[data-rating]').forEach(function(button) {
-        button.addEventListener('click', function() {
-          filters.rating = button.dataset.rating;
-          currentPage = 1;
-          updateAndRender();
-        });
-      });
-
-      document.querySelectorAll('[data-exp]').forEach(function(button) {
-        button.addEventListener('click', function() {
-          filters.experience = button.dataset.exp;
-          currentPage = 1;
-          updateAndRender();
-        });
-      });
-
-      document.getElementById('resetBtn').addEventListener('click', resetFilters);
-
-      document.getElementById('openFiltersBtn').addEventListener('click', openFilters);
-      document.getElementById('closeFiltersBtn').addEventListener('click', closeFilters);
-      document.getElementById('filtersOverlay').addEventListener('click', closeFilters);
-    }
-
-    function openFilters() {
-      document.getElementById('filtersCard').classList.add('open');
-      document.getElementById('filtersOverlay').classList.add('show');
-      document.body.classList.add('locked');
-    }
-
-    function closeFilters() {
-      document.getElementById('filtersCard').classList.remove('open');
-      document.getElementById('filtersOverlay').classList.remove('show');
-      document.body.classList.remove('locked');
-    }
-
-    function showToast(text) {
-      const toast = document.getElementById('toast');
-      toast.textContent = text;
-      toast.classList.add('show');
-
-      setTimeout(function() {
-        toast.classList.remove('show');
-      }, 2200);
-    }
-
-    function sendResize() {
-      setTimeout(function() {
-        window.parent.postMessage({
-          action: 'resize',
-          height: document.body.scrollHeight
-        }, '*');
+    function resize() {
+      setTimeout(() => {
+        const height = Math.max(
+          document.body.scrollHeight,
+          document.documentElement.scrollHeight,
+          app ? app.scrollHeight : 0
+        );
+        if (Math.abs(height - lastSentHeight) < 4) return;
+        lastSentHeight = height;
+        sendToTilda('resize', { height });
       }, 50);
     }
-
-    function init() {
-      seedIfEmpty();
-      readUrlParams();
-      loadSpecialists();
-      fillSelects();
-      bindControls();
-      applyInputs();
-      updateAndRender();
+    function currentUser() { return read(DB.currentUser, null); }
+    function setCurrentUser(user) { write(DB.currentUser, user); }
+    function users() { return read(DB.users, []); }
+    function safeUsers() {
+      const demoEmails = ['tutor@example.ru', 'nanny@example.ru', 'client@example.ru'];
+      const cleaned = users().filter(user => !demoEmails.includes(String(user.email || '').toLowerCase()) && user.role !== 'admin');
+      if (cleaned.length !== users().length) {
+        write(DB.users, cleaned);
+        const current = currentUser();
+        if (current && (demoEmails.includes(String(current.email || '').toLowerCase()) || current.role === 'admin')) {
+          localStorage.removeItem(DB.currentUser);
+        }
+      }
+      return cleaned;
+    }
+    function profiles() { return read(DB.profiles, []); }
+    function saveProfiles(items) { write(DB.profiles, items); }
+    function initials(item) { return ((item.firstName || 'С')[0] || 'С') + ((item.lastName || 'П')[0] || 'П'); }
+    function avatarHTML(item) { return item && item.photo ? `<img src="${item.photo}" alt="">` : initials(item || {}); }
+    function roleTitle(role) { return role === 'tutor' ? 'Репетитор' : role === 'nanny' ? 'Няня' : 'Клиент'; }
+    function registrationLeadData(user) {
+      return {
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        roleTitle: roleTitle(user.role),
+        createdAt: user.createdAt || new Date().toISOString(),
+        source: 'marketplace'
+      };
+    }
+    function requestLeadData(profile, request) {
+      const user = currentUser() || {};
+      return {
+        id: request.id,
+        clientName: `${user.firstName || ''} ${user.lastName || ''}`.trim(),
+        clientEmail: user.email || '',
+        clientPhone: user.phone || '',
+        specialistName: profile ? `${profile.firstName || ''} ${profile.lastName || ''}`.trim() : '',
+        specialistType: profile ? roleTitle(profile.type) : '',
+        specialistCity: profile?.city || '',
+        text: request.text,
+        createdAt: request.createdAt,
+        source: 'marketplace-request'
+      };
+    }
+    function crmProfileData(profile) {
+      if (!profile) return {};
+      return {
+        id: profile.id,
+        userId: profile.userId,
+        firstName: profile.firstName || '',
+        lastName: profile.lastName || '',
+        type: profile.type || '',
+        typeTitle: roleTitle(profile.type),
+        city: profile.city || '',
+        district: profile.district || '',
+        price: profile.price || '',
+        status: profile.status || '',
+        experienceYears: profile.experienceYears || '',
+        experienceLevel: profile.experienceLevel || '',
+        subjects: profile.subjects || [],
+        childAges: profile.childAges || [],
+        employmentTypes: profile.employmentTypes || [],
+        skills: [].concat(profile.tutorSkills || [], profile.nannySkills || []),
+        about: profile.about || '',
+        createdAt: profile.createdAt || '',
+        updatedAt: profile.updatedAt || '',
+        source: 'marketplace-profile'
+      };
+    }
+    function statusText(status) { return ({ draft:'Черновик', review:'На модерации', published:'Опубликована', hidden:'Скрыта' })[status] || status; }
+    function scheduleCatalogRender(selector, delay = 260) {
+      const node = selector ? document.querySelector(selector) : null;
+      pendingFocus = node ? {
+        selector,
+        start: node.selectionStart || 0,
+        end: node.selectionEnd || node.selectionStart || 0
+      } : null;
+      clearTimeout(catalogRenderTimer);
+      catalogRenderTimer = setTimeout(() => {
+        renderCatalog();
+        restorePendingFocus();
+      }, delay);
+    }
+    function restorePendingFocus() {
+      if (!pendingFocus) return;
+      const node = document.querySelector(pendingFocus.selector);
+      if (node) {
+        node.focus();
+        if (typeof node.setSelectionRange === 'function') {
+          node.setSelectionRange(pendingFocus.start, pendingFocus.end);
+        }
+      }
+      pendingFocus = null;
     }
 
-    window.addEventListener('load', function() {
-      window.parent.postMessage({
-        action: 'resize',
-        height: document.body.scrollHeight
-      }, '*');
-    });
+    function seed() {
+      if (localStorage.getItem('mp_seeded_v2')) {
+        if (!localStorage.getItem(DB.reviews)) write(DB.reviews, demoReviews());
+        safeUsers();
+        return;
+      }
+      const demoProfiles = [
+        {
+          id: 201, userId: 101, type: 'tutor', status: 'published', views: 128, responses: 17,
+          firstName: 'Ирина', lastName: 'Иванова', city: 'Москва', district: 'Хамовники',
+          photo: '', rating: 4.9, reviewsCount: 42, experienceYears: 8, experienceLevel: 'Опытный',
+          price: 1600, about: 'Готовлю к ОГЭ и ЕГЭ, закрываю пробелы по математике, работаю спокойно и системно.',
+          keywords: 'математика огэ егэ школьная программа алгебра геометрия',
+          subjects: ['Математика','Подготовка к школе'], educationLevels: ['Средняя школа'], lessonFormats: ['Индивидуальные','Онлайн','Очные'],
+          tutorSkills: ['Подготовка к ЕГЭ','Подготовка к ОГЭ'], teachingLanguages: ['Русский'],
+          childAges: [], employmentTypes: [], nannySkills: [], careMethods: [], extraServices: [],
+          weekdays: ['Пн','Ср','Пт'], timeFrom: '10:00', timeTo: '20:00', homeVisit: true, homeWork: false,
+          workConditions: ['Наличие домашних животных'], territories: ['На территории клиента']
+        },
+        {
+          id: 202, userId: 102, type: 'nanny', status: 'published', views: 96, responses: 21,
+          firstName: 'Наталья', lastName: 'Орлова', city: 'Москва', district: 'Сокол',
+          photo: '', rating: 4.8, reviewsCount: 31, experienceYears: 10, experienceLevel: 'Опытный',
+          price: 1200, about: 'Няня с педагогическим образованием. Режим дня, прогулки, развивающие занятия, спокойная коммуникация.',
+          keywords: 'няня прогулки режим развивающие занятия педагогика',
+          subjects: [], educationLevels: [], lessonFormats: [], tutorSkills: [], teachingLanguages: ['Русский'],
+          childAges: ['От 1 до 3 лет','От 3 до 6 лет'], employmentTypes: ['Частичная занятость','Автоняня'],
+          nannySkills: ['Педагогическое образование','Первая помощь'], careMethods: ['Игровые методики','Развивающие занятия'],
+          extraServices: ['Приготовление пищи','Помощь с уроками'], weekdays: ['Пн','Вт','Чт'], timeFrom: '09:00', timeTo: '18:00',
+          homeVisit: false, homeWork: true, workConditions: ['Работа с несколькими детьми'], territories: ['На территории специалиста','На территории клиента']
+        }
+      ];
+      write(DB.users, []);
+      write(DB.profiles, demoProfiles);
+      write(DB.requests, []);
+      write(DB.messages, []);
+      write(DB.reviews, demoReviews());
+      localStorage.setItem('mp_seeded_v2', 'true');
+      safeUsers();
+    }
 
-    const observer = new ResizeObserver(function() {
-      sendResize();
-    });
+    function demoReviews() {
+      return [
+        { id: 301, profileId: 201, clientId: 103, clientName: 'Анна Петрова', rating: 5, text: 'Ирина быстро нашла пробелы у ребенка и дала понятный план занятий. После месяца стало спокойнее с математикой.', createdAt: '2026-04-12T12:00:00.000Z' },
+        { id: 302, profileId: 201, clientId: 104, clientName: 'Мария Соколова', rating: 5, text: 'Очень структурные уроки, ребенку комфортно задавать вопросы. Будем продолжать подготовку к ОГЭ.', createdAt: '2026-05-08T12:00:00.000Z' },
+        { id: 303, profileId: 202, clientId: 105, clientName: 'Елена Морозова', rating: 5, text: 'Наталья аккуратная, пунктуальная и очень мягкая в общении с детьми. Дочь быстро привыкла.', createdAt: '2026-03-19T12:00:00.000Z' },
+        { id: 304, profileId: 202, clientId: 103, clientName: 'Анна Петрова', rating: 4, text: 'Хороший контакт с ребенком, прогулки и развивающие игры проходили спокойно. Спасибо.', createdAt: '2026-05-22T12:00:00.000Z' }
+      ];
+    }
 
-    observer.observe(document.body);
+    function renderShell(content) {
+      const user = currentUser();
+      app.innerHTML = `
+        <header class="topbar">
+          <button class="burger" id="burgerBtn" type="button">☰</button>
+          <div class="brand" id="homeBtn">ПЛАТФОРМА</div>
+          <div class="user-chip">${user ? esc(user.firstName) + ' · ' + roleTitle(user.role) : 'Гость'}</div>
+          ${user ? '<button class="secondary" id="logoutTopBtn" type="button">Выйти</button>' : '<button id="loginTopBtn" type="button">Войти</button>'}
+        </header>
+        <div class="overlay" id="overlay"></div>
+        <div class="layout">
+          <aside class="sidebar" id="sidebar">${navHTML()}</aside>
+          <main class="content">${content}</main>
+        </div>
+        <div class="overlay" id="modalOverlay"></div>
+        <div class="modal" id="modal"></div>`;
+      bindShell();
+      resize();
+    }
 
-    init();
+    function navHTML() {
+      const user = currentUser();
+      const base = [
+        ['catalog','🔎','Каталог'],
+        ['auth','👤', user ? 'Профиль' : 'Вход'],
+      ];
+      const cabinet = user ? [
+        ['cabinet','🏠','Личный кабинет'],
+        ['messages','✉️','Сообщения'],
+        ['requests','📋','Заявки'],
+        ['settings','⚙️','Настройки']
+      ] : [];
+      return `<div class="nav-title">Навигация</div>${base.concat(cabinet).map(i => `<button class="nav-btn ${state.route === i[0] ? 'active' : ''}" data-route="${i[0]}" type="button"><span>${i[1]}</span><span>${i[2]}</span></button>`).join('')}`;
+    }
+
+    function bindShell() {
+      document.getElementById('burgerBtn').onclick = () => { document.getElementById('sidebar').classList.add('open'); document.getElementById('overlay').classList.add('show'); document.body.classList.add('locked'); };
+      document.getElementById('overlay').onclick = closeDrawer;
+      document.getElementById('homeBtn').onclick = goHome;
+      const login = document.getElementById('loginTopBtn');
+      if (login) login.onclick = () => setRoute('auth');
+      const logout = document.getElementById('logoutTopBtn');
+      if (logout) logout.onclick = doLogout;
+      document.querySelectorAll('[data-route]').forEach(btn => btn.onclick = () => { setRoute(btn.dataset.route); closeDrawer(); });
+    }
+    function closeDrawer() { document.getElementById('sidebar')?.classList.remove('open'); document.getElementById('overlay')?.classList.remove('show'); document.body.classList.remove('locked'); }
+    function setRoute(route) { goToRoute(route); }
+
+    function render() {
+      seed();
+      if (enforcePageAccess()) return;
+      if (state.initialChatProfileId && currentUser()) {
+        const profileId = state.initialChatProfileId;
+        state.initialChatProfileId = null;
+        const conversation = findOrCreateConversation(profileId);
+        if (conversation) {
+          state.activeConversationId = conversation.id;
+          state.route = 'messages';
+        }
+      }
+      if (state.route === 'auth') return renderAuth();
+      if (state.route === 'cabinet') return renderCabinet();
+      if (state.route === 'messages') return renderMessages();
+      if (state.route === 'requests') return renderRequests();
+      if (state.route === 'settings') return renderSettings();
+      if (state.route === 'profile') return renderPublicProfile();
+      return renderCatalog();
+    }
+
+    function renderAuth() {
+      const user = currentUser();
+      if (user) return goToCabinetForUser(user);
+      renderShell(`
+        <div class="auth-wrap">
+          <section class="card auth-card">
+            <div class="tabs">
+              <button class="tab active" id="loginTab" type="button">Вход</button>
+              <button class="tab" id="registerTab" type="button">Регистрация</button>
+            </div>
+            <div id="authBox"></div>
+          </section>
+        </div>`);
+      showLogin();
+      document.getElementById('loginTab').onclick = showLogin;
+      document.getElementById('registerTab').onclick = showRegister;
+    }
+
+    function setAuthTab(type) {
+      document.getElementById('loginTab').classList.toggle('active', type === 'login');
+      document.getElementById('registerTab').classList.toggle('active', type === 'register');
+    }
+    function clearFieldErrors(scope = document) {
+      scope.querySelectorAll('.field-error').forEach(field => field.classList.remove('field-error'));
+    }
+    function markInvalid(field) {
+      if (!field) return;
+      field.classList.add('field-error');
+    }
+    function isEmail(value) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+    }
+    function validateRegistrationForm() {
+      const fields = [
+        document.getElementById('regFirst'),
+        document.getElementById('regLast'),
+        document.getElementById('regEmail'),
+        document.getElementById('regPhone'),
+        document.getElementById('regPassword'),
+        document.getElementById('regRole')
+      ];
+      clearFieldErrors(document.getElementById('authBox'));
+      let valid = true;
+      fields.forEach(field => {
+        if (!String(field.value || '').trim()) {
+          markInvalid(field);
+          valid = false;
+        }
+      });
+      const email = document.getElementById('regEmail');
+      const password = document.getElementById('regPassword');
+      if (email.value.trim() && !isEmail(email.value)) {
+        markInvalid(email);
+        showToast('Введите корректный email');
+        return false;
+      }
+      if (password.value && password.value.length < 8) {
+        markInvalid(password);
+        showToast('Пароль должен быть минимум 8 символов');
+        return false;
+      }
+      if (!valid) showToast('Заполните обязательные поля');
+      return valid;
+    }
+    function showLogin() {
+      setAuthTab('login');
+      document.getElementById('authBox').innerHTML = `
+        <form class="form" id="loginForm" novalidate>
+          <label>Email<input id="loginEmail" type="email" autocomplete="off" autocapitalize="none" spellcheck="false" value=""></label>
+          <label>Пароль<input id="loginPassword" type="password" autocomplete="new-password" value=""></label>
+          <button id="loginBtn" type="submit">Войти</button>
+        </form>`;
+      const loginUser = () => {
+        const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+        const password = document.getElementById('loginPassword').value;
+        clearFieldErrors(document.getElementById('authBox'));
+        if (!email || !password) return showToast('Введите email и пароль');
+        if (email.toLowerCase() === 'admin' || password.toLowerCase() === 'admin') return showToast('Неверный email или пароль');
+        const user = safeUsers().find(u => String(u.email || '').toLowerCase() === email && u.password === password && u.role !== 'admin');
+        if (!user) {
+          markInvalid(document.getElementById('loginEmail'));
+          markInvalid(document.getElementById('loginPassword'));
+          return showToast('Неверный email или пароль');
+        }
+        setCurrentUser(user);
+        localStorage.setItem('mp_is_logged_in', 'true');
+        goToCabinetForUser(user);
+      };
+      document.getElementById('loginForm').onsubmit = event => {
+        event.preventDefault();
+        loginUser();
+      };
+      document.getElementById('loginBtn').onclick = event => {
+        event.preventDefault();
+        loginUser();
+      };
+    }
+    function showRegister() {
+      setAuthTab('register');
+      document.getElementById('authBox').innerHTML = `
+        <div class="form">
+          <div class="form-row"><label>Имя<input id="regFirst" autocomplete="given-name"></label><label>Фамилия<input id="regLast" autocomplete="family-name"></label></div>
+          <div class="form-row"><label>Email<input id="regEmail" type="email" autocomplete="off" autocapitalize="none" spellcheck="false"></label><label>Телефон<input id="regPhone" type="tel" autocomplete="tel"></label></div>
+          <div class="form-row"><label>Пароль<input id="regPassword" type="password" autocomplete="new-password"></label><label>Тип аккаунта<select id="regRole"><option value="tutor">Репетитор</option><option value="nanny">Няня</option><option value="client">Клиент</option></select></label></div>
+          <button id="registerBtn" type="button">Создать аккаунт</button>
+        </div>`;
+      document.getElementById('registerBtn').onclick = () => {
+        const user = {
+          id: id(), role: document.getElementById('regRole').value,
+          firstName: document.getElementById('regFirst').value.trim(),
+          lastName: document.getElementById('regLast').value.trim(),
+          email: document.getElementById('regEmail').value.trim().toLowerCase(),
+          phone: document.getElementById('regPhone').value.trim(),
+          password: document.getElementById('regPassword').value,
+          photo: '',
+          createdAt: new Date().toISOString()
+        };
+        if (!validateRegistrationForm()) return;
+        if (user.email.toLowerCase() === 'admin' || user.password.toLowerCase() === 'admin') return showToast('Используйте другой email и пароль');
+        if (safeUsers().some(u => u.email === user.email)) {
+          markInvalid(document.getElementById('regEmail'));
+          return showToast('Этот email уже зарегистрирован');
+        }
+        write(DB.users, safeUsers().concat(user));
+        sendToTilda('registrationLead', { user: registrationLeadData(user) });
+        sendCrmEvent('registration', { user: registrationLeadData(user) });
+        setCurrentUser(user);
+        localStorage.setItem('mp_is_logged_in', 'true');
+        goToCabinetForUser(user);
+      };
+      document.querySelectorAll('#authBox input, #authBox select').forEach(field => {
+        field.oninput = () => field.classList.remove('field-error');
+        field.onchange = () => field.classList.remove('field-error');
+      });
+    }
+
+    function renderCabinet() {
+      const user = currentUser();
+      if (!user) return goToAuthPage();
+      if (user.role === 'client') return renderClientCabinet(user);
+      const ownProfiles = profiles().filter(p => String(p.userId) === String(user.id));
+      const active = ownProfiles[0];
+      const editingProfile = state.editingProfileId === 'new'
+        ? newProfileDraft(user)
+        : ownProfiles.find(p => String(p.id) === String(state.editingProfileId));
+      renderShell(`
+        <div class="page-head">
+          <h1>Личный кабинет ${roleTitle(user.role).toLowerCase()}</h1>
+          <p class="muted">Создайте анкету, отслеживайте статус, просмотры и отклики.</p>
+        </div>
+        ${editingProfile ? profileFormHTML(editingProfile) : `
+        <div class="grid two">
+          <section class="card profile-card">
+            <div class="avatar">${avatarHTML(user)}</div>
+            <div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">${roleTitle(user.role)}</p><p>${esc(user.email)} · ${esc(user.phone)}</p></div>
+          </section>
+          <section class="card">
+            <div class="between">
+              <div><h2>Анкета</h2><p class="muted">${active ? 'Управляйте публикацией в каталоге.' : 'Анкета еще не создана.'}</p></div>
+              <button id="createProfileBtn" type="button">${active ? 'Редактировать анкету' : 'Разместить анкету'}</button>
+            </div>
+          </section>
+        </div>
+        <br>
+        ${active ? profileManagerHTML(active) : '<div class="empty">Нажмите «Разместить анкету», заполните поля, и анкета появится в каталоге.</div>'}`}`);
+      const createProfileBtn = document.getElementById('createProfileBtn');
+      if (createProfileBtn) createProfileBtn.onclick = () => openProfileForm(active || null);
+      bindProfileActions();
+      if (editingProfile) {
+        bindProfileForm(editingProfile);
+      }
+    }
+
+    function renderClientCabinet(user) {
+      const favItems = favoriteProfiles();
+      renderShell(`
+        <div class="page-head"><h1>Личный кабинет клиента</h1><p class="muted">Избранные специалисты, заявки и сообщения.</p></div>
+        <section class="card profile-card"><div class="avatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p>${esc(user.email)} · ${esc(user.phone)}</p></div></section>
+        <br><div class="grid two">
+          <section class="card"><h2>Быстрый поиск</h2><p class="muted">Откройте каталог и примените фильтры для репетиторов или нянь.</p><br><button id="goCatalogBtn">Открыть каталог</button></section>
+          <section class="card"><h2>Избранное</h2><div class="message-list">${favItems.length ? favItems.map(favoriteCardHTML).join('') : '<p class="muted">Пока пусто.</p>'}</div></section>
+        </div>`);
+      document.getElementById('goCatalogBtn').onclick = () => setRoute('catalog');
+      bindFavoriteCards();
+    }
+
+    function profileManagerHTML(profile) {
+      return `
+        <section class="card catalog-search">
+          <div class="between">
+            <div>
+              <h2>${esc(profile.firstName)} ${esc(profile.lastName)}</h2>
+              <p class="muted">${roleTitle(profile.type)} · ${esc(profile.city)} · ${esc(profile.district)}</p>
+            </div>
+            <span class="status ${profile.status}">${statusText(profile.status)}</span>
+          </div>
+          <br>
+          <div class="grid three">
+            <div><b>${profile.views || 0}</b><p class="muted">просмотров</p></div>
+            <div><b>${profile.responses || 0}</b><p class="muted">откликов</p></div>
+            <div><b>${profile.price} ₽/час</b><p class="muted">стоимость</p></div>
+          </div>
+          <br>
+          <div class="row">
+            <button data-action="publish" data-id="${profile.id}" class="success">Опубликовать</button>
+            <button data-action="hide" data-id="${profile.id}" class="secondary">Скрыть</button>
+            <button data-action="edit" data-id="${profile.id}">Редактировать</button>
+            <button data-action="delete" data-id="${profile.id}" class="danger">Удалить</button>
+          </div>
+        </section>`;
+    }
+
+    function bindProfileActions() {
+      document.querySelectorAll('[data-action]').forEach(btn => btn.onclick = () => {
+        const profile = profiles().find(p => String(p.id) === String(btn.dataset.id));
+        if (!profile) return;
+        if (btn.dataset.action === 'edit') return openProfileForm(profile);
+        if (btn.dataset.action === 'delete') {
+          saveProfiles(profiles().filter(p => String(p.id) !== String(profile.id)));
+          showToast('Анкета удалена');
+          return render();
+        }
+        profile.status = btn.dataset.action === 'publish' ? 'published' : 'hidden';
+        saveProfile(profile);
+        if (profile.status === 'published') sendCrmEvent('profile_published', { profile: crmProfileData(profile), user: registrationLeadData(currentUser() || {}) });
+        showToast(profile.status === 'published' ? 'Анкета опубликована в каталоге' : 'Анкета скрыта');
+        render();
+      });
+    }
+
+    function openProfileForm(profile) {
+      const user = currentUser();
+      state.editingProfileId = profile ? profile.id : 'new';
+      render();
+    }
+
+    function newProfileDraft(user) {
+      return {
+        id: id(), userId: user.id, type: user.role, status: 'draft', views: 0, responses: 0,
+        firstName: user.firstName, lastName: user.lastName, city: '', district: '', photo: user.photo || '',
+        rating: 0, reviewsCount: 0, experienceYears: 0, experienceLevel: 'Начинающий', price: 1000,
+        about: '', keywords: '', subjects: [], educationLevels: [], lessonFormats: [], tutorSkills: [], teachingLanguages: [],
+        childAges: [], employmentTypes: [], nannySkills: [], careMethods: [], extraServices: [],
+        weekdays: [], timeFrom: '09:00', timeTo: '18:00', homeVisit: false, homeWork: false, workConditions: [], territories: []
+      };
+    }
+
+    function profileFormHTML(p) {
+      const type = p.type;
+      const isExisting = profiles().some(profile => String(profile.id) === String(p.id));
+      return `
+        <section class="card" id="profileFormCard">
+        <h2>${isExisting ? 'Редактировать анкету' : 'Разместить анкету'}</h2>
+        <div class="form" id="profileForm">
+          <div class="form-row"><label>Имя<input id="pfFirst" value="${esc(p.firstName)}"></label><label>Фамилия<input id="pfLast" value="${esc(p.lastName)}"></label></div>
+          <div class="form-row"><label>Город<input id="pfCity" value="${esc(p.city)}"></label><label>Район<input id="pfDistrict" value="${esc(p.district)}"></label></div>
+          <div class="form-row"><label>Опыт, лет<input id="pfExpYears" type="number" min="0" value="${esc(p.experienceYears)}"></label><label>Уровень опыта<select id="pfExpLevel">${options(filters.experienceLevels, p.experienceLevel)}</select></label></div>
+          <div class="form-row"><label>Стоимость ₽/час<input id="pfPrice" type="number" min="0" value="${esc(p.price)}"></label><label>Фото<input id="pfPhoto" type="file" accept="image/*"></label></div>
+          <label>Описание<textarea id="pfAbout">${esc(p.about)}</textarea></label>
+          <label>Ключевые слова<input id="pfKeywords" value="${esc(p.keywords)}" placeholder="математика, няня, развитие, экзамены"></label>
+          ${type === 'tutor' ? tutorFields(p) : nannyFields(p)}
+          ${commonFields(p)}
+          <div class="row"><button id="saveDraftBtn" type="button" class="secondary">Сохранить черновик</button><button id="sendReviewBtn" type="button">Сохранить и опубликовать</button><button id="closeModalBtn" type="button" class="secondary">Закрыть</button></div>
+        </div>
+        </section>`;
+    }
+
+    function bindProfileForm(p) {
+      document.getElementById('closeModalBtn').onclick = () => { state.editingProfileId = null; render(); };
+      document.getElementById('pfPhoto').onchange = event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { p.photo = reader.result; };
+        reader.readAsDataURL(file);
+      };
+      document.getElementById('saveDraftBtn').onclick = () => saveProfileFromForm(p, 'draft');
+      document.getElementById('sendReviewBtn').onclick = () => saveProfileFromForm(p, 'published');
+    }
+
+    function options(items, selected) { return items.map(i => `<option value="${esc(i)}" ${i === selected ? 'selected' : ''}>${esc(i)}</option>`).join(''); }
+    function checks(name, items, selected = []) { return `<div class="check-list">${items.map(i => `<label class="check-item"><input type="checkbox" name="${name}" value="${esc(i)}" ${selected.includes(i) ? 'checked' : ''}>${esc(i)}</label>`).join('')}</div>`; }
+    function tutorFields(p) {
+      return `<section class="card"><h3>Поля репетитора</h3><div class="filter-grid">
+        <label>Предметы${checks('subjects', filters.tutorSubjects, p.subjects)}</label>
+        <label>Уровень образования${checks('educationLevels', filters.educationLevels, p.educationLevels)}</label>
+        <label>Формат занятий${checks('lessonFormats', filters.lessonFormats, p.lessonFormats)}</label>
+        <label>Дополнительные навыки${checks('tutorSkills', filters.tutorSkills, p.tutorSkills)}</label>
+        <label>Язык преподавания${checks('teachingLanguages', filters.teachingLanguages, p.teachingLanguages)}</label>
+      </div></section>`;
+    }
+    function nannyFields(p) {
+      return `<section class="card"><h3>Поля няни</h3><div class="filter-grid">
+        <label>Возраст детей${checks('childAges', filters.childAges, p.childAges)}</label>
+        <label>Тип занятости${checks('employmentTypes', filters.employmentTypes, p.employmentTypes)}</label>
+        <label>Навыки и квалификации${checks('nannySkills', filters.nannySkills, p.nannySkills)}</label>
+        <label>Методы ухода${checks('careMethods', filters.careMethods, p.careMethods)}</label>
+        <label>Дополнительные услуги${checks('extraServices', filters.extraServices, p.extraServices)}</label>
+      </div></section>`;
+    }
+    function commonFields(p) {
+      return `<section class="card"><h3>Общие условия</h3><div class="form-row"><label>Дни недели${checks('weekdays', filters.weekdays, p.weekdays)}</label><label>Территория${checks('territories', filters.territories, p.territories)}</label></div>
+        <div class="form-row"><label>Начало работы<input id="pfTimeFrom" type="time" value="${esc(p.timeFrom)}"></label><label>Конец работы<input id="pfTimeTo" type="time" value="${esc(p.timeTo)}"></label></div>
+        <label>Условия работы${checks('workConditions', filters.workConditions, p.workConditions)}</label>
+        <div class="row"><label class="check-item"><input id="pfHomeVisit" type="checkbox" ${p.homeVisit ? 'checked' : ''}>Выезд на дом</label><label class="check-item"><input id="pfHomeWork" type="checkbox" ${p.homeWork ? 'checked' : ''}>Работа на дому</label></div></section>`;
+    }
+
+    function selectedChecks(name) { return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(i => i.value); }
+    function saveProfileFromForm(p, status) {
+      Object.assign(p, {
+        firstName: document.getElementById('pfFirst').value.trim(),
+        lastName: document.getElementById('pfLast').value.trim(),
+        city: document.getElementById('pfCity').value.trim(),
+        district: document.getElementById('pfDistrict').value.trim(),
+        experienceYears: Number(document.getElementById('pfExpYears').value || 0),
+        experienceLevel: document.getElementById('pfExpLevel').value,
+        price: Number(document.getElementById('pfPrice').value || 0),
+        about: document.getElementById('pfAbout').value.trim(),
+        keywords: document.getElementById('pfKeywords').value.trim(),
+        status,
+        subjects: selectedChecks('subjects'), educationLevels: selectedChecks('educationLevels'), lessonFormats: selectedChecks('lessonFormats'),
+        tutorSkills: selectedChecks('tutorSkills'), teachingLanguages: selectedChecks('teachingLanguages'), childAges: selectedChecks('childAges'),
+        employmentTypes: selectedChecks('employmentTypes'), nannySkills: selectedChecks('nannySkills'), careMethods: selectedChecks('careMethods'),
+        extraServices: selectedChecks('extraServices'), weekdays: selectedChecks('weekdays'), territories: selectedChecks('territories'),
+        workConditions: selectedChecks('workConditions'), timeFrom: document.getElementById('pfTimeFrom').value, timeTo: document.getElementById('pfTimeTo').value,
+        homeVisit: document.getElementById('pfHomeVisit').checked, homeWork: document.getElementById('pfHomeWork').checked
+      });
+      clearFieldErrors(document.getElementById('profileForm'));
+      const requiredProfileFields = [
+        ['pfFirst', p.firstName],
+        ['pfCity', p.city],
+        ['pfAbout', p.about],
+        ['pfPrice', p.price]
+      ];
+      const missing = requiredProfileFields.filter(([, value]) => !String(value || '').trim() || Number(value) === 0);
+      if (missing.length) {
+        missing.forEach(([fieldId]) => markInvalid(document.getElementById(fieldId)));
+        return showToast('Заполните имя, город, описание и стоимость');
+      }
+      saveProfile(p);
+      if (status === 'published') sendCrmEvent('profile_published', { profile: crmProfileData(p), user: registrationLeadData(currentUser() || {}) });
+      state.editingProfileId = null;
+      showToast(status === 'published' ? 'Анкета опубликована' : 'Черновик сохранен');
+      render();
+    }
+    function saveProfile(profile) {
+      const list = profiles();
+      const index = list.findIndex(p => String(p.id) === String(profile.id));
+      if (index >= 0) list[index] = profile; else list.push(profile);
+      saveProfiles(list);
+    }
+
+    function renderCatalog() {
+      const items = filteredProfiles();
+      const pages = Math.max(1, Math.ceil(items.length / state.perPage));
+      if (state.page > pages) state.page = pages;
+      const pageItems = items.slice((state.page - 1) * state.perPage, state.page * state.perPage);
+      renderShell(`
+        <div class="page-head">
+          <h1>Каталог специалистов</h1>
+          <p class="muted">Поиск по имени, услуге, предмету, городу и ключевым словам. Фильтры для нянь и репетиторов меняются автоматически.</p>
+        </div>
+        <section class="card">
+          <div class="form-row">
+            <label>Поиск<input id="searchQ" value="${esc(state.search.q)}" placeholder="Например: математика, няня, Москва, ОГЭ"></label>
+            <label>Тип специалиста<select id="typeFilter"><option value="all">Все</option><option value="tutor" ${state.search.type === 'tutor' ? 'selected' : ''}>Репетиторы</option><option value="nanny" ${state.search.type === 'nanny' ? 'selected' : ''}>Няни</option></select></label>
+          </div>
+          <br><button id="mobileFilterBtn" class="mobile-filter secondary" type="button">⚙️ Фильтры</button>
+        </section>
+        <div class="catalog-shell">
+          <aside class="filters card" id="filtersPanel">${filtersHTML()}</aside>
+          <section>
+            <div class="between catalog-toolbar"><b>Найдено ${items.length}</b><label>Сортировка<select id="sortFilter">${sortOptions()}</select></label></div>
+            <div class="grid three results-grid">${pageItems.length ? pageItems.map(cardHTML).join('') : '<div class="empty">Специалисты не найдены. Измените фильтры или поисковый запрос.</div>'}</div>
+            <div class="pagination">${Array.from({length: pages}, (_, i) => `<button class="page-btn ${state.page === i + 1 ? 'active' : ''}" data-page="${i + 1}" type="button">${i + 1}</button>`).join('')}</div>
+          </section>
+        </div>`);
+      bindCatalog();
+    }
+
+    function filtersHTML() {
+      const s = state.search;
+      const type = s.type;
+      const tutor = type !== 'nanny';
+      const nanny = type !== 'tutor';
+      return `
+        <div class="between"><h2>Фильтры</h2><button id="closeFiltersBtn" class="secondary mobile-filter" type="button">Закрыть</button></div>
+        <div class="filter-grid">
+          <label>Город<input data-filter="city" value="${esc(s.city)}"></label>
+          <label>Район<input data-filter="district" value="${esc(s.district)}"></label>
+          <div class="form-row"><label>Цена от<input data-filter="priceMin" type="number" value="${esc(s.priceMin)}"></label><label>Цена до<input data-filter="priceMax" type="number" value="${esc(s.priceMax)}"></label></div>
+          <div class="form-row"><label>Рейтинг от<input data-filter="ratingMin" type="number" step="0.1" value="${esc(s.ratingMin)}"></label><label>Отзывы от<input data-filter="reviewsMin" type="number" value="${esc(s.reviewsMin)}"></label></div>
+          <label>Опыт<select data-filter="experienceLevel"><option value="">Любой</option>${options(filters.experienceLevels, s.experienceLevel)}</select></label>
+          ${tutor ? `<label>Предмет<select data-filter="subject"><option value="">Любой</option>${options(filters.tutorSubjects, s.subject)}</select></label>
+          <label>Уровень образования<select data-filter="educationLevel"><option value="">Любой</option>${options(filters.educationLevels, s.educationLevel)}</select></label>
+          <label>Формат занятий<select data-filter="lessonFormat"><option value="">Любой</option>${options(filters.lessonFormats, s.lessonFormat)}</select></label>
+          <label>Навык<select data-filter="tutorSkill"><option value="">Любой</option>${options(filters.tutorSkills, s.tutorSkill)}</select></label>
+          <label>Язык<select data-filter="language"><option value="">Любой</option>${options(filters.teachingLanguages, s.language)}</select></label>` : ''}
+          ${nanny ? `<label>Возраст детей<select data-filter="childAge"><option value="">Любой</option>${options(filters.childAges, s.childAge)}</select></label>
+          <label>Тип занятости<select data-filter="employmentType"><option value="">Любой</option>${options(filters.employmentTypes, s.employmentType)}</select></label>
+          <label>Навык няни<select data-filter="nannySkill"><option value="">Любой</option>${options(filters.nannySkills, s.nannySkill)}</select></label>
+          <label>Метод ухода<select data-filter="careMethod"><option value="">Любой</option>${options(filters.careMethods, s.careMethod)}</select></label>
+          <label>Доп. услуга<select data-filter="extraService"><option value="">Любая</option>${options(filters.extraServices, s.extraService)}</select></label>` : ''}
+          <label>День недели<select data-filter="weekday"><option value="">Любой</option>${options(filters.weekdays, s.weekday)}</select></label>
+          <label>Территория<select data-filter="territory"><option value="">Любая</option>${options(filters.territories, s.territory)}</select></label>
+          <label>Выезд / дом<select data-filter="homeVisit"><option value="">Не важно</option><option value="yes" ${s.homeVisit === 'yes' ? 'selected' : ''}>Выезд на дом</option></select></label>
+          <button id="resetFiltersBtn" class="secondary" type="button">Сбросить фильтры</button>
+        </div>`;
+    }
+    function sortOptions() {
+      return [['rating','По рейтингу'],['priceAsc','Сначала дешевле'],['priceDesc','Сначала дороже'],['reviews','По отзывам'],['responses','По откликам']].map(([v,t]) => `<option value="${v}" ${state.search.sort === v ? 'selected' : ''}>${t}</option>`).join('');
+    }
+
+    function filteredProfiles() {
+      const s = state.search;
+      const q = s.q.trim().toLowerCase();
+      let items = profiles().filter(p => p.status === 'published');
+      items = items.filter(p => {
+        if (s.type !== 'all' && p.type !== s.type) return false;
+        const hay = [p.firstName, p.lastName, p.city, p.district, p.about, p.keywords, ...(p.subjects || []), ...(p.extraServices || []), ...(p.nannySkills || []), ...(p.tutorSkills || [])].join(' ').toLowerCase();
+        if (q && !hay.includes(q)) return false;
+        if (s.city && !String(p.city).toLowerCase().includes(s.city.toLowerCase())) return false;
+        if (s.district && !String(p.district).toLowerCase().includes(s.district.toLowerCase())) return false;
+        if (s.priceMin && Number(p.price) < Number(s.priceMin)) return false;
+        if (s.priceMax && Number(p.price) > Number(s.priceMax)) return false;
+        if (s.ratingMin && Number(p.rating || 0) < Number(s.ratingMin)) return false;
+        if (s.reviewsMin && Number(p.reviewsCount || 0) < Number(s.reviewsMin)) return false;
+        if (s.experienceLevel && p.experienceLevel !== s.experienceLevel) return false;
+        if (s.subject && !(p.subjects || []).includes(s.subject)) return false;
+        if (s.educationLevel && !(p.educationLevels || []).includes(s.educationLevel)) return false;
+        if (s.lessonFormat && !(p.lessonFormats || []).includes(s.lessonFormat)) return false;
+        if (s.tutorSkill && !(p.tutorSkills || []).includes(s.tutorSkill)) return false;
+        if (s.language && !(p.teachingLanguages || []).includes(s.language)) return false;
+        if (s.childAge && !(p.childAges || []).includes(s.childAge)) return false;
+        if (s.employmentType && !(p.employmentTypes || []).includes(s.employmentType)) return false;
+        if (s.nannySkill && !(p.nannySkills || []).includes(s.nannySkill)) return false;
+        if (s.careMethod && !(p.careMethods || []).includes(s.careMethod)) return false;
+        if (s.extraService && !(p.extraServices || []).includes(s.extraService)) return false;
+        if (s.weekday && !(p.weekdays || []).includes(s.weekday)) return false;
+        if (s.territory && !(p.territories || []).includes(s.territory)) return false;
+        if (s.homeVisit === 'yes' && !p.homeVisit) return false;
+        return true;
+      });
+      items.sort((a,b) => {
+        if (s.sort === 'priceAsc') return Number(a.price) - Number(b.price);
+        if (s.sort === 'priceDesc') return Number(b.price) - Number(a.price);
+        if (s.sort === 'reviews') return Number(b.reviewsCount || 0) - Number(a.reviewsCount || 0);
+        if (s.sort === 'responses') return Number(b.responses || 0) - Number(a.responses || 0);
+        return Number(b.rating || 0) - Number(a.rating || 0);
+      });
+      return items;
+    }
+
+    function cardHTML(p) {
+      return `<article class="specialist-card">
+        <div class="specialist-top"><div class="avatar">${p.photo ? `<img src="${p.photo}" alt="">` : initials(p)}</div><div><h3>${esc(p.firstName)} ${esc(p.lastName)}</h3><span class="pill">${roleTitle(p.type)}</span></div></div>
+        <div class="card-meta"><span>📍 ${esc(p.city)}${p.district ? ', ' + esc(p.district) : ''}</span><span class="rating">★ ${esc(p.rating || '0.0')}</span><span>${esc(p.reviewsCount || 0)} отзывов</span></div>
+        <div class="card-meta"><span>${esc(p.experienceLevel)}</span><span>${esc(p.experienceYears)} лет опыта</span></div>
+        <div class="price">${esc(p.price)} ₽/час</div>
+        <p>${esc(String(p.about || '').slice(0, 150))}${String(p.about || '').length > 150 ? '...' : ''}</p>
+        <div class="row">${(p.subjects || p.childAges || []).slice(0, 3).map(x => `<span class="pill">${esc(x)}</span>`).join('')}</div>
+        <div class="card-actions"><button data-view-profile="${p.id}" type="button">Открыть карточку</button><button data-write="${p.id}" class="secondary" type="button">Написать</button><button data-request="${p.id}" class="secondary" type="button">Оставить заявку</button><button data-favorite="${p.id}" class="secondary" type="button">В избранное</button></div>
+      </article>`;
+    }
+    function cardMini(p) { return `<b>${esc(p.firstName)} ${esc(p.lastName)}</b><p class="muted">${roleTitle(p.type)} · ${esc(p.city)} · ${esc(p.price)} ₽/час</p>`; }
+    function favoriteCardHTML(p) {
+      return `<div class="message-item">
+        <div class="profile-card">
+          <div class="avatar">${avatarHTML(p)}</div>
+          <div>
+            <button class="ghost" data-view-profile="${p.id}" type="button"><b>${esc(p.firstName)} ${esc(p.lastName)}</b></button>
+            <p class="muted">${roleTitle(p.type)} · ${esc(p.city)} · ${esc(p.price)} ₽/час</p>
+            <p>${esc(String(p.about || '').slice(0, 92))}${String(p.about || '').length > 92 ? '...' : ''}</p>
+          </div>
+        </div>
+        <br>
+        <div class="card-actions">
+          <button data-view-profile="${p.id}" type="button">Открыть карточку</button>
+          <button data-write="${p.id}" class="secondary" type="button">Написать</button>
+          <button data-remove-favorite="${p.id}" class="secondary" type="button">Убрать из избранного</button>
+        </div>
+      </div>`;
+    }
+    function favoriteProfiles() {
+      const user = currentUser();
+      const fav = user?.favorites || [];
+      return profiles().filter(p => fav.map(String).includes(String(p.id)));
+    }
+    function reviews() { return read(DB.reviews, []); }
+    function saveReviews(items) { write(DB.reviews, items); }
+    function profileReviews(profileId) {
+      return reviews()
+        .filter(review => String(review.profileId) === String(profileId))
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+    function stars(value) {
+      const count = Math.max(0, Math.min(5, Number(value) || 0));
+      return '★'.repeat(count) + '☆'.repeat(5 - count);
+    }
+    function reviewsHTML(profile) {
+      const items = profileReviews(profile.id);
+      return `
+        <section class="card">
+          <div class="between">
+            <div>
+              <h2>Отзывы</h2>
+              <p class="muted">${items.length ? 'Отзывы клиентов о работе специалиста.' : 'Пока отзывов нет. Можно стать первым.'}</p>
+            </div>
+            <div class="rating">★ ${esc(profile.rating || '0.0')} · ${items.length} отзывов</div>
+          </div>
+          <br>
+          <div class="message-list">
+            ${items.length ? items.map(review => `<div class="message-item">
+              <div class="between">
+                <div><b>${esc(review.clientName || 'Клиент')}</b><p class="rating">${stars(review.rating)}</p></div>
+                <span class="muted">${new Date(review.createdAt).toLocaleDateString('ru-RU')}</span>
+              </div>
+              <p>${esc(review.text)}</p>
+            </div>`).join('') : '<p class="muted">Отзывов пока нет.</p>'}
+          </div>
+          <br>
+          ${reviewFormHTML(profile)}
+        </section>`;
+    }
+    function reviewFormHTML(profile) {
+      const user = currentUser();
+      if (!user) return '<p class="muted">Войдите как клиент, чтобы оставить отзыв.</p>';
+      if (user.role !== 'client') return '<p class="muted">Отзывы могут оставлять клиенты.</p>';
+      if (String(profile.userId) === String(user.id)) return '<p class="muted">Нельзя оставить отзыв на собственную анкету.</p>';
+      const own = profileReviews(profile.id).find(review => String(review.clientId) === String(user.id));
+      return `<div class="form">
+        <h3>${own ? 'Обновить свой отзыв' : 'Добавить отзыв'}</h3>
+        <div class="form-row">
+          <label>Оценка
+            <select id="reviewRating">
+              ${[5,4,3,2,1].map(v => `<option value="${v}" ${Number(own?.rating || 5) === v ? 'selected' : ''}>${v} ${stars(v)}</option>`).join('')}
+            </select>
+          </label>
+        </div>
+        <label>Текст отзыва<textarea id="reviewText" placeholder="Расскажите, как прошли занятия или работа со специалистом">${esc(own?.text || '')}</textarea></label>
+        <button id="saveReviewBtn" type="button">${own ? 'Сохранить отзыв' : 'Опубликовать отзыв'}</button>
+      </div>`;
+    }
+    function bindReviews(profile) {
+      const btn = document.getElementById('saveReviewBtn');
+      if (!btn) return;
+      btn.onclick = () => saveReview(profile.id);
+    }
+    function saveReview(profileId) {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      if (user.role !== 'client') return showToast('Отзывы могут оставлять клиенты');
+      const text = document.getElementById('reviewText')?.value.trim();
+      const rating = Number(document.getElementById('reviewRating')?.value || 5);
+      if (!text || text.length < 10) return showToast('Напишите отзыв минимум 10 символов');
+      const profile = profiles().find(p => String(p.id) === String(profileId));
+      if (!profile) return showToast('Анкета не найдена');
+      if (String(profile.userId) === String(user.id)) return showToast('Нельзя оставить отзыв на свою анкету');
+      const items = reviews();
+      const existing = items.find(review => String(review.profileId) === String(profileId) && String(review.clientId) === String(user.id));
+      if (existing) {
+        existing.rating = rating;
+        existing.text = text;
+        existing.updatedAt = new Date().toISOString();
+      } else {
+        items.push({
+          id: id(),
+          profileId,
+          clientId: user.id,
+          clientName: `${user.firstName || 'Клиент'} ${user.lastName || ''}`.trim(),
+          rating,
+          text,
+          createdAt: new Date().toISOString()
+        });
+      }
+      saveReviews(items);
+      recalcProfileRating(profileId);
+      showToast(existing ? 'Отзыв обновлен' : 'Отзыв опубликован');
+      renderPublicProfile();
+    }
+    function recalcProfileRating(profileId) {
+      const items = profileReviews(profileId);
+      const rating = items.length ? (items.reduce((sum, item) => sum + Number(item.rating || 0), 0) / items.length).toFixed(1) : 0;
+      saveProfiles(profiles().map(profile => String(profile.id) === String(profileId)
+        ? Object.assign({}, profile, { rating, reviewsCount: items.length })
+        : profile
+      ));
+    }
+    function bindFavoriteCards() {
+      document.querySelectorAll('[data-view-profile]').forEach(btn => btn.onclick = () => openPublicProfile(btn.dataset.viewProfile));
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
+      document.querySelectorAll('[data-remove-favorite]').forEach(btn => btn.onclick = () => removeFavorite(btn.dataset.removeFavorite));
+    }
+    function removeFavorite(profileId) {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      user.favorites = (user.favorites || []).filter(id => String(id) !== String(profileId));
+      setCurrentUser(user);
+      write(DB.users, users().map(u => String(u.id) === String(user.id) ? user : u));
+      showToast('Удалено из избранного');
+      renderClientCabinet(user);
+    }
+    function openPublicProfile(profileId) {
+      if (!requireLogin()) return;
+      if (isSplitMode() && APP_PAGE !== 'profile') {
+        goToPage('profile', { profileId });
+        return;
+      }
+      state.viewProfileId = profileId;
+      state.route = 'profile';
+      render();
+    }
+
+    function renderPublicProfile() {
+      const profile = profiles().find(p => String(p.id) === String(state.viewProfileId));
+      if (!profile) {
+        renderShell(`<div class="empty"><h1>Специалист не найден</h1><p>Анкета могла быть удалена или скрыта.</p><br><button id="backCatalogBtn">В каталог</button></div>`);
+        document.getElementById('backCatalogBtn').onclick = () => setRoute('catalog');
+        return;
+      }
+      profile.views = Number(profile.views || 0) + 1;
+      saveProfile(profile);
+      const tags = [].concat(profile.subjects || [], profile.childAges || [], profile.lessonFormats || [], profile.employmentTypes || []).slice(0, 8);
+      renderShell(`
+        <div class="page-head">
+          <button class="secondary" id="backCabinetBtn" type="button">← Назад</button>
+          <h1>${esc(profile.firstName)} ${esc(profile.lastName)}</h1>
+          <p class="muted">${roleTitle(profile.type)} · ${esc(profile.city)}${profile.district ? ', ' + esc(profile.district) : ''}</p>
+        </div>
+        <section class="card">
+          <div class="profile-card">
+            <div class="avatar">${avatarHTML(profile)}</div>
+            <div>
+              <h2>${esc(profile.firstName)} ${esc(profile.lastName)}</h2>
+              <p><span class="pill">${roleTitle(profile.type)}</span></p>
+              <p class="rating">★ ${esc(profile.rating || '0.0')} · ${esc(profile.reviewsCount || 0)} отзывов</p>
+              <p class="price">${esc(profile.price)} ₽/час</p>
+            </div>
+          </div>
+          <br>
+          <div class="row">${tags.map(x => `<span class="pill">${esc(x)}</span>`).join('')}</div>
+          <br>
+          <h2>О специалисте</h2>
+          <p>${esc(profile.about || 'Описание пока не заполнено.')}</p>
+          <br>
+          <div class="grid three">
+            <div><b>${esc(profile.experienceLevel || 'Не указан')}</b><p class="muted">уровень опыта</p></div>
+            <div><b>${esc(profile.experienceYears || 0)} лет</b><p class="muted">опыт работы</p></div>
+            <div><b>${esc(profile.views || 0)}</b><p class="muted">просмотров</p></div>
+          </div>
+          <br>
+          <div class="card-actions">
+            <button data-write="${profile.id}" type="button">Написать</button>
+            <button data-request="${profile.id}" class="secondary" type="button">Оставить заявку</button>
+            <button data-favorite="${profile.id}" class="secondary" type="button">В избранное</button>
+          </div>
+        </section>
+        <br>
+        ${reviewsHTML(profile)}`);
+      document.getElementById('backCabinetBtn').onclick = () => {
+        setRoute(currentUser()?.role === 'client' ? 'cabinet' : 'catalog');
+      };
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
+      document.querySelectorAll('[data-request]').forEach(btn => btn.onclick = () => makeRequest(btn.dataset.request));
+      document.querySelectorAll('[data-favorite]').forEach(btn => btn.onclick = () => addFavorite(btn.dataset.favorite));
+      bindReviews(profile);
+    }
+
+    function bindCatalog() {
+      const searchQ = document.getElementById('searchQ');
+      searchQ.oninput = () => { state.search.q = searchQ.value; state.page = 1; scheduleCatalogRender('#searchQ'); };
+      document.getElementById('typeFilter').onchange = e => { state.search.type = e.target.value; state.page = 1; renderCatalog(); };
+      document.getElementById('sortFilter').onchange = e => { state.search.sort = e.target.value; renderCatalog(); };
+      document.querySelectorAll('[data-filter]').forEach(el => {
+        if (el.tagName === 'INPUT') {
+          el.oninput = () => { state.search[el.dataset.filter] = el.value; state.page = 1; scheduleCatalogRender('[data-filter="' + el.dataset.filter + '"]'); };
+        } else {
+          el.onchange = () => { state.search[el.dataset.filter] = el.value; state.page = 1; renderCatalog(); };
+        }
+      });
+      document.getElementById('resetFiltersBtn').onclick = () => { Object.keys(state.search).forEach(k => state.search[k] = k === 'type' ? 'all' : k === 'sort' ? 'rating' : ''); state.page = 1; renderCatalog(); };
+      document.querySelectorAll('[data-page]').forEach(btn => btn.onclick = () => { state.page = Number(btn.dataset.page); renderCatalog(); window.scrollTo({top:0, behavior:'smooth'}); });
+      document.querySelectorAll('[data-view-profile]').forEach(btn => btn.onclick = () => openPublicProfile(btn.dataset.viewProfile));
+      document.querySelectorAll('[data-favorite]').forEach(btn => btn.onclick = () => addFavorite(btn.dataset.favorite));
+      document.querySelectorAll('[data-write]').forEach(btn => btn.onclick = () => openChat(btn.dataset.write));
+      document.querySelectorAll('[data-request]').forEach(btn => btn.onclick = () => makeRequest(btn.dataset.request));
+      const mobileFilterBtn = document.getElementById('mobileFilterBtn');
+      mobileFilterBtn.onclick = () => document.getElementById('filtersPanel').classList.toggle('open');
+      const close = document.getElementById('closeFiltersBtn');
+      if (close) close.onclick = () => document.getElementById('filtersPanel').classList.remove('open');
+    }
+
+    function requireLogin() {
+      if (currentUser()) return true;
+      showToast('Войдите или зарегистрируйтесь');
+      if (isSplitMode() && APP_PAGE !== 'auth') {
+        setTimeout(() => goToPage('auth'), 700);
+      } else {
+        state.route = 'auth';
+        setTimeout(render, 700);
+      }
+      return false;
+    }
+    function addFavorite(profileId) {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      user.favorites = user.favorites || [];
+      if (!user.favorites.map(String).includes(String(profileId))) user.favorites.push(profileId);
+      setCurrentUser(user);
+      write(DB.users, users().map(u => String(u.id) === String(user.id) ? user : u));
+      showToast('Добавлено в избранное');
+    }
+    function conversations() { return read(DB.messages, []); }
+    function saveConversations(items) { write(DB.messages, items); }
+    function findOrCreateConversation(profileId) {
+      if (!requireLogin()) return;
+      const profile = profiles().find(p => String(p.id) === String(profileId));
+      const user = currentUser();
+      if (!profile) return null;
+      if (user.role !== 'client') {
+        showToast('Написать специалисту можно из клиентского аккаунта');
+        return null;
+      }
+      if (String(profile.userId) === String(user.id)) {
+        showToast('Это ваша анкета');
+        return null;
+      }
+      let list = conversations();
+      let conversation = list.find(item => {
+        if (String(item.profileId) !== String(profile.id)) return false;
+        return String(item.clientId) === String(user.id);
+      });
+      if (!conversation) {
+        conversation = {
+          id: id(),
+          profileId: profile.id,
+          specialistUserId: profile.userId,
+          clientId: user.id,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          messages: []
+        };
+        list.push(conversation);
+        saveConversations(list);
+      }
+      return conversation;
+    }
+    function openChat(profileId) {
+      const conversation = findOrCreateConversation(profileId);
+      if (!conversation) return;
+      if (isSplitMode() && APP_PAGE !== pageForRoute('messages')) {
+        goToPage(pageForRoute('messages'), { route: 'messages', chatProfileId: profileId });
+        return;
+      }
+      state.activeConversationId = conversation.id;
+      state.route = 'messages';
+      renderMessages();
+    }
+    function makeRequest(profileId) {
+      if (!requireLogin()) return;
+      const profile = profiles().find(p => String(p.id) === String(profileId));
+      const list = read(DB.requests, []);
+      const request = { id: id(), profileId, specialistUserId: profile.userId, clientId: currentUser().id, status: 'new', text: 'Новая заявка из каталога', createdAt: new Date().toISOString() };
+      list.push(request);
+      write(DB.requests, list);
+      profile.responses = Number(profile.responses || 0) + 1;
+      saveProfile(profile);
+      sendToTilda('requestLead', { request: requestLeadData(profile, request) });
+      sendCrmEvent('request', { request: requestLeadData(profile, request) });
+      showToast('Заявка отправлена');
+    }
+
+    function renderMessages() {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      const list = conversations().filter(item => {
+        if (String(item.clientId) === String(user.id)) return true;
+        if (String(item.specialistUserId) === String(user.id)) return true;
+        return false;
+      });
+      if (!state.activeConversationId && list.length) state.activeConversationId = list[0].id;
+      const active = list.find(item => String(item.id) === String(state.activeConversationId)) || list[0] || null;
+      const activeProfile = active ? profiles().find(p => String(p.id) === String(active.profileId)) : null;
+      renderShell(`
+        <div class="page-head"><h1>Сообщения</h1><p class="muted">Диалоги между клиентами и специалистами.</p></div>
+        <div class="chat-layout">
+          <section class="card dialogs-list">
+            ${list.length ? list.map(item => dialogButtonHTML(item)).join('') : '<p class="muted">Диалогов пока нет. Нажмите «Написать» в каталоге.</p>'}
+          </section>
+          <section class="card chat-panel">
+            ${active ? chatPanelHTML(active, activeProfile, user) : '<div class="empty">Выберите диалог или напишите специалисту из каталога.</div>'}
+          </section>
+        </div>`);
+      document.querySelectorAll('[data-dialog]').forEach(btn => btn.onclick = () => { state.activeConversationId = Number(btn.dataset.dialog); renderMessages(); });
+      const input = document.getElementById('chatInput');
+      const send = document.getElementById('sendChatBtn');
+      if (input && send && active) {
+        const submit = () => sendChatMessage(active.id);
+        send.onclick = submit;
+        input.onkeydown = event => { if (event.key === 'Enter') { event.preventDefault(); submit(); } };
+        setTimeout(() => {
+          const body = document.getElementById('chatBody');
+          if (body) body.scrollTop = body.scrollHeight;
+        }, 0);
+      }
+    }
+    function dialogButtonHTML(conversation) {
+      const profile = profiles().find(p => String(p.id) === String(conversation.profileId));
+      const client = users().find(u => String(u.id) === String(conversation.clientId));
+      const user = currentUser();
+      const title = user.role === 'client'
+        ? `${profile?.firstName || 'Специалист'} ${profile?.lastName || ''}`.trim()
+        : `${client?.firstName || 'Клиент'} ${client?.lastName || ''}`.trim();
+      const last = conversation.messages[conversation.messages.length - 1];
+      const avatarSource = user.role === 'client' ? profile : client;
+      return `<button class="dialog-btn ${String(state.activeConversationId) === String(conversation.id) ? 'active' : ''}" data-dialog="${conversation.id}" type="button">
+        <div class="avatar">${avatarHTML(avatarSource || {})}</div>
+        <div><b>${esc(title || 'Диалог')}</b><p class="muted">${last ? esc(last.text).slice(0, 54) : 'Диалог создан'}</p></div>
+      </button>`;
+    }
+    function chatPanelHTML(conversation, profile, user) {
+      const client = users().find(u => String(u.id) === String(conversation.clientId));
+      const title = user.role === 'client'
+        ? `${profile?.firstName || 'Специалист'} ${profile?.lastName || ''}`.trim()
+        : `${client?.firstName || 'Клиент'} ${client?.lastName || ''}`.trim();
+      return `
+        <div class="chat-head"><h2>${esc(title || 'Диалог')}</h2><p class="muted">${profile ? roleTitle(profile.type) + ' · ' + esc(profile.city || '') : 'Переписка'}</p></div>
+        <div class="chat-body" id="chatBody">
+          ${conversation.messages.length ? conversation.messages.map(message => `<div class="bubble ${String(message.senderId) === String(user.id) ? 'mine' : ''}"><p>${esc(message.text)}</p><small>${new Date(message.createdAt).toLocaleString('ru-RU')}</small></div>`).join('') : '<p class="muted">Напишите первое сообщение.</p>'}
+        </div>
+        <div class="chat-form"><input id="chatInput" placeholder="Введите сообщение..."><button id="sendChatBtn" type="button">Отправить</button></div>`;
+    }
+    function sendChatMessage(conversationId) {
+      const input = document.getElementById('chatInput');
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+      const user = currentUser();
+      const list = conversations();
+      const conversation = list.find(item => String(item.id) === String(conversationId));
+      if (!conversation) return;
+      conversation.messages.push({ id: id(), senderId: user.id, text, createdAt: new Date().toISOString(), isRead: false });
+      conversation.updatedAt = new Date().toISOString();
+      const profile = profiles().find(p => String(p.id) === String(conversation.profileId));
+      if (profile && String(profile.userId) !== String(user.id) && conversation.messages.length === 1) {
+        profile.responses = Number(profile.responses || 0) + 1;
+        saveProfile(profile);
+      }
+      saveConversations(list);
+      renderMessages();
+    }
+    function renderRequests() {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      const list = read(DB.requests, []).filter(r => String(r.clientId) === String(user.id) || String(r.specialistUserId) === String(user.id));
+      renderShell(`<div class="page-head"><h1>Заявки</h1><p class="muted">Новые, принятые и завершенные обращения.</p></div><section class="card message-list">${list.length ? list.map(r => `<div class="request-item between"><div><b>Заявка #${r.id}</b><p>${esc(r.text)}</p><p class="muted">${new Date(r.createdAt).toLocaleString('ru-RU')}</p></div><span class="status review">${esc(r.status)}</span></div>`).join('') : '<p class="muted">Заявок пока нет.</p>'}</section>`);
+    }
+    function renderSettings() {
+      if (!requireLogin()) return;
+      const user = currentUser();
+      renderShell(`<div class="page-head"><h1>Настройки профиля</h1></div><section class="card form" id="settingsForm"><div class="profile-card"><div class="avatar" id="settingsAvatar">${avatarHTML(user)}</div><div><h2>${esc(user.firstName)} ${esc(user.lastName)}</h2><p class="muted">Аватар отображается в личном кабинете${user.role === 'client' ? '.' : ' и может использоваться в анкете каталога.'}</p><br><label>Аватар<input id="setPhoto" type="file" accept="image/*"></label></div></div><div class="form-row"><label>Имя<input id="setFirst" value="${esc(user.firstName)}"></label><label>Фамилия<input id="setLast" value="${esc(user.lastName)}"></label></div><div class="form-row"><label>Email<input id="setEmail" type="email" value="${esc(user.email)}"></label><label>Телефон<input id="setPhone" value="${esc(user.phone)}"></label></div><section class="card"><h2>Смена пароля</h2><div class="form-row"><label>Текущий пароль<input id="setCurrentPassword" type="password" autocomplete="current-password"></label><label>Новый пароль<input id="setNewPassword" type="password" autocomplete="new-password"></label></div><label>Повторите новый пароль<input id="setRepeatPassword" type="password" autocomplete="new-password"></label><p class="muted">Оставьте поля пустыми, если не хотите менять пароль.</p></section><button id="saveSettingsBtn">Сохранить</button></section>`);
+      document.getElementById('setPhoto').onchange = event => {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          user.photo = reader.result;
+          document.getElementById('settingsAvatar').innerHTML = `<img src="${reader.result}" alt="">`;
+          persistUserSettings(user, false);
+          showToast('Аватар обновлен');
+        };
+        reader.readAsDataURL(file);
+      };
+      document.getElementById('saveSettingsBtn').onclick = () => {
+        clearFieldErrors(document.getElementById('settingsForm'));
+        user.firstName = document.getElementById('setFirst').value.trim();
+        user.lastName = document.getElementById('setLast').value.trim();
+        user.email = document.getElementById('setEmail').value.trim().toLowerCase();
+        user.phone = document.getElementById('setPhone').value.trim();
+        const currentPassword = document.getElementById('setCurrentPassword').value;
+        const newPassword = document.getElementById('setNewPassword').value;
+        const repeatPassword = document.getElementById('setRepeatPassword').value;
+        if (!user.firstName || !user.lastName || !user.email || !user.phone || !isEmail(user.email)) {
+          [['setFirst', user.firstName], ['setLast', user.lastName], ['setEmail', user.email], ['setPhone', user.phone]].forEach(([id, value]) => {
+            if (!String(value || '').trim()) markInvalid(document.getElementById(id));
+          });
+          if (user.email && !isEmail(user.email)) markInvalid(document.getElementById('setEmail'));
+          return showToast('Проверьте обязательные поля');
+        }
+        const emailBusy = safeUsers().some(u => String(u.id) !== String(user.id) && String(u.email || '').toLowerCase() === user.email);
+        if (emailBusy) {
+          markInvalid(document.getElementById('setEmail'));
+          return showToast('Этот email уже зарегистрирован');
+        }
+        if (currentPassword || newPassword || repeatPassword) {
+          if (currentPassword !== user.password) {
+            markInvalid(document.getElementById('setCurrentPassword'));
+            return showToast('Текущий пароль указан неверно');
+          }
+          if (newPassword.length < 8) {
+            markInvalid(document.getElementById('setNewPassword'));
+            return showToast('Новый пароль должен быть минимум 8 символов');
+          }
+          if (newPassword !== repeatPassword) {
+            markInvalid(document.getElementById('setRepeatPassword'));
+            return showToast('Пароли не совпадают');
+          }
+          if (newPassword.toLowerCase() === 'admin') {
+            markInvalid(document.getElementById('setNewPassword'));
+            return showToast('Используйте другой пароль');
+          }
+          user.password = newPassword;
+        }
+        persistUserSettings(user, true);
+        showToast('Настройки сохранены');
+        render();
+      };
+      document.querySelectorAll('#settingsForm input').forEach(field => {
+        field.oninput = () => field.classList.remove('field-error');
+      });
+    }
+
+    function persistUserSettings(user, syncNames) {
+      setCurrentUser(user);
+      write(DB.users, users().map(u => String(u.id) === String(user.id) ? Object.assign({}, u, user) : u));
+      if (user.role !== 'client') {
+        saveProfiles(profiles().map(profile => {
+          if (String(profile.userId) !== String(user.id)) return profile;
+          const next = Object.assign({}, profile, { photo: user.photo || profile.photo || '' });
+          if (syncNames) {
+            next.firstName = user.firstName;
+            next.lastName = user.lastName;
+          }
+          return next;
+        }));
+      }
+    }
+
+    function openModal(html) {
+      setViewportHeight();
+      document.getElementById('modal').innerHTML = html;
+      document.getElementById('modalOverlay').classList.add('show');
+      document.getElementById('modal').classList.add('show');
+      document.body.classList.add('locked');
+      document.getElementById('modalOverlay').onclick = closeModal;
+      document.getElementById('modal').scrollTop = 0;
+      closeDrawer();
+      resize();
+    }
+    function closeModal() {
+      document.getElementById('modalOverlay').classList.remove('show');
+      document.getElementById('modal').classList.remove('show');
+      document.body.classList.remove('locked');
+      resize();
+    }
+    function doLogout() {
+      localStorage.removeItem(DB.currentUser);
+      localStorage.removeItem('mp_is_logged_in');
+      state.activeConversationId = null;
+      state.viewProfileId = null;
+      showToast('Вы вышли из аккаунта');
+      goToAuthPage();
+    }
+
+    window.addEventListener('load', () => { setViewportHeight(); resize(); });
+    window.addEventListener('resize', () => { setViewportHeight(); resize(); });
+    new ResizeObserver(resize).observe(document.body);
+    applyInitialPage();
+    render();
   </script>
 </body>
 </html>
